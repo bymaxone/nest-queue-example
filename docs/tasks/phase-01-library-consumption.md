@@ -1,6 +1,6 @@
 # Phase 1: library-consumption
 
-> **Status**: 🔄 In Progress · **Progress**: 3 / 4 tasks · **Last updated**: 2026-07-09
+> **Status**: 👀 Review · **Progress**: 3 / 4 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P1)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §8; matrix rows 69, 70
 
@@ -22,12 +22,12 @@ Phase 0 delivered a governed, empty workspace. This phase makes both future apps
 
 ## Task index
 
-| ID  | Task                                                                    | Status  | Priority | Size | Depends on |
-| --- | ----------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | ✅ Done | P0       | S    | Phase 0    |
-| 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe    | ✅ Done | P0       | S    | Phase 0    |
-| 1.3 | Workspace typecheck gate + single-copy peer verification                | ✅ Done | P0       | XS   | 1.1, 1.2   |
-| 1.4 | Phase close: audit, dashboards, PR with Copilot review                  | 📋 ToDo | P0       | S    | 1.3        |
+| ID  | Task                                                                    | Status    | Priority | Size | Depends on |
+| --- | ----------------------------------------------------------------------- | --------- | -------- | ---- | ---------- |
+| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | ✅ Done   | P0       | S    | Phase 0    |
+| 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe    | ✅ Done   | P0       | S    | Phase 0    |
+| 1.3 | Workspace typecheck gate + single-copy peer verification                | ✅ Done   | P0       | XS   | 1.1, 1.2   |
+| 1.4 | Phase close: audit, dashboards, PR with Copilot review                  | 👀 Review | P0       | S    | 1.3        |
 
 ## Tasks
 
@@ -222,7 +222,7 @@ Completion Protocol: standard 5 steps, id 1.3, commit
 
 ### Task 1.4: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 👀 Review
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 1.3
@@ -233,8 +233,8 @@ Audit Phase 1 acceptance criteria, update dashboards, open the phase PR, request
 
 #### Acceptance criteria
 
-- [ ] All 1.1 to 1.3 verifications re-run green.
-- [ ] Dashboards updated (this file, plan §1 P1 row, tasks README).
+- [x] All 1.1 to 1.3 verifications re-run green.
+- [x] Dashboards updated (this file, plan §1 P1 row, tasks README).
 - [ ] PR merged squash with branch deleted after Copilot findings resolved and CI green.
 
 #### Files to create / modify
@@ -285,3 +285,4 @@ commit dashboards on main: `docs(plan): mark P1 complete`.
 - 1.1 ✅ 2026-07-09 apps/api consumes nest-queue via file link with the five peers; dual-subpath probe typechecks
 - 1.2 ✅ 2026-07-09 apps/web consumes the zero-dependency shared subpath only; no server peers declared or resolved
 - 1.3 ✅ 2026-07-09 workspace typecheck green; five peers resolve to a single copy (ioredis pinned to bullmq's exact version via root override); Job re-export compiles (row 70)
+- 1.4 👀 2026-07-09 acceptance audit green; dashboards updated; phase PR opened and GitHub Copilot review requested (merge owned downstream)
