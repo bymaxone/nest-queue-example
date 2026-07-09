@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 🔄 In Progress · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 👀 Review · **Progress**: 4 / 5 tasks (PR open, review requested) · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -23,13 +23,13 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 
 ## Task index
 
-| ID  | Task                                                                           | Status  | Priority | Size | Depends on |
-| --- | ------------------------------------------------------------------------------ | ------- | -------- | ---- | ---------- |
-| 0.1 | Branch + workspace root + base tsconfig + README skeleton                      | ✅ Done | P0       | S    | none       |
-| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged               | ✅ Done | P0       | S    | 0.1        |
-| 0.3 | docker-compose Redis stack + `.env.example`                                    | ✅ Done | P0       | S    | 0.1        |
-| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | ✅ Done | P0       | M    | 0.2        |
-| 0.5 | Phase close: audit, dashboards, PR with Copilot review                         | 📋 ToDo | P0       | S    | 0.1 to 0.4 |
+| ID  | Task                                                                           | Status    | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------------------ | --------- | -------- | ---- | ---------- |
+| 0.1 | Branch + workspace root + base tsconfig + README skeleton                      | ✅ Done   | P0       | S    | none       |
+| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged               | ✅ Done   | P0       | S    | 0.1        |
+| 0.3 | docker-compose Redis stack + `.env.example`                                    | ✅ Done   | P0       | S    | 0.1        |
+| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | ✅ Done   | P0       | M    | 0.2        |
+| 0.5 | Phase close: audit, dashboards, PR with Copilot review                         | 👀 Review | P0       | S    | 0.1 to 0.4 |
 
 ## Tasks
 
@@ -293,7 +293,7 @@ Completion Protocol: same 5 steps, id 0.4, commit
 
 ### Task 0.5: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 👀 Review
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1 to 0.4
@@ -302,12 +302,16 @@ Completion Protocol: same 5 steps, id 0.4, commit
 
 Audit every Phase 0 acceptance criterion against the working tree, update all dashboards, open the phase PR, request the GitHub Copilot code review, address every finding, and merge with CI green.
 
+> **Note:** the implementer's mandate for this run ends at opening the PR and requesting
+> the review. Waiting for CI/review, addressing findings, and merging are handled in a
+> separate follow-up pass.
+
 #### Acceptance criteria
 
-- [ ] Every acceptance criterion of tasks 0.1 to 0.4 re-verified (commands actually run).
-- [ ] Dashboards updated: this file header + index, plan §1 row P0, tasks README index.
-- [ ] PR opened with `gh pr create` (professional English title/body, no attribution), Copilot review requested, all findings addressed.
-- [ ] Merged with `gh pr merge --squash --delete-branch` only after CI green; local branch pruned.
+- [x] Every acceptance criterion of tasks 0.1 to 0.4 re-verified (commands actually run).
+- [x] Dashboards updated: this file header + index, plan §1 row P0, tasks README index.
+- [x] PR opened with `gh pr create` (professional English title/body, no attribution), Copilot review requested.
+- [ ] All findings addressed; merged with `gh pr merge --squash --delete-branch` only after CI green; local branch pruned.
 
 #### Files to create / modify
 
@@ -361,3 +365,4 @@ commit the dashboard updates on main: `docs(plan): mark P0 complete`.
 - 0.2 ✅ 2026-07-09 ESLint flat config, Prettier, husky, commitlint and lint-staged wired
 - 0.3 ✅ 2026-07-09 Redis compose stack (healthcheck verified PONG) and .env.example added
 - 0.4 ✅ 2026-07-09 ci.yml (install/lint/typecheck/build/unit), conditional codeql/scorecard, dependabot added
+- 0.5 👀 2026-07-09 acceptance criteria re-verified, dashboards updated, PR opened and Copilot review requested; merge pending a follow-up pass

@@ -9,19 +9,19 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 
 ## Phase files (folder index)
 
-| Phase | File                                                                                   | Tasks      | Status         |
-| ----- | -------------------------------------------------------------------------------------- | ---------- | -------------- |
-| P0    | [`phase-00-repo-foundation.md`](./phase-00-repo-foundation.md)                         | 4 / 5      | 🔄 In Progress |
-| P1    | [`phase-01-library-consumption.md`](./phase-01-library-consumption.md)                 | 0 / 4      | 📋 ToDo        |
-| P2    | [`phase-02-api-skeleton-wiring.md`](./phase-02-api-skeleton-wiring.md)                 | 0 / 5      | 📋 ToDo        |
-| P3    | [`phase-03-enqueue-surface-admin-api.md`](./phase-03-enqueue-surface-admin-api.md)     | 0 / 6      | 📋 ToDo        |
-| P4    | [`phase-04-workers-events.md`](./phase-04-workers-events.md)                           | 0 / 6      | 📋 ToDo        |
-| P5    | [`phase-05-flows-schedulers-dynamic.md`](./phase-05-flows-schedulers-dynamic.md)       | 0 / 6      | 📋 ToDo        |
-| P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 0 / 5      | 📋 ToDo        |
-| P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 0 / 6      | 📋 ToDo        |
-| P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 0 / 5      | 📋 ToDo        |
-| P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 0 / 5      | 📋 ToDo        |
-|       | **Total**                                                                              | **0 / 53** | 📋 ToDo        |
+| Phase | File                                                                                   | Tasks      | Status    |
+| ----- | -------------------------------------------------------------------------------------- | ---------- | --------- |
+| P0    | [`phase-00-repo-foundation.md`](./phase-00-repo-foundation.md)                         | 4 / 5      | 👀 Review |
+| P1    | [`phase-01-library-consumption.md`](./phase-01-library-consumption.md)                 | 0 / 4      | 📋 ToDo   |
+| P2    | [`phase-02-api-skeleton-wiring.md`](./phase-02-api-skeleton-wiring.md)                 | 0 / 5      | 📋 ToDo   |
+| P3    | [`phase-03-enqueue-surface-admin-api.md`](./phase-03-enqueue-surface-admin-api.md)     | 0 / 6      | 📋 ToDo   |
+| P4    | [`phase-04-workers-events.md`](./phase-04-workers-events.md)                           | 0 / 6      | 📋 ToDo   |
+| P5    | [`phase-05-flows-schedulers-dynamic.md`](./phase-05-flows-schedulers-dynamic.md)       | 0 / 6      | 📋 ToDo   |
+| P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 0 / 5      | 📋 ToDo   |
+| P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 0 / 6      | 📋 ToDo   |
+| P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 0 / 5      | 📋 ToDo   |
+| P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 0 / 5      | 📋 ToDo   |
+|       | **Total**                                                                              | **0 / 53** | 📋 ToDo   |
 
 ## Status legend
 
