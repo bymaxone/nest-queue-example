@@ -10,6 +10,7 @@ import { ConfigModule } from './config/config.module.js'
 import { APP_ENV } from './config/env.js'
 import { buildQueueOptions } from './config/queue.config.js'
 import { AdminModule } from './admin/admin.module.js'
+import { OrdersModule } from './orders/orders.module.js'
 import { ProcessorsModule } from './processors/processors.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
 
@@ -23,6 +24,7 @@ import { SmokeModule } from './smoke/smoke.module.js'
     }),
     ProcessorsModule,
     SmokeModule,
+    OrdersModule,
     AdminModule,
   ],
 })

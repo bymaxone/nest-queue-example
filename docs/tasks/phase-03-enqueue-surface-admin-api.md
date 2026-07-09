@@ -1,6 +1,6 @@
 # Phase 3: enqueue-surface-admin-api
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 6 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P3)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.2, §7.3, §11; matrix rows 12 to 27, 31, 32
 
@@ -23,7 +23,7 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 
 | ID  | Task                                                        | Status  | Priority | Size | Depends on |
 | --- | ----------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 3.1 | Branch + Orderly domain + typed order placement enqueue     | 📋 ToDo | P0       | M    | Phase 2    |
+| 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done | P0       | M    | Phase 2    |
 | 3.2 | Priority, delay, and `jobId` idempotency endpoints          | 📋 ToDo | P0       | S    | 3.1        |
 | 3.3 | Four deduplication modes + dedup inspector                  | 📋 ToDo | P0       | M    | 3.1        |
 | 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | 📋 ToDo | P0       | S    | 3.1        |
@@ -34,7 +34,7 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 
 ### Task 3.1: Branch + Orderly domain + typed order placement enqueue
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 2
@@ -45,11 +45,11 @@ Create the demo domain: `orders/` module with an in-memory `OrdersRepository`, `
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-03-enqueue-surface-admin-api` created with `git switch -c`.
-- [ ] `orders/order-jobs.types.ts`: `ReceiptEmailJobData` (+ result type), documented.
-- [ ] `POST /orders` validates with zod, stores in-memory, enqueues `email`/`send-receipt` typed, returns `{ orderId, jobId }`.
-- [ ] `getOrCreateQueue` per-queue override exercised once (e.g. the `email` queue created with a custom `defaultJobOptions.attempts` override, row 12/24) inside `admin/queues.service.ts`.
-- [ ] Unit tests: repository, service (QueueService mocked), controller validation (invalid payload rejected with the stable envelope shape).
+- [x] Branch `feat/phase-03-enqueue-surface-admin-api` created with `git switch -c`.
+- [x] `orders/order-jobs.types.ts`: `ReceiptEmailJobData` (+ result type), documented.
+- [x] `POST /orders` validates with zod, stores in-memory, enqueues `email`/`send-receipt` typed, returns `{ orderId, jobId }`.
+- [x] `getOrCreateQueue` per-queue override exercised once (e.g. the `email` queue created with a custom `defaultJobOptions.attempts` override, row 12/24) inside `admin/queues.service.ts`.
+- [x] Unit tests: repository, service (QueueService mocked), controller validation (invalid payload rejected with the stable envelope shape).
 
 #### Files to create / modify
 
@@ -397,3 +397,5 @@ main: `docs(plan): mark P3 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 3.1 ✅ 2026-07-09 Orderly domain: bounded in-memory OrdersRepository, POST /orders typed send-receipt enqueue, AdminQueuesService per-queue override + caching, shared zod validation surfacing queue.invalid_job_data.
