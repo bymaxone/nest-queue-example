@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Test and coverage outputs
+coverage/
+.stryker-tmp/
+reports/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor and OS files
+.DS_Store
+.vscode/
+*.local
+
+# pnpm
+.pnpm-debug.log*
+
+# TypeScript incremental compilation cache
+*.tsbuildinfo

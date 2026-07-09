@@ -1,0 +1,14 @@
+{
+  "name": "nest-queue-example",
+  "private": true,
+  "packageManager": "pnpm@10.8.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lint": "pnpm -r --workspace-concurrency=1 run --if-present lint",
+    "typecheck": "pnpm -r --workspace-concurrency=1 run --if-present typecheck",
+    "build": "pnpm -r --workspace-concurrency=1 run --if-present build",
+    "test": "pnpm -r --workspace-concurrency=1 run --if-present test"
+  }
+}

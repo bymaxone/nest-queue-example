@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 🔄 In Progress · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -25,7 +25,7 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 
 | ID | Task | Status | Priority | Size | Depends on |
 |---|---|---|---|---|---|
-| 0.1 | Branch + workspace root + base tsconfig + README skeleton | 📋 ToDo | P0 | S | none |
+| 0.1 | Branch + workspace root + base tsconfig + README skeleton | ✅ Done | P0 | S | none |
 | 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged | 📋 ToDo | P0 | S | 0.1 |
 | 0.3 | docker-compose Redis stack + `.env.example` | 📋 ToDo | P0 | S | 0.1 |
 | 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | 📋 ToDo | P0 | M | 0.2 |
@@ -35,7 +35,7 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 
 ### Task 0.1: Branch + workspace root + base tsconfig + README skeleton
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: none
@@ -46,12 +46,12 @@ Create the phase branch and the pnpm workspace skeleton: private root `package.j
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-00-repo-foundation` created with `git switch -c`.
-- [ ] Root `package.json`: `"private": true`, `"engines": { "node": ">=24" }`, scripts `lint`, `typecheck`, `build`, `test` that fan out via `pnpm -r --workspace-concurrency=1`.
-- [ ] `pnpm-workspace.yaml` lists `apps/*`.
-- [ ] `tsconfig.base.json`: `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2022, NodeNext.
-- [ ] `.npmrc` contains `engine-strict=true`; `.gitignore` covers node_modules, dist, coverage, .env.
-- [ ] README states purpose (reference implementation of `@bymax-one/nest-queue`) and links `docs/TECHNICAL_SPECIFICATION.md`.
+- [x] Branch `feat/phase-00-repo-foundation` created with `git switch -c`.
+- [x] Root `package.json`: `"private": true`, `"engines": { "node": ">=24" }`, scripts `lint`, `typecheck`, `build`, `test` that fan out via `pnpm -r --workspace-concurrency=1`.
+- [x] `pnpm-workspace.yaml` lists `apps/*`.
+- [x] `tsconfig.base.json`: `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2022, NodeNext.
+- [x] `.npmrc` contains `engine-strict=true`; `.gitignore` covers node_modules, dist, coverage, .env.
+- [x] README states purpose (reference implementation of `@bymax-one/nest-queue`) and links `docs/TECHNICAL_SPECIFICATION.md`.
 
 #### Files to create / modify
 
@@ -356,3 +356,4 @@ commit the dashboard updates on main: `docs(plan): mark P0 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+- 0.1 ✅ 2026-07-09 pnpm workspace root, base tsconfig, npmrc, gitignore, README scaffolded
