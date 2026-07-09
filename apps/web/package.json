@@ -1,0 +1,15 @@
+{
+  "name": "@nest-queue-example/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bymax-one/nest-queue": "file:../../../nest-queue"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
