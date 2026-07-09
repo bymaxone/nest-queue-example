@@ -31,3 +31,21 @@ pnpm typecheck
 
 `apps/` is populated starting in the library-consumption phase; a clean checkout of this
 repository at the repo-foundation stage contains only the workspace tooling and CI.
+
+## Local infra
+
+Redis is the only external service this example needs.
+
+```bash
+docker compose up -d
+docker compose exec redis redis-cli ping   # expect: PONG
+```
+
+Copy `.env.example` to `.env` and adjust as needed. Applications load configuration through
+Node's native `--env-file` flag; there is no `dotenv` dependency anywhere in this repository.
+
+```bash
+node --env-file=.env dist/main.js
+```
+
+Tear the stack down with `docker compose down` (add `-v` to also drop the Redis volume).

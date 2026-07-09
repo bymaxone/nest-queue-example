@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 3 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -27,7 +27,7 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 | --- | ------------------------------------------------------------------------------ | ------- | -------- | ---- | ---------- |
 | 0.1 | Branch + workspace root + base tsconfig + README skeleton                      | ✅ Done | P0       | S    | none       |
 | 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged               | ✅ Done | P0       | S    | 0.1        |
-| 0.3 | docker-compose Redis stack + `.env.example`                                    | 📋 ToDo | P0       | S    | 0.1        |
+| 0.3 | docker-compose Redis stack + `.env.example`                                    | ✅ Done | P0       | S    | 0.1        |
 | 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | 📋 ToDo | P0       | M    | 0.2        |
 | 0.5 | Phase close: audit, dashboards, PR with Copilot review                         | 📋 ToDo | P0       | S    | 0.1 to 0.4 |
 
@@ -173,7 +173,7 @@ Completion Protocol: same 5 steps as Task 0.1, with id 0.2 and commit
 
 ### Task 0.3: docker-compose Redis stack + `.env.example`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1
@@ -184,9 +184,9 @@ Provide the only external service the example needs: `redis:7-alpine` with a hea
 
 #### Acceptance criteria
 
-- [ ] `docker-compose.yml`: service `redis` (`redis:7-alpine`), port 6379, `redis-cli ping` healthcheck, named volume.
-- [ ] `docker compose up -d` reaches `healthy`; `docker compose exec redis redis-cli ping` prints PONG.
-- [ ] `.env.example` lists every spec §9 variable with default and one-line comment; README gains a "Local infra" section (`docker compose up -d`, Node `--env-file`).
+- [x] `docker-compose.yml`: service `redis` (`redis:7-alpine`), port 6379, `redis-cli ping` healthcheck, named volume.
+- [x] `docker compose up -d` reaches `healthy`; `docker compose exec redis redis-cli ping` prints PONG.
+- [x] `.env.example` lists every spec §9 variable with default and one-line comment; README gains a "Local infra" section (`docker compose up -d`, Node `--env-file`).
 
 #### Files to create / modify
 
@@ -359,3 +359,4 @@ commit the dashboard updates on main: `docs(plan): mark P0 complete`.
 
 - 0.1 ✅ 2026-07-09 pnpm workspace root, base tsconfig, npmrc, gitignore, README scaffolded
 - 0.2 ✅ 2026-07-09 ESLint flat config, Prettier, husky, commitlint and lint-staged wired
+- 0.3 ✅ 2026-07-09 Redis compose stack (healthcheck verified PONG) and .env.example added
