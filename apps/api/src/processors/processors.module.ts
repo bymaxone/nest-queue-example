@@ -9,12 +9,21 @@ import { AuditTrail } from './audit-trail.service.js'
 import { AuditProcessor } from './audit.processor.js'
 import { EmailProcessor } from './email.processor.js'
 import { MailerStub } from './mailer.stub.js'
+import { ReportProcessor } from './report.processor.js'
 import { WebhookLog } from './webhook-log.service.js'
 import { WebhookProcessor } from './webhook.processor.js'
 
 /** Module holding the queue processors and their inspectable in-memory state. */
 @Module({
-  providers: [AuditTrail, AuditProcessor, MailerStub, EmailProcessor, WebhookLog, WebhookProcessor],
+  providers: [
+    AuditTrail,
+    AuditProcessor,
+    MailerStub,
+    EmailProcessor,
+    WebhookLog,
+    WebhookProcessor,
+    ReportProcessor,
+  ],
   exports: [AuditTrail, MailerStub, WebhookLog],
 })
 export class ProcessorsModule {}

@@ -1,6 +1,6 @@
 # Phase 4: workers-events
 
-> **Status**: 🔄 In progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P4)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4; matrix rows 34 to 46
 
@@ -26,7 +26,7 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 | --- | ------------------------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | ✅ Done | P0       | M    | Phase 3    |
 | 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done | P0       | M    | 4.1        |
-| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | 📋 ToDo | P0       | S    | 4.1        |
+| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | ✅ Done | P0       | S    | 4.1        |
 | 4.4 | Event decorators bridged to the SSE stream                                            | 📋 ToDo | P0       | M    | 4.1        |
 | 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | 📋 ToDo | P1       | S    | 4.2        |
 | 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 📋 ToDo | P0       | S    | 4.2 to 4.5 |
@@ -162,7 +162,7 @@ Completion Protocol: standard 5 steps, id 4.2, commit
 
 ### Task 4.3: Report processor: progress (number + object) + lock tuning; concurrency-warning proof
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 4.1
@@ -173,10 +173,10 @@ Rows 38, 42, 43: a long-running `reports` job emitting `updateProgress(10..100)`
 
 #### Acceptance criteria
 
-- [ ] `ReportProcessor`: `@Processor('reports', { concurrency: 2, lockDuration: 60_000 })`; handler simulates staged work (`setTimeout` steps), calls `updateProgress` with numbers and one object, returns a summary result.
-- [ ] `POST /reports` enqueues a report job.
-- [ ] Unit test proves the library's warning + `DEFAULT_WORKER_CONCURRENCY` fallback fires for the audit processor (spy on the logger or registration path; row 38).
-- [ ] Unit tests for the report handler progress sequence (mock `job.updateProgress`).
+- [x] `ReportProcessor`: `@Processor('reports', { concurrency: 2, lockDuration: 60_000 })`; handler simulates staged work (shared `sleep` steps), calls `updateProgress` with three numbers (25/50/75) and one object (`{ stage: 'render', pct: 90 }`), returns a `{ reportId, durationMs }` summary.
+- [x] `POST /reports` enqueues a report job with a fresh report id.
+- [x] Unit test proves the library's warning + `DEFAULT_WORKER_CONCURRENCY` fallback path for the audit processor via the registration metadata (`_warnedNoConcurrency` set, `workerOptions.concurrency` defaulted), contrasted with an explicitly-configured processor (row 38).
+- [x] Unit tests for the report handler progress sequence (fake timers + mocked `job.updateProgress`) and the raised lock duration.
 
 #### Files to create / modify
 
@@ -407,3 +407,4 @@ main: `docs(plan): mark P4 complete`.
 
 - 4.1 ✅ 2026-07-09 email processor: named `send-welcome`/`send-receipt` dispatch, catch-all to the audit trail, and an at-least-once idempotency marker (result-memoizing `Map` keyed by `job.id`); mailer stub; 100% coverage.
 - 4.2 ✅ 2026-07-09 webhook processor: concurrency 5 + limiter 2/s, deterministic in-process failure injection (`WEBHOOK_FAILURES`) with N-then-success and N+1 attempts recorded in `WebhookLog`; `POST /orders` fan-out; 100% coverage.
+- 4.3 ✅ 2026-07-09 report processor: staged `updateProgress` (25/50/75 then `{ stage: 'render', pct: 90 }`) with a raised `lockDuration`; `POST /reports`; audit missing-concurrency warn-and-fallback proven via registration metadata; shared `sleep`; 100% coverage.

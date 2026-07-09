@@ -12,6 +12,7 @@ import { buildQueueOptions } from './config/queue.config.js'
 import { AdminModule } from './admin/admin.module.js'
 import { OrdersModule } from './orders/orders.module.js'
 import { ProcessorsModule } from './processors/processors.module.js'
+import { ReportsModule } from './reports/reports.module.js'
 import { SearchModule } from './search/search.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
 
@@ -26,6 +27,7 @@ import { SmokeModule } from './smoke/smoke.module.js'
     ProcessorsModule,
     SmokeModule,
     OrdersModule,
+    ReportsModule,
     SearchModule,
     AdminModule,
   ],
