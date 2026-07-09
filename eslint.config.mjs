@@ -88,6 +88,17 @@ export default tseslint.config(
     },
   },
 
+  // NestJS module classes are intentionally empty: the `@Module` decorator holds
+  // every piece of metadata and the class itself is the DI handle the framework
+  // requires. `no-extraneous-class` (from the strict preset) would flag them, so
+  // it is switched off for these framework-mandated shells only.
+  {
+    files: ['**/*.module.ts'],
+    rules: {
+      '@typescript-eslint/no-extraneous-class': 'off',
+    },
+  },
+
   // Relaxed type-unsafe rules for test files (spec and e2e), where mocking
   // and fixture construction routinely cross strict-typing boundaries.
   {

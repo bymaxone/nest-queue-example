@@ -83,6 +83,4 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Run unit tests
-        # --passWithNoTests keeps this job green until the first Jest suite
-        # lands; removed when the first real test is committed.
-        run: pnpm -r --workspace-concurrency=1 run --if-present test -- --passWithNoTests
+        run: pnpm -r --workspace-concurrency=1 run --if-present test
