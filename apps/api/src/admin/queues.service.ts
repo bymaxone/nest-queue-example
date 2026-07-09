@@ -54,7 +54,7 @@ export interface JobView {
   /** Latest reported progress (a number or a structured value). */
   progress: unknown
   /** The handler return value, when completed. */
-  returnvalue: unknown
+  returnValue: unknown
   /** The failure reason, when failed. */
   failedReason: string | undefined
 }
@@ -75,7 +75,7 @@ function toJobView(job: Job<unknown, unknown>): JobView {
     attemptsMade: job.attemptsMade,
     delay: job.delay,
     progress: job.progress,
-    returnvalue: job.returnvalue,
+    returnValue: job.returnvalue,
     failedReason: job.failedReason,
   }
 }

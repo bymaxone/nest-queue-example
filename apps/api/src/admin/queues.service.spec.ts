@@ -158,7 +158,7 @@ describe('AdminQueuesService (unit)', () => {
         attemptsMade: 1,
         delay: 0,
         progress: 50,
-        returnvalue: { messageId: 'm1' },
+        returnValue: { messageId: 'm1' },
         failedReason: undefined,
       },
     ])
