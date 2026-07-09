@@ -33,6 +33,7 @@ export const envSchema = z.object({
   QUEUE_DRAIN_ON_SHUTDOWN: booleanFlag,
   QUEUE_OTEL: booleanFlag,
   WEBHOOK_FAILURES: z.coerce.number().int().min(0).default(2),
+  REMINDER_DELAY_MS: z.coerce.number().int().positive().default(60000),
   // Normalize to the URL origin (scheme + host + port). A configured value with a
   // path or query would pass URL validation yet never match the browser's `Origin`
   // header, silently breaking CORS.
