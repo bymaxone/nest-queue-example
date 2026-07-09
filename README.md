@@ -1,7 +1,8 @@
 # nest-queue-example
 
 Reference implementation of [`@bymax-one/nest-queue`](https://github.com/bymaxone/nest-queue), a
-NestJS 11 wrapper over BullMQ. This repository is a pnpm workspace with two applications:
+NestJS 11 wrapper over BullMQ. This repository is a pnpm workspace that builds out two
+applications across the phased plan; they land in later phases, not at this repo-foundation stage:
 
 - `apps/api`: a NestJS 11 backend that wires the library end to end (module registration,
   producers, workers, flows, schedulers, metrics, error handling) against a real Redis instance.
@@ -43,9 +44,6 @@ docker compose exec redis redis-cli ping   # expect: PONG
 
 Copy `.env.example` to `.env` and adjust as needed. Applications load configuration through
 Node's native `--env-file` flag; there is no `dotenv` dependency anywhere in this repository.
-
-```bash
-node --env-file=.env dist/main.js
-```
+Each application documents its own start command as it lands in a later phase.
 
 Tear the stack down with `docker compose down` (add `-v` to also drop the Redis volume).

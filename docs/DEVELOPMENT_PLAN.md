@@ -11,7 +11,7 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 0 / 10 phases complete (0%) · 0 / 53 tasks
+> **Progress:** 0 / 10 phases complete (0%) · 4 / 53 tasks
 > **Active phase:** P0 repo-foundation (PR open, review requested)
 > **Blockers:** none
 
