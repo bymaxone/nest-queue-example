@@ -22,14 +22,14 @@ The api exposes every library feature; this phase makes them visible. `apps/web`
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 7.1 | Branch + Next.js skeleton + design system + app shell | 📋 ToDo | P0 | M | Phase 5 |
-| 7.2 | Data layer + overview + queue detail | 📋 ToDo | P0 | M | 7.1 |
-| 7.3 | Job detail + live events feed | 📋 ToDo | P0 | M | 7.2 |
-| 7.4 | Playground + flows + schedulers pages | 📋 ToDo | P0 | M | 7.2 |
-| 7.5 | Workers + errors + health pages | 📋 ToDo | P0 | M | 7.2 |
-| 7.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 7.3 to 7.5 |
+| ID  | Task                                                   | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------ | ------- | -------- | ---- | ---------- |
+| 7.1 | Branch + Next.js skeleton + design system + app shell  | 📋 ToDo | P0       | M    | Phase 5    |
+| 7.2 | Data layer + overview + queue detail                   | 📋 ToDo | P0       | M    | 7.1        |
+| 7.3 | Job detail + live events feed                          | 📋 ToDo | P0       | M    | 7.2        |
+| 7.4 | Playground + flows + schedulers pages                  | 📋 ToDo | P0       | M    | 7.2        |
+| 7.5 | Workers + errors + health pages                        | 📋 ToDo | P0       | M    | 7.2        |
+| 7.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0       | S    | 7.3 to 7.5 |
 
 ## Tasks
 
@@ -58,7 +58,7 @@ Turn the `apps/web` package into a Next.js 16 App Router app carrying the design
 
 #### Agent prompt
 
-````
+```
 You are a senior Next.js engineer instantiating a shared design system.
 
 PROJECT: nest-queue-example, Phase 7 Task 7.1 of 6 (FIRST). The design system's source
@@ -93,7 +93,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P7 row, tasks README,
 completion log), commit `feat(web): next skeleton with shared design system shell (7.1)`.
-````
+```
 
 ---
 
@@ -121,7 +121,7 @@ The typed api client (`lib/api.ts`, `lib/api-types.ts` mirroring api DTOs, `lib/
 
 #### Agent prompt
 
-````
+```
 You are a senior Next.js engineer building an observability dashboard data layer.
 
 PROJECT: nest-queue-example, Phase 7 Task 7.2 of 6 (MIDDLE). The api (localhost:3080)
@@ -151,7 +151,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 7.2, commit
 `feat(web): data layer, overview and queue detail (7.2)`.
-````
+```
 
 ---
 
@@ -178,7 +178,7 @@ Completion Protocol: standard 5 steps, id 7.2, commit
 
 #### Agent prompt
 
-````
+```
 You are a senior Next.js engineer visualizing job lifecycles in real time.
 
 PROJECT: nest-queue-example, Phase 7 Task 7.3 of 6 (MIDDLE). /admin/jobs/:queue/:id
@@ -208,7 +208,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 7.3, commit
 `feat(web): job detail with attempts timeline and live events feed (7.3)`.
-````
+```
 
 ---
 
@@ -236,7 +236,7 @@ Completion Protocol: standard 5 steps, id 7.3, commit
 
 #### Agent prompt
 
-````
+```
 You are a senior Next.js engineer building interactive queue laboratories.
 
 PROJECT: nest-queue-example, Phase 7 Task 7.4 of 6 (MIDDLE). Api surfaces:
@@ -266,7 +266,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 7.4, commit
 `feat(web): playground, flows and schedulers pages (7.4)`.
-````
+```
 
 ---
 
@@ -294,7 +294,7 @@ Completion Protocol: standard 5 steps, id 7.4, commit
 
 #### Agent prompt
 
-````
+```
 You are a senior Next.js engineer completing an observability dashboard.
 
 PROJECT: nest-queue-example, Phase 7 Task 7.5 of 6 (MIDDLE). Api surfaces:
@@ -324,7 +324,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 7.5, commit
 `feat(web): workers, errors and health pages (7.5)`.
-````
+```
 
 ---
 
@@ -352,7 +352,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 7 of nest-queue-example.
 
 CURRENT PHASE: 7 (web-dashboard), Task 7.6 of 6 (LAST).
@@ -384,7 +384,7 @@ Verification:
 
 Completion Protocol: append `- 7.6 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P7 complete`.
-````
+```
 
 ---
 

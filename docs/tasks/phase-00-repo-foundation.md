@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -23,13 +23,13 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 0.1 | Branch + workspace root + base tsconfig + README skeleton | ✅ Done | P0 | S | none |
-| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged | 📋 ToDo | P0 | S | 0.1 |
-| 0.3 | docker-compose Redis stack + `.env.example` | 📋 ToDo | P0 | S | 0.1 |
-| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | 📋 ToDo | P0 | M | 0.2 |
-| 0.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 0.1 to 0.4 |
+| ID  | Task                                                                           | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------------------ | ------- | -------- | ---- | ---------- |
+| 0.1 | Branch + workspace root + base tsconfig + README skeleton                      | ✅ Done | P0       | S    | none       |
+| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged               | ✅ Done | P0       | S    | 0.1        |
+| 0.3 | docker-compose Redis stack + `.env.example`                                    | 📋 ToDo | P0       | S    | 0.1        |
+| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | 📋 ToDo | P0       | M    | 0.2        |
+| 0.5 | Phase close: audit, dashboards, PR with Copilot review                         | 📋 ToDo | P0       | S    | 0.1 to 0.4 |
 
 ## Tasks
 
@@ -59,7 +59,7 @@ Create the phase branch and the pnpm workspace skeleton: private root `package.j
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript platform engineer bootstrapping a pnpm workspace.
 
 PROJECT: nest-queue-example, the reference implementation of @bymax-one/nest-queue
@@ -104,13 +104,13 @@ Completion Protocol:
 3. Update the P0 row in docs/DEVELOPMENT_PLAN.md §1 and docs/tasks/README.md.
 4. Append to Completion log: `- 0.1 ✅ <date> <summary>`.
 5. Commit: `chore(repo): scaffold pnpm workspace root (0.1)`.
-````
+```
 
 ---
 
 ### Task 0.2: ESLint flat config + Prettier + husky + commitlint + lint-staged
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1
@@ -121,11 +121,11 @@ Wire the lint/format/commit governance used across the sibling examples: ESLint 
 
 #### Acceptance criteria
 
-- [ ] `eslint.config.mjs` (flat) with typescript-eslint strict and `no-restricted-imports` banning `dotenv`, `moment`, `lodash`.
-- [ ] `prettier` config + `.prettierignore`; `pnpm lint` and `pnpm format:check` green.
-- [ ] `.husky/pre-commit` runs lint-staged; `.husky/commit-msg` runs commitlint; `commitlint.config.cjs` extends `@commitlint/config-conventional`.
-- [ ] `.gitmessage` documents `<type>(<scope>): <subject> (N.M)` with scopes `api, web, repo, ci, docs`.
-- [ ] A deliberately bad commit message is rejected locally (verified once, then amended).
+- [x] `eslint.config.mjs` (flat) with typescript-eslint strict and `no-restricted-imports` banning `dotenv`, `moment`, `lodash`.
+- [x] `prettier` config + `.prettierignore`; `pnpm lint` and `pnpm format:check` green.
+- [x] `.husky/pre-commit` runs lint-staged; `.husky/commit-msg` runs commitlint; `commitlint.config.cjs` extends `@commitlint/config-conventional`.
+- [x] `.gitmessage` documents `<type>(<scope>): <subject> (N.M)` with scopes `api, web, repo, ci, docs`.
+- [x] A deliberately bad commit message is rejected locally (verified once, then amended).
 
 #### Files to create / modify
 
@@ -133,7 +133,7 @@ Wire the lint/format/commit governance used across the sibling examples: ESLint 
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript tooling engineer wiring repository governance.
 
 PROJECT: nest-queue-example (pnpm workspace, empty of apps). Governance mirrors the
@@ -167,7 +167,7 @@ Verification:
 
 Completion Protocol: same 5 steps as Task 0.1, with id 0.2 and commit
 `chore(repo): add lint, format and commit governance (0.2)`.
-````
+```
 
 ---
 
@@ -194,7 +194,7 @@ Provide the only external service the example needs: `redis:7-alpine` with a hea
 
 #### Agent prompt
 
-````
+```
 You are a senior platform engineer adding local infrastructure.
 
 PROJECT: nest-queue-example. The api (later phases) runs BullMQ against a real Redis;
@@ -225,7 +225,7 @@ Verification:
 
 Completion Protocol: same 5 steps, id 0.3, commit
 `chore(repo): add redis compose stack and env example (0.3)`.
-````
+```
 
 ---
 
@@ -253,7 +253,7 @@ CI from day one: `ci.yml` runs install, lint, typecheck, build, and unit (with `
 
 #### Agent prompt
 
-````
+```
 You are a senior CI engineer creating the pipeline that gates every future PR.
 
 PROJECT: nest-queue-example (pnpm workspace; apps arrive later). The repository is
@@ -287,7 +287,7 @@ Verification:
 
 Completion Protocol: same 5 steps, id 0.4, commit
 `ci(repo): add ci pipeline and conditional public-only workflows (0.4)`.
-````
+```
 
 ---
 
@@ -315,7 +315,7 @@ Dashboards only (this file, `../DEVELOPMENT_PLAN.md`, `README.md` index)
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 0 of nest-queue-example.
 
 CURRENT PHASE: 0 (repo-foundation), Task 0.5 of 5 (LAST).
@@ -349,11 +349,13 @@ Verification:
 
 Completion Protocol: append `- 0.5 ✅ <date> phase PR merged` to the Completion log and
 commit the dashboard updates on main: `docs(plan): mark P0 complete`.
-````
+```
 
 ---
 
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
 - 0.1 ✅ 2026-07-09 pnpm workspace root, base tsconfig, npmrc, gitignore, README scaffolded
+- 0.2 ✅ 2026-07-09 ESLint flat config, Prettier, husky, commitlint and lint-staged wired

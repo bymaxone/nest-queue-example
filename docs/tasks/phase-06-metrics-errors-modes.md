@@ -22,13 +22,13 @@ Every feature area now works on the default configuration. This phase completes 
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 6.1 | Branch + `MetricsService` surface + readiness composition | 📋 ToDo | P0 | S | Phase 5 |
-| 6.2 | Error explorer: the full reproducible catalog | 📋 ToDo | P0 | M | Phase 5 |
-| 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | 📋 ToDo | P0 | M | Phase 5 |
-| 6.4 | Optional telemetry (`bullmq-otel`) behind `QUEUE_OTEL` | 📋 ToDo | P1 | S | 6.3 |
-| 6.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 6.2 to 6.4 |
+| ID  | Task                                                                   | Status  | Priority | Size | Depends on |
+| --- | ---------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 6.1 | Branch + `MetricsService` surface + readiness composition              | 📋 ToDo | P0       | S    | Phase 5    |
+| 6.2 | Error explorer: the full reproducible catalog                          | 📋 ToDo | P0       | M    | Phase 5    |
+| 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | 📋 ToDo | P0       | M    | Phase 5    |
+| 6.4 | Optional telemetry (`bullmq-otel`) behind `QUEUE_OTEL`                 | 📋 ToDo | P1       | S    | 6.3        |
+| 6.5 | Phase close: audit, dashboards, PR with Copilot review                 | 📋 ToDo | P0       | S    | 6.2 to 6.4 |
 
 ## Tasks
 
@@ -57,7 +57,7 @@ Rows 28 to 30, 33: expose the cached metrics surface (`get`, `getAll`, `invalida
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer exposing cached queue metrics.
 
 PROJECT: nest-queue-example, Phase 6 Task 6.1 of 5 (FIRST). MetricsService (enabled,
@@ -85,7 +85,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P6 row, tasks README,
 completion log), commit `feat(api): cached metrics surface and readiness composition (6.1)`.
-````
+```
 
 ---
 
@@ -113,7 +113,7 @@ Rows 66, 67: `POST /errors/trigger/:code` provokes every catalog code reproducib
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer building a living error catalog.
 
 PROJECT: nest-queue-example, Phase 6 Task 6.2 of 5 (MIDDLE). QueueException produces
@@ -149,7 +149,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 6.2, commit
 `feat(api): error explorer covering the reproducible catalog (6.2)`.
-````
+```
 
 ---
 
@@ -178,7 +178,7 @@ Rows 7, 8, 9: complete the `buildQueueOptions` union. `QUEUE_CONNECTION_MODE=sha
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer completing the connection-mode matrix.
 
 PROJECT: nest-queue-example, Phase 6 Task 6.3 of 5 (MIDDLE). Mode A: the app provides
@@ -217,7 +217,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 6.3, commit
 `feat(api): connection mode matrix with retry-policy diagnostics (6.3)`.
-````
+```
 
 ---
 
@@ -245,7 +245,7 @@ Row 68: when `QUEUE_OTEL=true`, the options factory attaches a lazily imported `
 
 #### Agent prompt
 
-````
+```
 You are a senior Node.js observability engineer wiring optional OpenTelemetry.
 
 PROJECT: nest-queue-example, Phase 6 Task 6.4 of 5 (MIDDLE). The library accepts a
@@ -281,7 +281,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 6.4, commit
 `feat(api): optional bullmq-otel telemetry behind env flag (6.4)`.
-````
+```
 
 ---
 
@@ -308,7 +308,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 6 of nest-queue-example.
 
 CURRENT PHASE: 6 (metrics-errors-modes), Task 6.5 of 5 (LAST).
@@ -338,7 +338,7 @@ Verification:
 
 Completion Protocol: append `- 6.5 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P6 complete`.
-````
+```
 
 ---
 
