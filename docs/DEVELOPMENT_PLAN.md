@@ -11,22 +11,22 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 1 / 10 phases complete (10%) · 5 / 53 tasks
+> **Progress:** 1 / 10 phases complete (10%) · 6 / 53 tasks
 > **Active phase:** P1 library-consumption
 > **Blockers:** none
 
-| ID  | Phase                       | Status  | Progress  | Size | Last updated |
-| --- | --------------------------- | ------- | --------- | ---- | ------------ |
-| P0  | repo-foundation             | ✅ Done | 5/5 tasks | M    | 2026-07-09   |
-| P1  | library-consumption         | 📋 ToDo | 0/4 tasks | S    | 2026-07-06   |
-| P2  | api-skeleton-wiring         | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
-| P3  | enqueue-surface-admin-api   | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P4  | workers-events              | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P5  | flows-schedulers-dynamic    | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P6  | metrics-errors-modes        | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
-| P7  | web-dashboard               | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P8  | testing                     | 📋 ToDo | 0/5 tasks | L    | 2026-07-06   |
-| P9  | hardening-release-readiness | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
+| ID  | Phase                       | Status         | Progress  | Size | Last updated |
+| --- | --------------------------- | -------------- | --------- | ---- | ------------ |
+| P0  | repo-foundation             | ✅ Done        | 5/5 tasks | M    | 2026-07-09   |
+| P1  | library-consumption         | 🔄 In Progress | 1/4 tasks | S    | 2026-07-09   |
+| P2  | api-skeleton-wiring         | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
+| P3  | enqueue-surface-admin-api   | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P4  | workers-events              | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P5  | flows-schedulers-dynamic    | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P6  | metrics-errors-modes        | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
+| P7  | web-dashboard               | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P8  | testing                     | 📋 ToDo        | 0/5 tasks | L    | 2026-07-06   |
+| P9  | hardening-release-readiness | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
 
 ### External prerequisite (not a phase of this plan)
 

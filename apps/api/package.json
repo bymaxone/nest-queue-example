@@ -1,0 +1,20 @@
+{
+  "name": "@nest-queue-example/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bymax-one/nest-queue": "file:../../../nest-queue",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "bullmq": "^5.16.0",
+    "ioredis": "^5.0.0",
+    "reflect-metadata": "^0.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

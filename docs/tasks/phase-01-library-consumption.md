@@ -1,6 +1,6 @@
 # Phase 1: library-consumption
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 4 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 4 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P1)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §8; matrix rows 69, 70
 
@@ -24,7 +24,7 @@ Phase 0 delivered a governed, empty workspace. This phase makes both future apps
 
 | ID  | Task                                                                    | Status  | Priority | Size | Depends on |
 | --- | ----------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | 📋 ToDo | P0       | S    | Phase 0    |
+| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | ✅ Done | P0       | S    | Phase 0    |
 | 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe    | 📋 ToDo | P0       | S    | Phase 0    |
 | 1.3 | Workspace typecheck gate + single-copy peer verification                | 📋 ToDo | P0       | XS   | 1.1, 1.2   |
 | 1.4 | Phase close: audit, dashboards, PR with Copilot review                  | 📋 ToDo | P0       | S    | 1.3        |
@@ -33,7 +33,7 @@ Phase 0 delivered a governed, empty workspace. This phase makes both future apps
 
 ### Task 1.1: Branch + `apps/api` package + library link + peers + dual-subpath probe
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: Phase 0
@@ -44,10 +44,10 @@ Create `apps/api` as a workspace package (no Nest code yet) that consumes the li
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-01-library-consumption` created with `git switch -c`.
-- [ ] `apps/api/package.json` declares `"@bymax-one/nest-queue": "file:../../../nest-queue"` and the five peers under `dependencies` (a note records the published end-state `^0.1.0`).
-- [ ] `apps/api/src/library-probe.ts` imports `BymaxQueueModule`, `QueueService` from `.` and `QUEUE_ERROR_CODES`, `JOB_STATUS`, type `QueueMetrics` from `./shared`, referencing each symbol.
-- [ ] `pnpm --filter api exec tsc --noEmit` exits 0 (own `tsconfig.json` extending the base).
+- [x] Branch `feat/phase-01-library-consumption` created with `git switch -c`.
+- [x] `apps/api/package.json` declares `"@bymax-one/nest-queue": "file:../../../nest-queue"` and the five peers under `dependencies` (a note records the published end-state `^0.1.0`).
+- [x] `apps/api/src/library-probe.ts` imports `BymaxQueueModule`, `QueueService` from `.` and `QUEUE_ERROR_CODES`, `JOB_STATUS`, type `QueueMetrics` from `./shared`, referencing each symbol.
+- [x] `pnpm --filter api exec tsc --noEmit` exits 0 (own `tsconfig.json` extending the base).
 
 #### Files to create / modify
 
@@ -281,3 +281,5 @@ commit dashboards on main: `docs(plan): mark P1 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 1.1 ✅ 2026-07-09 apps/api consumes nest-queue via file link with the five peers; dual-subpath probe typechecks
