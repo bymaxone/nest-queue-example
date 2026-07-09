@@ -3,7 +3,7 @@
  *
  * Layer: unit.
  * Goal: every field of the canonical wiring maps from the parsed environment.
- * Mocks: none — the factory is pure; the env is produced by parseEnv on a literal.
+ * Mocks: none - the factory is pure; the env is produced by parseEnv on a literal.
  */
 import { parseEnv } from './env.js'
 import { buildQueueOptions } from './queue.config.js'

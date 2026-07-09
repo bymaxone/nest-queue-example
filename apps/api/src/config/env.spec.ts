@@ -4,7 +4,7 @@
  * Layer: unit.
  * Goal: defaults, numeric coercion, boolean-flag semantics, freezing, and the
  * fail-fast path with a variable-naming message.
- * Mocks: none — parseEnv is called with explicit source records, never the real
+ * Mocks: none - parseEnv is called with explicit source records, never the real
  * process environment.
  */
 import { APP_ENV, appEnvProvider, parseEnv } from './env.js'
@@ -84,7 +84,7 @@ describe('appEnvProvider (unit)', () => {
     /*
      * Scenario: DI registration of the environment.
      * Rule it protects: the provider is bound to the APP_ENV token and its factory
-     * parses the process environment once into a frozen AppEnv — the single value
+     * parses the process environment once into a frozen AppEnv - the single value
      * every other provider injects.
      */
     expect(appEnvProvider.provide).toBe(APP_ENV)
