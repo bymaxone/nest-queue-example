@@ -4,6 +4,8 @@
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
+> **Known blocker (runtime boot):** all consumer code is complete, statically green, and unit-tested at 100%, but the app cannot boot against the current built library. The `@bymax-one/nest-queue` dist is bundled with tsup/esbuild, which strips `emitDecoratorMetadata`; several of the library's own providers (`QueueService`, `WorkerRegistry`, `QueueEventsRegistry`, `QueueLifecycle`, and the non-exported `ProcessorDiscoveryService`) rely on class-reflection metadata for constructor params that are not `@Inject`-decorated, so `BymaxQueueModule` fails DI resolution. Reproduce with `BymaxQueueModule.forRoot({ connection: { url } })` alone. No consumer-side fix is possible (the affected `ProcessorDiscoveryService` is not exported). Upstream fix: decorate those params with `@Inject(...)` or build the library with a metadata-preserving compiler (e.g. `tsc`). The boot + smoke DoD unblocks the moment the library ships decorator metadata; the wiring in this phase is correct as-is.
+
 ## Context
 
 Phases 0 and 1 delivered governance and package resolution. This phase turns `apps/api` into a booting NestJS 11 application with `BymaxQueueModule` wired through `forRootAsync`, one smoke queue proving the enqueue-to-process loop, health endpoints, and a real Jest unit setup (removing CI's `--passWithNoTests`).
@@ -285,7 +287,7 @@ Completion Protocol: standard 5 steps, id 2.4, commit
 
 ### Task 2.5: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 🔄 In Progress
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 2.4
@@ -296,9 +298,9 @@ Standard phase close: re-verify 2.1 to 2.4, update dashboards, open the PR, Copi
 
 #### Acceptance criteria
 
-- [ ] All 2.1 to 2.4 verifications re-run green (boot journey included).
-- [ ] Dashboards updated (this file, plan §1 P2 row, tasks README).
-- [ ] PR merged squash, branch deleted, CI green, Copilot findings resolved.
+- [x] All 2.1 to 2.4 static verifications re-run green (lint, typecheck, build, api unit at 100%). Boot journey blocked upstream (see the phase-level known blocker).
+- [x] Dashboards updated (this file, plan §1 P2 row, tasks README).
+- [ ] PR merged squash, branch deleted, CI green, Copilot findings resolved. (Owned by the orchestrator; this agent stops after opening the PR and requesting review.)
 
 #### Files to create / modify
 
@@ -349,3 +351,4 @@ main: `docs(plan): mark P2 complete`.
 - 2.2 🟡 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot blocked upstream (library dist omits decorator metadata).
 - 2.3 🟡 2026-07-09 Audit `@Processor` (no-concurrency fallback proof), in-memory trail, and smoke enqueue/inspect controller (proves `isGlobal`); 100% coverage. Live curl journey blocked upstream.
 - 2.4 🟡 2026-07-09 `/health/live` + `/health/ready` (timeout-bounded, secret-safe 503) and `/admin/diagnostics` (token probe, no credential echo); CI unit job now runs the real suite; 100% coverage. Live boot verification blocked upstream.
+- 2.5 🔄 2026-07-09 Phase-close audit + dashboards; PR opened and Copilot review requested. Merge/branch-deletion owned by the orchestrator. Boot DoD blocked upstream (library dist omits decorator metadata).
