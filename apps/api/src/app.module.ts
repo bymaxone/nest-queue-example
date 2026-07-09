@@ -1,13 +1,27 @@
 /**
  * @fileoverview Root application module. Composes the global configuration and
- * wires the queue library through `forRootAsync`.
+ * wires the queue library through `forRootAsync`, injecting the parsed
+ * environment into the pure options factory.
  * @layer app/root
  */
 import { Module } from '@nestjs/common'
+import { BymaxQueueModule } from '@bymax-one/nest-queue'
 import { ConfigModule } from './config/config.module.js'
+import { APP_ENV } from './config/env.js'
+import { buildQueueOptions } from './config/queue.config.js'
+import { ProcessorsModule } from './processors/processors.module.js'
+import { SmokeModule } from './smoke/smoke.module.js'
 
-/** Root module wiring configuration and feature modules. */
+/** Root module wiring configuration and the globally-registered queue library. */
 @Module({
-  imports: [ConfigModule],
+  imports: [
+    ConfigModule,
+    BymaxQueueModule.forRootAsync({
+      inject: [APP_ENV],
+      useFactory: buildQueueOptions,
+    }),
+    ProcessorsModule,
+    SmokeModule,
+  ],
 })
 export class AppModule {}

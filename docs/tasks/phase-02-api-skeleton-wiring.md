@@ -1,6 +1,6 @@
 # Phase 2: api-skeleton-wiring
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
@@ -22,13 +22,13 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 
 ## Task index
 
-| ID  | Task                                                             | Status  | Priority | Size | Depends on |
-| --- | ---------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done | P0       | M    | Phase 1    |
-| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 📋 ToDo | P0       | M    | 2.1        |
-| 2.3 | Audit processor + smoke enqueue endpoint                         | 📋 ToDo | P0       | S    | 2.2        |
-| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 📋 ToDo | P0       | S    | 2.3        |
-| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo | P0       | S    | 2.4        |
+| ID  | Task                                                             | Status     | Priority | Size | Depends on |
+| --- | ---------------------------------------------------------------- | ---------- | -------- | ---- | ---------- |
+| 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done    | P0       | M    | Phase 1    |
+| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 🟡 Partial | P0       | M    | 2.1        |
+| 2.3 | Audit processor + smoke enqueue endpoint                         | 📋 ToDo    | P0       | S    | 2.2        |
+| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 📋 ToDo    | P0       | S    | 2.3        |
+| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo    | P0       | S    | 2.4        |
 
 ## Tasks
 
@@ -97,7 +97,7 @@ completion log), commit `feat(api): nest skeleton with typed env parsing (2.1)`.
 
 ### Task 2.2: `buildQueueOptions` factory + `forRootAsync` wiring + unit tests
 
-- **Status**: 📋 ToDo
+- **Status**: 🟡 Partial
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 2.1
@@ -108,10 +108,10 @@ Implement spec §9.1: the pure `buildQueueOptions(env)` factory (Mode B url, pre
 
 #### Acceptance criteria
 
-- [ ] `src/config/queue.config.ts` exports pure `buildQueueOptions(env: AppEnv): BymaxQueueModuleOptions` per spec §9.1 (Mode A/options-style branches arrive in Phase 6; leave documented TODO-free seams, the union just falls through to url).
-- [ ] `AppModule` wires `BymaxQueueModule.forRootAsync({ inject: [APP_ENV], useFactory: buildQueueOptions })`.
-- [ ] Jest unit config (`jest.config.ts`, `maxWorkers: '50%'`) + tests covering: url connection shape, prefix propagation, defaultJobOptions override, flows/metrics enabled, shutdown values from env.
-- [ ] App boots against compose Redis: `pnpm --filter api start:dev` logs a ready state.
+- [x] `src/config/queue.config.ts` exports pure `buildQueueOptions(env: AppEnv): BymaxQueueModuleOptions` per spec §9.1 (Mode A/options-style branches arrive in Phase 6; leave documented TODO-free seams, the union just falls through to url).
+- [x] `AppModule` wires `BymaxQueueModule.forRootAsync({ inject: [APP_ENV], useFactory: buildQueueOptions })`.
+- [x] Jest unit config (`jest.config.cjs`, `maxWorkers: '50%'`) + tests covering: url connection shape, prefix propagation, defaultJobOptions override, flows/metrics enabled, shutdown values from env. (Config uses `.cjs`, not `.ts`: Jest 30 cannot load a TS config without `ts-node`; this matches the sibling-example convention.)
+- [ ] App boots against compose Redis: `pnpm --filter api start:dev` logs a ready state. **BLOCKED upstream** — the built `@bymax-one/nest-queue` package cannot be DI-instantiated: its tsup/esbuild bundle omits `design:paramtypes`, and `QueueService` (plus `WorkerRegistry`, `QueueEventsRegistry`, `QueueLifecycle`, `ProcessorDiscoveryService`) rely on class reflection for constructor params that are not `@Inject`-decorated. The wiring here is correct and boots once the library ships decorator metadata.
 
 #### Files to create / modify
 
@@ -346,3 +346,4 @@ main: `docs(plan): mark P2 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 2.1 ✅ 2026-07-09 NestJS 11 skeleton (main.ts, AppModule) + typed env parsing (zod, frozen APP_ENV token, fail-fast on bad env).
+- 2.2 🟡 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot blocked upstream (library dist omits decorator metadata).

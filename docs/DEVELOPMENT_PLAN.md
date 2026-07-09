@@ -11,7 +11,7 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 2 / 10 phases complete (20%) · 10 / 53 tasks
+> **Progress:** 2 / 10 phases complete (20%) · 11 / 53 tasks
 > **Active phase:** P2 api-skeleton-wiring
 > **Blockers:** none
 
@@ -19,7 +19,7 @@
 | --- | --------------------------- | -------------- | --------- | ---- | ------------ |
 | P0  | repo-foundation             | ✅ Done        | 5/5 tasks | M    | 2026-07-09   |
 | P1  | library-consumption         | ✅ Done        | 4/4 tasks | S    | 2026-07-09   |
-| P2  | api-skeleton-wiring         | 🔄 In Progress | 1/5 tasks | M    | 2026-07-09   |
+| P2  | api-skeleton-wiring         | 🔄 In Progress | 2/5 tasks | M    | 2026-07-09   |
 | P3  | enqueue-surface-admin-api   | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
 | P4  | workers-events              | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
 | P5  | flows-schedulers-dynamic    | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |

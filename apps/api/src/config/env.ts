@@ -6,7 +6,7 @@
  * @layer app/config
  */
 import { z } from 'zod'
-import type { Provider } from '@nestjs/common'
+import type { FactoryProvider } from '@nestjs/common'
 
 /**
  * Parses a boolean-ish environment string without `z.coerce.boolean`, whose
@@ -55,7 +55,7 @@ export const APP_ENV: unique symbol = Symbol('APP_ENV')
  * @throws {Error} When any variable fails validation; the message names each
  *   invalid variable and never echoes a secret value.
  */
-export function parseEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
+export function parseEnv(source: Record<string, unknown> = process.env): AppEnv {
   const parsed = envSchema.safeParse(source)
   if (!parsed.success) {
     throw new Error(`Invalid environment:\n${z.prettifyError(parsed.error)}`)
@@ -64,7 +64,7 @@ export function parseEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
 }
 
 /** Provider that parses the environment once and exposes it under {@link APP_ENV}. */
-export const appEnvProvider: Provider = {
+export const appEnvProvider: FactoryProvider = {
   provide: APP_ENV,
   useFactory: (): AppEnv => parseEnv(),
 }
