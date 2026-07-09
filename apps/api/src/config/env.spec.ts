@@ -42,6 +42,14 @@ describe('parseEnv (unit)', () => {
     expect(env.WEBHOOK_FAILURES).toBe(0)
   })
 
+  it('normalizes WEB_ORIGIN to its origin, dropping any path or query', () => {
+    // A configured value with a path/query passes URL validation but would never
+    // match the browser Origin header; collapsing to the origin keeps CORS working.
+    expect(parseEnv({ WEB_ORIGIN: 'https://app.example.com/dashboard?x=1' }).WEB_ORIGIN).toBe(
+      'https://app.example.com',
+    )
+  })
+
   it.each([
     ['true', true],
     ['1', true],
