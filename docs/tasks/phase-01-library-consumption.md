@@ -22,12 +22,12 @@ Phase 0 delivered a governed, empty workspace. This phase makes both future apps
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | 📋 ToDo | P0 | S | Phase 0 |
-| 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe | 📋 ToDo | P0 | S | Phase 0 |
-| 1.3 | Workspace typecheck gate + single-copy peer verification | 📋 ToDo | P0 | XS | 1.1, 1.2 |
-| 1.4 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 1.3 |
+| ID  | Task                                                                    | Status  | Priority | Size | Depends on |
+| --- | ----------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | 📋 ToDo | P0       | S    | Phase 0    |
+| 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe    | 📋 ToDo | P0       | S    | Phase 0    |
+| 1.3 | Workspace typecheck gate + single-copy peer verification                | 📋 ToDo | P0       | XS   | 1.1, 1.2   |
+| 1.4 | Phase close: audit, dashboards, PR with Copilot review                  | 📋 ToDo | P0       | S    | 1.3        |
 
 ## Tasks
 
@@ -55,7 +55,7 @@ Create `apps/api` as a workspace package (no Nest code yet) that consumes the li
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript engineer wiring an app to consume an unpublished library.
 
 PROJECT: nest-queue-example. The library @bymax-one/nest-queue lives as a sibling
@@ -97,7 +97,7 @@ Completion Protocol:
 1. Status ✅ in this file (block + index) + header progress. 2. Tick checkboxes.
 3. Update plan §1 P1 row + tasks README. 4. Append completion-log line.
 5. Commit: `feat(api): consume nest-queue via file link with dual-subpath probe (1.1)`.
-````
+```
 
 ---
 
@@ -124,7 +124,7 @@ Create `apps/web` as a workspace package (no Next.js yet) consuming the library 
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript engineer proving a zero-dependency browser path.
 
 PROJECT: nest-queue-example. @bymax-one/nest-queue exposes `./shared` with zero
@@ -161,7 +161,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 1.2, commit
 `feat(web): consume nest-queue shared subpath with zero-dep probe (1.2)`.
-````
+```
 
 ---
 
@@ -188,7 +188,7 @@ Close the resolution proof: workspace-wide `pnpm typecheck` green, peers resolvi
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript engineer closing a package-resolution gate.
 
 PROJECT: nest-queue-example, Phase 1 Task 1.3 of 4 (MIDDLE). Tasks 1.1/1.2 wired both
@@ -216,7 +216,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 1.3, commit
 `test(repo): close dual-subpath resolution gate (1.3)`.
-````
+```
 
 ---
 
@@ -243,7 +243,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 1 of nest-queue-example.
 
 CURRENT PHASE: 1 (library-consumption), Task 1.4 of 4 (LAST).
@@ -274,7 +274,7 @@ Verification:
 
 Completion Protocol: append `- 1.4 ✅ <date> phase PR merged` to the Completion log;
 commit dashboards on main: `docs(plan): mark P1 complete`.
-````
+```
 
 ---
 

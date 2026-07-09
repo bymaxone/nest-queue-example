@@ -1,0 +1,18 @@
+# <type>(<scope>): <subject>
+#
+# To use this template automatically: git config commit.template .gitmessage
+#
+# Types: feat | fix | chore | docs | refactor | test | ci | perf | style | revert | build
+#
+# Scopes for this repository:
+#   repo   - root configuration, tooling, governance
+#   ci     - GitHub Actions workflows and repository automation
+#   docs   - documentation files
+#   api    - NestJS backend application
+#   web    - Next.js frontend application
+#
+# Rules:
+#   - Subject line: imperative mood, lowercase, no trailing period, <=72 chars
+#   - Body: wrap at 100 chars; explain WHY, not WHAT
+#   - No Co-Authored-By or AI-attribution lines
+#

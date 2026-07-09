@@ -23,13 +23,13 @@ Every feature exists with per-task unit tests. This phase raises the floor to th
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 8.1 | Branch + api unit coverage to 100% with hard thresholds | 📋 ToDo | P0 | L | Phase 7 |
-| 8.2 | Web unit coverage to 100% with hard thresholds | 📋 ToDo | P0 | M | Phase 7 |
-| 8.3 | E2E suite: every scenario + registration/connection/shutdown specs | 📋 ToDo | P0 | L | 8.1 |
-| 8.4 | CI: e2e job with Redis service container + coverage gates | 📋 ToDo | P0 | S | 8.3 |
-| 8.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 8.2, 8.4 |
+| ID  | Task                                                               | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ---------- |
+| 8.1 | Branch + api unit coverage to 100% with hard thresholds            | 📋 ToDo | P0       | L    | Phase 7    |
+| 8.2 | Web unit coverage to 100% with hard thresholds                     | 📋 ToDo | P0       | M    | Phase 7    |
+| 8.3 | E2E suite: every scenario + registration/connection/shutdown specs | 📋 ToDo | P0       | L    | 8.1        |
+| 8.4 | CI: e2e job with Redis service container + coverage gates          | 📋 ToDo | P0       | S    | 8.3        |
+| 8.5 | Phase close: audit, dashboards, PR with Copilot review             | 📋 ToDo | P0       | S    | 8.2, 8.4   |
 
 ## Tasks
 
@@ -57,7 +57,7 @@ Close every unit gap in `apps/api` (config factory branches, services, processor
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript test engineer driving a NestJS app to 100% coverage.
 
 PROJECT: nest-queue-example, Phase 8 Task 8.1 of 5 (FIRST). All features exist with
@@ -88,7 +88,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P8 row, tasks README,
 completion log), commit `test(api): reach 100 percent unit coverage with hard gates (8.1)`.
-````
+```
 
 ---
 
@@ -115,7 +115,7 @@ Same standard for `apps/web`: components (cards, badges, timeline, tree, pickers
 
 #### Agent prompt
 
-````
+```
 You are a senior React test engineer driving a Next.js dashboard to 100% coverage.
 
 PROJECT: nest-queue-example, Phase 8 Task 8.2 of 5 (MIDDLE). React Testing Library +
@@ -141,7 +141,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 8.2, commit
 `test(web): reach 100 percent unit coverage with hard gates (8.2)`.
-````
+```
 
 ---
 
@@ -168,7 +168,7 @@ The e2e suite (`apps/api/test/`, own `jest.e2e.config.ts`) against real Redis co
 
 #### Agent prompt
 
-````
+```
 You are a senior test engineer writing end-to-end queue behavior specs.
 
 PROJECT: nest-queue-example, Phase 8 Task 8.3 of 5 (MIDDLE). Real Redis via docker
@@ -203,7 +203,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 8.3, commit
 `test(api): e2e suite covering every documented scenario (8.3)`.
-````
+```
 
 ---
 
@@ -231,7 +231,7 @@ Extend `ci.yml`: the `unit` job now enforces both apps' 100% thresholds; a new `
 
 #### Agent prompt
 
-````
+```
 You are a senior CI engineer adding an e2e stage with a service container.
 
 PROJECT: nest-queue-example, Phase 8 Task 8.4 of 5 (MIDDLE). ci.yml has install ->
@@ -259,7 +259,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 8.4, commit
 `ci(repo): enforce coverage gates and add e2e stage (8.4)`.
-````
+```
 
 ---
 
@@ -286,7 +286,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 8 of nest-queue-example.
 
 CURRENT PHASE: 8 (testing), Task 8.5 of 5 (LAST).
@@ -316,7 +316,7 @@ Verification:
 
 Completion Protocol: append `- 8.5 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P8 complete`.
-````
+```
 
 ---
 

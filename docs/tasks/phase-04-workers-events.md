@@ -22,14 +22,14 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker | 📋 ToDo | P0 | M | Phase 3 |
-| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff | 📋 ToDo | P0 | M | 4.1 |
-| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | 📋 ToDo | P0 | S | 4.1 |
-| 4.4 | Event decorators bridged to the SSE stream | 📋 ToDo | P0 | M | 4.1 |
-| 4.5 | Stalled-recovery demo + graceful-shutdown demo script | 📋 ToDo | P1 | S | 4.2 |
-| 4.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 4.2 to 4.5 |
+| ID  | Task                                                                                  | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | 📋 ToDo | P0       | M    | Phase 3    |
+| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | 📋 ToDo | P0       | M    | 4.1        |
+| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | 📋 ToDo | P0       | S    | 4.1        |
+| 4.4 | Event decorators bridged to the SSE stream                                            | 📋 ToDo | P0       | M    | 4.1        |
+| 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | 📋 ToDo | P1       | S    | 4.2        |
+| 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 📋 ToDo | P0       | S    | 4.2 to 4.5 |
 
 ## Tasks
 
@@ -58,7 +58,7 @@ The `email` queue consumer (rows 34 to 36, 41): `@Processor('email', { concurren
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer implementing typed queue consumers.
 
 PROJECT: nest-queue-example, Phase 4 Task 4.1 of 6 (FIRST). The library dispatches
@@ -95,7 +95,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P4 row, tasks README,
 completion log), commit `feat(api): email processor with dispatch and idempotency (4.1)`.
-````
+```
 
 ---
 
@@ -123,7 +123,7 @@ The retry theater (rows 37, 39, 40): `@Processor('webhooks', { concurrency: 5, l
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer making retries and rate limits observable.
 
 PROJECT: nest-queue-example, Phase 4 Task 4.2 of 6 (MIDDLE). Module defaults give
@@ -156,7 +156,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 4.2, commit
 `feat(api): webhook processor with limiter and deterministic retries (4.2)`.
-````
+```
 
 ---
 
@@ -184,7 +184,7 @@ Rows 38, 42, 43: a long-running `reports` job emitting `updateProgress(10..100)`
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer instrumenting long-running jobs.
 
 PROJECT: nest-queue-example, Phase 4 Task 4.3 of 6 (MIDDLE). job.updateProgress accepts
@@ -216,7 +216,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 4.3, commit
 `feat(api): report processor with progress and lock tuning (4.3)`.
-````
+```
 
 ---
 
@@ -244,7 +244,7 @@ Rows 44, 45: `@OnWorkerEvent` listeners (completed, failed, progress, active: fu
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer bridging queue events to Server-Sent Events.
 
 PROJECT: nest-queue-example, Phase 4 Task 4.4 of 6 (MIDDLE). @OnWorkerEvent methods live
@@ -281,7 +281,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 4.4, commit
 `feat(api): worker and queue event bridge with sse stream (4.4)`.
-````
+```
 
 ---
 
@@ -308,7 +308,7 @@ Rows 42 (stalled side), 63: a documented, reproducible stalled-job demonstration
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer scripting operational demonstrations.
 
 PROJECT: nest-queue-example, Phase 4 Task 4.5 of 6 (MIDDLE). At-least-once semantics:
@@ -339,7 +339,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 4.5, commit
 `feat(api): stalled recovery and graceful shutdown demos (4.5)`.
-````
+```
 
 ---
 
@@ -366,7 +366,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 4 of nest-queue-example.
 
 CURRENT PHASE: 4 (workers-events), Task 4.6 of 6 (LAST).
@@ -397,7 +397,7 @@ Verification:
 
 Completion Protocol: append `- 4.6 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P4 complete`.
-````
+```
 
 ---
 

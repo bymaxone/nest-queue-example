@@ -22,14 +22,14 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | 📋 ToDo | P0 | M | Phase 4 |
-| 5.2 | Failure-propagation variants + `addBulk` | 📋 ToDo | P0 | M | 5.1 |
-| 5.3 | Boot schedulers + management endpoints + validation errors | 📋 ToDo | P0 | M | Phase 4 |
-| 5.4 | Dynamic per-tenant workers via `WorkerRegistry` | 📋 ToDo | P0 | S | Phase 4 |
-| 5.5 | Sandboxed invoice processor (`registerSandboxed`) | 📋 ToDo | P0 | M | 5.4 |
-| 5.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 5.2, 5.3, 5.5 |
+| ID  | Task                                                               | Status  | Priority | Size | Depends on    |
+| --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ------------- |
+| 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | 📋 ToDo | P0       | M    | Phase 4       |
+| 5.2 | Failure-propagation variants + `addBulk`                           | 📋 ToDo | P0       | M    | 5.1           |
+| 5.3 | Boot schedulers + management endpoints + validation errors         | 📋 ToDo | P0       | M    | Phase 4       |
+| 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | 📋 ToDo | P0       | S    | Phase 4       |
+| 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | 📋 ToDo | P0       | M    | 5.4           |
+| 5.6 | Phase close: audit, dashboards, PR with Copilot review             | 📋 ToDo | P0       | S    | 5.2, 5.3, 5.5 |
 
 ## Tasks
 
@@ -58,7 +58,7 @@ Rows 50, 51, 56: the fulfillment flow (`ship-order` parent; `reserve-stock` + `c
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer orchestrating BullMQ flows.
 
 PROJECT: nest-queue-example, Phase 5 Task 5.1 of 6 (FIRST). FlowService (enabled via
@@ -92,7 +92,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P5 row, tasks README,
 completion log), commit `feat(api): fulfillment flow with live tree endpoint (5.1)`.
-````
+```
 
 ---
 
@@ -122,7 +122,7 @@ Rows 52 to 55: the three postures side by side. Variant `stuck`: a child exhaust
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer demonstrating flow failure semantics honestly.
 
 PROJECT: nest-queue-example, Phase 5 Task 5.2 of 6 (MIDDLE). BullMQ default: a
@@ -157,7 +157,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 5.2, commit
 `feat(api): flow failure-propagation variants and bulk flows (5.2)`.
-````
+```
 
 ---
 
@@ -186,7 +186,7 @@ Rows 57 to 62: three boot-registered schedulers (nightly cron with tz, 6-field s
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer wiring recurring jobs the current-API way.
 
 PROJECT: nest-queue-example, Phase 5 Task 5.3 of 6 (MIDDLE). Only Job Schedulers exist:
@@ -222,7 +222,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 5.3, commit
 `feat(api): boot-registered job schedulers with management api (5.3)`.
-````
+```
 
 ---
 
@@ -250,7 +250,7 @@ Rows 47, 48: runtime worker management. `POST /workers/tenants { tenantId, tier 
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer managing workers at runtime.
 
 PROJECT: nest-queue-example, Phase 5 Task 5.4 of 6 (MIDDLE). WorkerRegistry (advanced
@@ -279,7 +279,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 5.4, commit
 `feat(api): dynamic per-tenant workers via registry (5.4)`.
-````
+```
 
 ---
 
@@ -308,7 +308,7 @@ Row 49: CPU-bound work out of process. A standalone `invoice.sandboxed.ts` (no N
 
 #### Agent prompt
 
-````
+```
 You are a senior Node.js engineer offloading CPU work to sandboxed processors.
 
 PROJECT: nest-queue-example, Phase 5 Task 5.5 of 6 (MIDDLE). Sandboxed processors are
@@ -346,7 +346,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 5.5, commit
 `feat(api): sandboxed invoice processor with build wiring (5.5)`.
-````
+```
 
 ---
 
@@ -373,7 +373,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 5 of nest-queue-example.
 
 CURRENT PHASE: 5 (flows-schedulers-dynamic), Task 5.6 of 6 (LAST).
@@ -404,7 +404,7 @@ Verification:
 
 Completion Protocol: append `- 5.6 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P5 complete`.
-````
+```
 
 ---
 

@@ -22,13 +22,13 @@ Everything works and everything is tested. This phase completes governance (the 
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 9.1 | Branch + the four Copilot review files | 📋 ToDo | P0 | S | Phase 8 |
-| 9.2 | README final + docs cross-check | 📋 ToDo | P0 | M | Phase 8 |
-| 9.3 | Stryker mutation gate on `apps/api` | 📋 ToDo | P0 | L | Phase 8 |
-| 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0 | M | 9.1 to 9.3 |
-| 9.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 9.4 |
+| ID  | Task                                                      | Status  | Priority | Size | Depends on |
+| --- | --------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 9.1 | Branch + the four Copilot review files                    | 📋 ToDo | P0       | S    | Phase 8    |
+| 9.2 | README final + docs cross-check                           | 📋 ToDo | P0       | M    | Phase 8    |
+| 9.3 | Stryker mutation gate on `apps/api`                       | 📋 ToDo | P0       | L    | Phase 8    |
+| 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
+| 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 📋 ToDo | P0       | S    | 9.4        |
 
 ## Tasks
 
@@ -56,7 +56,7 @@ Everything works and everything is tested. This phase completes governance (the 
 
 #### Agent prompt
 
-````
+```
 You are a senior engineer authoring GitHub Copilot code-review configuration.
 
 PROJECT: nest-queue-example, Phase 9 Task 9.1 of 5 (FIRST). Copilot review files must
@@ -88,7 +88,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P9 row, tasks README,
 completion log), commit `docs(repo): add copilot review configuration (9.1)`.
-````
+```
 
 ---
 
@@ -115,7 +115,7 @@ The public face: README with what/why, quick start (compose + env + two terminal
 
 #### Agent prompt
 
-````
+```
 You are a senior technical writer finalizing a reference repository README.
 
 PROJECT: nest-queue-example, Phase 9 Task 9.2 of 5 (MIDDLE). The README is the public
@@ -143,7 +143,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 9.2, commit
 `docs(repo): final readme and documentation cross-check (9.2)`.
-````
+```
 
 ---
 
@@ -171,7 +171,7 @@ The pre-release assertiveness gate: Stryker over `apps/api/src` with `break 95, 
 
 #### Agent prompt
 
-````
+```
 You are a senior test engineer running a mutation-testing hardening session.
 
 PROJECT: nest-queue-example, Phase 9 Task 9.3 of 5 (MIDDLE). Stryker with the Jest
@@ -204,7 +204,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 9.3, commit
 `test(api): mutation hardening to the 95 gate (9.3)`.
-````
+```
 
 ---
 
@@ -231,7 +231,7 @@ The completion contract: audit all 70 spec §7 rows with evidence (file, route, 
 
 #### Agent prompt
 
-````
+```
 You are the completeness auditor of a reference implementation.
 
 PROJECT: nest-queue-example, Phase 9 Task 9.4 of 5 (MIDDLE). The spec §7 Feature
@@ -261,7 +261,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 9.4, commit
 `docs(repo): coverage audit and release checklists (9.4)`.
-````
+```
 
 ---
 
@@ -289,7 +289,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 9, the final phase of nest-queue-example.
 
 CURRENT PHASE: 9 (hardening-release-readiness), Task 9.5 of 5 (LAST).
@@ -321,7 +321,7 @@ Verification:
 
 Completion Protocol: append `- 9.5 ✅ <date> final phase PR merged`; commit dashboards
 on main: `docs(plan): mark P9 complete, roadmap done`.
-````
+```
 
 ---
 

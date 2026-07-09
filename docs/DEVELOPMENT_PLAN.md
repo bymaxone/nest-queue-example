@@ -11,22 +11,22 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 0 / 10 phases complete (0%) · 0 / 53 tasks
-> **Active phase:** none (awaiting kick-off)
+> **Progress:** 0 / 10 phases complete (0%) · 4 / 53 tasks
+> **Active phase:** P0 repo-foundation (PR open, review requested)
 > **Blockers:** none
 
-| ID | Phase | Status | Progress | Size | Last updated |
-|---|---|---|---|---|---|
-| P0 | repo-foundation | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
-| P1 | library-consumption | 📋 ToDo | 0/4 tasks | S | 2026-07-06 |
-| P2 | api-skeleton-wiring | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
-| P3 | enqueue-surface-admin-api | 📋 ToDo | 0/6 tasks | L | 2026-07-06 |
-| P4 | workers-events | 📋 ToDo | 0/6 tasks | L | 2026-07-06 |
-| P5 | flows-schedulers-dynamic | 📋 ToDo | 0/6 tasks | L | 2026-07-06 |
-| P6 | metrics-errors-modes | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
-| P7 | web-dashboard | 📋 ToDo | 0/6 tasks | L | 2026-07-06 |
-| P8 | testing | 📋 ToDo | 0/5 tasks | L | 2026-07-06 |
-| P9 | hardening-release-readiness | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
+| ID  | Phase                       | Status    | Progress  | Size | Last updated |
+| --- | --------------------------- | --------- | --------- | ---- | ------------ |
+| P0  | repo-foundation             | 👀 Review | 4/5 tasks | M    | 2026-07-09   |
+| P1  | library-consumption         | 📋 ToDo   | 0/4 tasks | S    | 2026-07-06   |
+| P2  | api-skeleton-wiring         | 📋 ToDo   | 0/5 tasks | M    | 2026-07-06   |
+| P3  | enqueue-surface-admin-api   | 📋 ToDo   | 0/6 tasks | L    | 2026-07-06   |
+| P4  | workers-events              | 📋 ToDo   | 0/6 tasks | L    | 2026-07-06   |
+| P5  | flows-schedulers-dynamic    | 📋 ToDo   | 0/6 tasks | L    | 2026-07-06   |
+| P6  | metrics-errors-modes        | 📋 ToDo   | 0/5 tasks | M    | 2026-07-06   |
+| P7  | web-dashboard               | 📋 ToDo   | 0/6 tasks | L    | 2026-07-06   |
+| P8  | testing                     | 📋 ToDo   | 0/5 tasks | L    | 2026-07-06   |
+| P9  | hardening-release-readiness | 📋 ToDo   | 0/5 tasks | M    | 2026-07-06   |
 
 ### External prerequisite (not a phase of this plan)
 

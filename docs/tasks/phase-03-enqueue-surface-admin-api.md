@@ -21,14 +21,14 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 3.1 | Branch + Orderly domain + typed order placement enqueue | 📋 ToDo | P0 | M | Phase 2 |
-| 3.2 | Priority, delay, and `jobId` idempotency endpoints | 📋 ToDo | P0 | S | 3.1 |
-| 3.3 | Four deduplication modes + dedup inspector | 📋 ToDo | P0 | M | 3.1 |
-| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path | 📋 ToDo | P0 | S | 3.1 |
-| 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | 📋 ToDo | P0 | M | 3.1 |
-| 3.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 3.2 to 3.5 |
+| ID  | Task                                                        | Status  | Priority | Size | Depends on |
+| --- | ----------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 3.1 | Branch + Orderly domain + typed order placement enqueue     | 📋 ToDo | P0       | M    | Phase 2    |
+| 3.2 | Priority, delay, and `jobId` idempotency endpoints          | 📋 ToDo | P0       | S    | 3.1        |
+| 3.3 | Four deduplication modes + dedup inspector                  | 📋 ToDo | P0       | M    | 3.1        |
+| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | 📋 ToDo | P0       | S    | 3.1        |
+| 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | 📋 ToDo | P0       | M    | 3.1        |
+| 3.6 | Phase close: audit, dashboards, PR with Copilot review      | 📋 ToDo | P0       | S    | 3.2 to 3.5 |
 
 ## Tasks
 
@@ -57,7 +57,7 @@ Create the demo domain: `orders/` module with an in-memory `OrdersRepository`, `
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer building a demo domain around typed enqueues.
 
 PROJECT: nest-queue-example, Phase 3 Task 3.1 of 6 (FIRST). QueueService is global;
@@ -94,7 +94,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (phase file, plan §1 P3 row, tasks README,
 completion log), commit `feat(api): orderly domain with typed receipt enqueue (3.1)`.
-````
+```
 
 ---
 
@@ -122,7 +122,7 @@ Per-job options in anger: `POST /orders/:id/remind` (delayed job, row 15), VIP p
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer surfacing per-job options.
 
 PROJECT: nest-queue-example, Phase 3 Task 3.2 of 6 (MIDDLE). enqueue() accepts BullMQ
@@ -154,7 +154,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 3.2, commit
 `feat(api): priority, delay and jobId idempotency endpoints (3.2)`.
-````
+```
 
 ---
 
@@ -182,7 +182,7 @@ The dedup lab (matrix rows 17 to 21): `POST /search/reindex` with `mode` selecti
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer building a deduplication laboratory.
 
 PROJECT: nest-queue-example, Phase 3 Task 3.3 of 6 (MIDDLE). BullMQ-native deduplication
@@ -216,7 +216,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 3.3, commit
 `feat(api): four deduplication modes with inspector (3.3)`.
-````
+```
 
 ---
 
@@ -243,7 +243,7 @@ Fan-out in one roundtrip (rows 22, 23): `POST /campaigns/receipts { count }` bul
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer exercising bulk enqueues and their guardrail.
 
 PROJECT: nest-queue-example, Phase 3 Task 3.4 of 6 (MIDDLE). enqueueBulk(queue, jobs)
@@ -274,7 +274,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 3.4, commit
 `feat(api): bulk receipt campaigns with bounded-bulk guard (3.4)`.
-````
+```
 
 ---
 
@@ -303,7 +303,7 @@ The read/control plane the dashboard will consume (rows 25 to 27, 31, 32): job l
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer building the queue admin plane.
 
 PROJECT: nest-queue-example, Phase 3 Task 3.5 of 6 (MIDDLE). QueueService exposes
@@ -332,7 +332,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 3.5, commit
 `feat(api): admin inspection and control endpoints (3.5)`.
-````
+```
 
 ---
 
@@ -359,7 +359,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 3 of nest-queue-example.
 
 CURRENT PHASE: 3 (enqueue-surface-admin-api), Task 3.6 of 6 (LAST).
@@ -390,7 +390,7 @@ Verification:
 
 Completion Protocol: append `- 3.6 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P3 complete`.
-````
+```
 
 ---
 

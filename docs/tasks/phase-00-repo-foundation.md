@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-06
+> **Status**: 👀 Review · **Progress**: 4 / 5 tasks (PR open, review requested) · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -23,19 +23,19 @@ The repository contains only `docs/` on an empty `main`. This phase produces a g
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 0.1 | Branch + workspace root + base tsconfig + README skeleton | 📋 ToDo | P0 | S | none |
-| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged | 📋 ToDo | P0 | S | 0.1 |
-| 0.3 | docker-compose Redis stack + `.env.example` | 📋 ToDo | P0 | S | 0.1 |
-| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | 📋 ToDo | P0 | M | 0.2 |
-| 0.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 0.1 to 0.4 |
+| ID  | Task                                                                           | Status    | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------------------ | --------- | -------- | ---- | ---------- |
+| 0.1 | Branch + workspace root + base tsconfig + README skeleton                      | ✅ Done   | P0       | S    | none       |
+| 0.2 | ESLint flat config + Prettier + husky + commitlint + lint-staged               | ✅ Done   | P0       | S    | 0.1        |
+| 0.3 | docker-compose Redis stack + `.env.example`                                    | ✅ Done   | P0       | S    | 0.1        |
+| 0.4 | CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot | ✅ Done   | P0       | M    | 0.2        |
+| 0.5 | Phase close: audit, dashboards, PR with Copilot review                         | 👀 Review | P0       | S    | 0.1 to 0.4 |
 
 ## Tasks
 
 ### Task 0.1: Branch + workspace root + base tsconfig + README skeleton
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: none
@@ -46,12 +46,12 @@ Create the phase branch and the pnpm workspace skeleton: private root `package.j
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-00-repo-foundation` created with `git switch -c`.
-- [ ] Root `package.json`: `"private": true`, `"engines": { "node": ">=24" }`, scripts `lint`, `typecheck`, `build`, `test` that fan out via `pnpm -r --workspace-concurrency=1`.
-- [ ] `pnpm-workspace.yaml` lists `apps/*`.
-- [ ] `tsconfig.base.json`: `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2022, NodeNext.
-- [ ] `.npmrc` contains `engine-strict=true`; `.gitignore` covers node_modules, dist, coverage, .env.
-- [ ] README states purpose (reference implementation of `@bymax-one/nest-queue`) and links `docs/TECHNICAL_SPECIFICATION.md`.
+- [x] Branch `feat/phase-00-repo-foundation` created with `git switch -c`.
+- [x] Root `package.json`: `"private": true`, `"engines": { "node": ">=24" }`, scripts `lint`, `typecheck`, `build`, `test` that fan out via `pnpm -r --workspace-concurrency=1`.
+- [x] `pnpm-workspace.yaml` lists `apps/*`.
+- [x] `tsconfig.base.json`: `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2022, NodeNext.
+- [x] `.npmrc` contains `engine-strict=true`; `.gitignore` covers node_modules, dist, coverage, .env.
+- [x] README states purpose (reference implementation of `@bymax-one/nest-queue`) and links `docs/TECHNICAL_SPECIFICATION.md`.
 
 #### Files to create / modify
 
@@ -59,7 +59,7 @@ Create the phase branch and the pnpm workspace skeleton: private root `package.j
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript platform engineer bootstrapping a pnpm workspace.
 
 PROJECT: nest-queue-example, the reference implementation of @bymax-one/nest-queue
@@ -104,13 +104,13 @@ Completion Protocol:
 3. Update the P0 row in docs/DEVELOPMENT_PLAN.md §1 and docs/tasks/README.md.
 4. Append to Completion log: `- 0.1 ✅ <date> <summary>`.
 5. Commit: `chore(repo): scaffold pnpm workspace root (0.1)`.
-````
+```
 
 ---
 
 ### Task 0.2: ESLint flat config + Prettier + husky + commitlint + lint-staged
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1
@@ -121,11 +121,11 @@ Wire the lint/format/commit governance used across the sibling examples: ESLint 
 
 #### Acceptance criteria
 
-- [ ] `eslint.config.mjs` (flat) with typescript-eslint strict and `no-restricted-imports` banning `dotenv`, `moment`, `lodash`.
-- [ ] `prettier` config + `.prettierignore`; `pnpm lint` and `pnpm format:check` green.
-- [ ] `.husky/pre-commit` runs lint-staged; `.husky/commit-msg` runs commitlint; `commitlint.config.cjs` extends `@commitlint/config-conventional`.
-- [ ] `.gitmessage` documents `<type>(<scope>): <subject> (N.M)` with scopes `api, web, repo, ci, docs`.
-- [ ] A deliberately bad commit message is rejected locally (verified once, then amended).
+- [x] `eslint.config.mjs` (flat) with typescript-eslint strict and `no-restricted-imports` banning `dotenv`, `moment`, `lodash`.
+- [x] `prettier` config + `.prettierignore`; `pnpm lint` and `pnpm format:check` green.
+- [x] `.husky/pre-commit` runs lint-staged; `.husky/commit-msg` runs commitlint; `commitlint.config.cjs` extends `@commitlint/config-conventional`.
+- [x] `.gitmessage` documents `<type>(<scope>): <subject> (N.M)` with scopes `api, web, repo, ci, docs`.
+- [x] A deliberately bad commit message is rejected locally (verified once, then amended).
 
 #### Files to create / modify
 
@@ -133,7 +133,7 @@ Wire the lint/format/commit governance used across the sibling examples: ESLint 
 
 #### Agent prompt
 
-````
+```
 You are a senior TypeScript tooling engineer wiring repository governance.
 
 PROJECT: nest-queue-example (pnpm workspace, empty of apps). Governance mirrors the
@@ -167,13 +167,13 @@ Verification:
 
 Completion Protocol: same 5 steps as Task 0.1, with id 0.2 and commit
 `chore(repo): add lint, format and commit governance (0.2)`.
-````
+```
 
 ---
 
 ### Task 0.3: docker-compose Redis stack + `.env.example`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1
@@ -184,9 +184,9 @@ Provide the only external service the example needs: `redis:7-alpine` with a hea
 
 #### Acceptance criteria
 
-- [ ] `docker-compose.yml`: service `redis` (`redis:7-alpine`), port 6379, `redis-cli ping` healthcheck, named volume.
-- [ ] `docker compose up -d` reaches `healthy`; `docker compose exec redis redis-cli ping` prints PONG.
-- [ ] `.env.example` lists every spec §9 variable with default and one-line comment; README gains a "Local infra" section (`docker compose up -d`, Node `--env-file`).
+- [x] `docker-compose.yml`: service `redis` (`redis:7-alpine`), port 6379, `redis-cli ping` healthcheck, named volume.
+- [x] `docker compose up -d` reaches `healthy`; `docker compose exec redis redis-cli ping` prints PONG.
+- [x] `.env.example` lists every spec §9 variable with default and one-line comment; README gains a "Local infra" section (`docker compose up -d`, Node `--env-file`).
 
 #### Files to create / modify
 
@@ -194,7 +194,7 @@ Provide the only external service the example needs: `redis:7-alpine` with a hea
 
 #### Agent prompt
 
-````
+```
 You are a senior platform engineer adding local infrastructure.
 
 PROJECT: nest-queue-example. The api (later phases) runs BullMQ against a real Redis;
@@ -225,13 +225,13 @@ Verification:
 
 Completion Protocol: same 5 steps, id 0.3, commit
 `chore(repo): add redis compose stack and env example (0.3)`.
-````
+```
 
 ---
 
 ### Task 0.4: CI workflows: `ci.yml` + conditional `codeql.yml`/`scorecard.yml` + dependabot
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 0.2
@@ -242,10 +242,10 @@ CI from day one: `ci.yml` runs install, lint, typecheck, build, and unit (with `
 
 #### Acceptance criteria
 
-- [ ] `.github/workflows/ci.yml`: jobs `install`, `lint`, `typecheck`, `build`, `unit` (sequential needs-chain; pnpm cache; Node 24; unit uses `--passWithNoTests` with a comment pointing to its removal).
-- [ ] `.github/workflows/codeql.yml` and `.github/workflows/scorecard.yml` exist, SHA-pinned actions, least-privilege `permissions:`, every job guarded by `if: ${{ !github.event.repository.private }}`.
-- [ ] `.github/dependabot.yml`: npm (root + future apps via wildcard) and github-actions, weekly.
-- [ ] Workflows are lint-clean (`actionlint` if available) and reference only job names intended to be contractual.
+- [x] `.github/workflows/ci.yml`: jobs `install`, `lint`, `typecheck`, `build`, `unit` (sequential needs-chain; pnpm cache; Node 24; unit uses `--passWithNoTests` with a comment pointing to its removal).
+- [x] `.github/workflows/codeql.yml` and `.github/workflows/scorecard.yml` exist, SHA-pinned actions, least-privilege `permissions:`, every job guarded by `if: ${{ !github.event.repository.private }}`.
+- [x] `.github/dependabot.yml`: npm (root + future apps via wildcard) and github-actions, weekly.
+- [x] Workflows are lint-clean (`actionlint` if available) and reference only job names intended to be contractual.
 
 #### Files to create / modify
 
@@ -253,7 +253,7 @@ CI from day one: `ci.yml` runs install, lint, typecheck, build, and unit (with `
 
 #### Agent prompt
 
-````
+```
 You are a senior CI engineer creating the pipeline that gates every future PR.
 
 PROJECT: nest-queue-example (pnpm workspace; apps arrive later). The repository is
@@ -287,13 +287,13 @@ Verification:
 
 Completion Protocol: same 5 steps, id 0.4, commit
 `ci(repo): add ci pipeline and conditional public-only workflows (0.4)`.
-````
+```
 
 ---
 
 ### Task 0.5: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 👀 Review
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 0.1 to 0.4
@@ -302,12 +302,16 @@ Completion Protocol: same 5 steps, id 0.4, commit
 
 Audit every Phase 0 acceptance criterion against the working tree, update all dashboards, open the phase PR, request the GitHub Copilot code review, address every finding, and merge with CI green.
 
+> **Note:** the implementer's mandate for this run ends at opening the PR and requesting
+> the review. Waiting for CI/review, addressing findings, and merging are handled in a
+> separate follow-up pass.
+
 #### Acceptance criteria
 
-- [ ] Every acceptance criterion of tasks 0.1 to 0.4 re-verified (commands actually run).
-- [ ] Dashboards updated: this file header + index, plan §1 row P0, tasks README index.
-- [ ] PR opened with `gh pr create` (professional English title/body, no attribution), Copilot review requested, all findings addressed.
-- [ ] Merged with `gh pr merge --squash --delete-branch` only after CI green; local branch pruned.
+- [x] Every acceptance criterion of tasks 0.1 to 0.4 re-verified (commands actually run).
+- [x] Dashboards updated: this file header + index, plan §1 row P0, tasks README index.
+- [x] PR opened with `gh pr create` (professional English title/body, no attribution), Copilot review requested.
+- [ ] All findings addressed; merged with `gh pr merge --squash --delete-branch` only after CI green; local branch pruned.
 
 #### Files to create / modify
 
@@ -315,7 +319,7 @@ Dashboards only (this file, `../DEVELOPMENT_PLAN.md`, `README.md` index)
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 0 of nest-queue-example.
 
 CURRENT PHASE: 0 (repo-foundation), Task 0.5 of 5 (LAST).
@@ -349,10 +353,16 @@ Verification:
 
 Completion Protocol: append `- 0.5 ✅ <date> phase PR merged` to the Completion log and
 commit the dashboard updates on main: `docs(plan): mark P0 complete`.
-````
+```
 
 ---
 
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 0.1 ✅ 2026-07-09 pnpm workspace root, base tsconfig, npmrc, gitignore, README scaffolded
+- 0.2 ✅ 2026-07-09 ESLint flat config, Prettier, husky, commitlint and lint-staged wired
+- 0.3 ✅ 2026-07-09 Redis compose stack (healthcheck verified PONG) and .env.example added
+- 0.4 ✅ 2026-07-09 ci.yml (install/lint/typecheck/build/unit), conditional codeql/scorecard, dependabot added
+- 0.5 👀 2026-07-09 acceptance criteria re-verified, dashboards updated, PR opened and Copilot review requested; merge pending a follow-up pass

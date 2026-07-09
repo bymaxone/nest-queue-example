@@ -22,13 +22,13 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 
 ## Task index
 
-| ID | Task | Status | Priority | Size | Depends on |
-|---|---|---|---|---|---|
-| 2.1 | Branch + NestJS skeleton + typed env parsing | 📋 ToDo | P0 | M | Phase 1 |
-| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 📋 ToDo | P0 | M | 2.1 |
-| 2.3 | Audit processor + smoke enqueue endpoint | 📋 ToDo | P0 | S | 2.2 |
-| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real | 📋 ToDo | P0 | S | 2.3 |
-| 2.5 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0 | S | 2.4 |
+| ID  | Task                                                             | Status  | Priority | Size | Depends on |
+| --- | ---------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 2.1 | Branch + NestJS skeleton + typed env parsing                     | 📋 ToDo | P0       | M    | Phase 1    |
+| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 📋 ToDo | P0       | M    | 2.1        |
+| 2.3 | Audit processor + smoke enqueue endpoint                         | 📋 ToDo | P0       | S    | 2.2        |
+| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 📋 ToDo | P0       | S    | 2.3        |
+| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo | P0       | S    | 2.4        |
 
 ## Tasks
 
@@ -57,7 +57,7 @@ Bootstrap NestJS 11 in `apps/api`: `main.ts` (shutdown hooks enabled, CORS from 
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer bootstrapping the reference api.
 
 PROJECT: nest-queue-example. apps/api consumes @bymax-one/nest-queue via a file: link
@@ -91,7 +91,7 @@ Verification:
 
 Completion Protocol: standard 5 steps (this file, plan §1 P2 row, tasks README,
 completion log), commit `feat(api): nest skeleton with typed env parsing (2.1)`.
-````
+```
 
 ---
 
@@ -119,7 +119,7 @@ Implement spec §9.1: the pure `buildQueueOptions(env)` factory (Mode B url, pre
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer wiring a dynamic module through a pure config factory.
 
 PROJECT: nest-queue-example, Phase 2 Task 2.2 of 5 (MIDDLE). Task 2.1 delivered the
@@ -154,7 +154,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 2.2, commit
 `feat(api): wire BymaxQueueModule via pure options factory (2.2)`.
-````
+```
 
 ---
 
@@ -182,7 +182,7 @@ Prove the enqueue-to-process loop: an `audit` queue with a minimal `@Processor` 
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer proving an enqueue-to-process loop.
 
 PROJECT: nest-queue-example, Phase 2 Task 2.3 of 5 (MIDDLE). BymaxQueueModule is wired
@@ -218,7 +218,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 2.3, commit
 `feat(api): audit processor and smoke enqueue loop (2.3)`.
-````
+```
 
 ---
 
@@ -246,7 +246,7 @@ Completion Protocol: standard 5 steps, id 2.3, commit
 
 #### Agent prompt
 
-````
+```
 You are a senior NestJS engineer adding health and diagnostics surfaces.
 
 PROJECT: nest-queue-example, Phase 2 Task 2.4 of 5 (MIDDLE). QueueService and the
@@ -279,7 +279,7 @@ Verification:
 
 Completion Protocol: standard 5 steps, id 2.4, commit
 `feat(api): health and diagnostics endpoints, real unit gate in ci (2.4)`.
-````
+```
 
 ---
 
@@ -306,7 +306,7 @@ Dashboards only
 
 #### Agent prompt
 
-````
+```
 You are the phase-close auditor for Phase 2 of nest-queue-example.
 
 CURRENT PHASE: 2 (api-skeleton-wiring), Task 2.5 of 5 (LAST).
@@ -337,7 +337,7 @@ Verification:
 
 Completion Protocol: append `- 2.5 ✅ <date> phase PR merged`; commit dashboards on
 main: `docs(plan): mark P2 complete`.
-````
+```
 
 ---
 
