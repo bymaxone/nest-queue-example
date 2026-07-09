@@ -1,6 +1,6 @@
 # Phase 0: repo-foundation
 
-> **Status**: 👀 Review · **Progress**: 4 / 5 tasks (PR open, review requested) · **Last updated**: 2026-07-09
+> **Status**: ✅ Done · **Progress**: 5 / 5 tasks (merged in PR #1) · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P0)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §5, §6, §16
 
@@ -365,4 +365,4 @@ commit the dashboard updates on main: `docs(plan): mark P0 complete`.
 - 0.2 ✅ 2026-07-09 ESLint flat config, Prettier, husky, commitlint and lint-staged wired
 - 0.3 ✅ 2026-07-09 Redis compose stack (healthcheck verified PONG) and .env.example added
 - 0.4 ✅ 2026-07-09 ci.yml (install/lint/typecheck/build/unit), conditional codeql/scorecard, dependabot added
-- 0.5 👀 2026-07-09 acceptance criteria re-verified, dashboards updated, PR opened and Copilot review requested; merge pending a follow-up pass
+- 0.5 ✅ 2026-07-09 phase PR #1 merged green (CI passing, 5 Copilot findings fixed in 6b94177, all threads resolved)
