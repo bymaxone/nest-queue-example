@@ -1,3 +1,11 @@
+/**
+ * Repository-wide ESLint flat configuration.
+ *
+ * Layer: config.
+ *
+ * Applies base JavaScript rules to tooling files (this config included) and
+ * strict, type-checked TypeScript rules to application source once it lands.
+ */
 // @ts-check
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
@@ -13,6 +21,7 @@ const BANNED_IMPORTS = [
   'dotenv',
   'moment',
   'lodash',
+  'crypto',
   'crypto-js',
   'md5',
   'bcrypt',
@@ -20,6 +29,17 @@ const BANNED_IMPORTS = [
   'uuid',
   'nanoid',
 ]
+
+/**
+ * Custom messages for banned imports whose generic "native equivalent"
+ * message would be misleading (the built-in itself is fine, only the
+ * unprefixed specifier is banned).
+ *
+ * @type {Record<string, string>}
+ */
+const BANNED_IMPORT_MESSAGE_OVERRIDES = {
+  crypto: "Do not import 'crypto'. Use the 'node:crypto' prefixed form instead.",
+}
 
 export default tseslint.config(
   // Files and directories excluded from all linting.
@@ -59,7 +79,9 @@ export default tseslint.config(
         {
           paths: BANNED_IMPORTS.map((name) => ({
             name,
-            message: `Do not import '${name}'. Use a native Node API or the platform-provided equivalent.`,
+            message:
+              BANNED_IMPORT_MESSAGE_OVERRIDES[name] ??
+              `Do not import '${name}'. Use a native Node API or the platform-provided equivalent.`,
           })),
         },
       ],
