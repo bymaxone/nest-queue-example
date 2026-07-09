@@ -1,6 +1,6 @@
 # Phase 1: library-consumption
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 4 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 3 / 4 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P1)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §8; matrix rows 69, 70
 
@@ -26,7 +26,7 @@ Phase 0 delivered a governed, empty workspace. This phase makes both future apps
 | --- | ----------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 1.1 | Branch + `apps/api` package + library link + peers + dual-subpath probe | ✅ Done | P0       | S    | Phase 0    |
 | 1.2 | `apps/web` package + library link (no peers) + `./shared`-only probe    | ✅ Done | P0       | S    | Phase 0    |
-| 1.3 | Workspace typecheck gate + single-copy peer verification                | 📋 ToDo | P0       | XS   | 1.1, 1.2   |
+| 1.3 | Workspace typecheck gate + single-copy peer verification                | ✅ Done | P0       | XS   | 1.1, 1.2   |
 | 1.4 | Phase close: audit, dashboards, PR with Copilot review                  | 📋 ToDo | P0       | S    | 1.3        |
 
 ## Tasks
@@ -167,7 +167,7 @@ Completion Protocol: standard 5 steps, id 1.2, commit
 
 ### Task 1.3: Workspace typecheck gate + single-copy peer verification
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: XS
 - **Depends on**: 1.1, 1.2
@@ -178,9 +178,9 @@ Close the resolution proof: workspace-wide `pnpm typecheck` green, peers resolvi
 
 #### Acceptance criteria
 
-- [ ] `pnpm typecheck` exits 0 across both packages from a clean `pnpm install`.
-- [ ] `pnpm why bullmq` / `pnpm why ioredis` show a single resolved copy (via `apps/api`).
-- [ ] Re-exported BullMQ types compile in the api probe (extend it with `type { Job }` from the server subpath: row 70).
+- [x] `pnpm typecheck` exits 0 across both packages from a clean `pnpm install`.
+- [x] `pnpm why bullmq` / `pnpm why ioredis` show a single resolved copy (via `apps/api`).
+- [x] Re-exported BullMQ types compile in the api probe (extend it with `type { Job }` from the server subpath: row 70).
 
 #### Files to create / modify
 
@@ -284,3 +284,4 @@ commit dashboards on main: `docs(plan): mark P1 complete`.
 
 - 1.1 ✅ 2026-07-09 apps/api consumes nest-queue via file link with the five peers; dual-subpath probe typechecks
 - 1.2 ✅ 2026-07-09 apps/web consumes the zero-dependency shared subpath only; no server peers declared or resolved
+- 1.3 ✅ 2026-07-09 workspace typecheck green; five peers resolve to a single copy (ioredis pinned to bullmq's exact version via root override); Job re-export compiles (row 70)

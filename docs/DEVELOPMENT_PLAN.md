@@ -11,14 +11,14 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 1 / 10 phases complete (10%) · 7 / 53 tasks
+> **Progress:** 1 / 10 phases complete (10%) · 8 / 53 tasks
 > **Active phase:** P1 library-consumption
 > **Blockers:** none
 
 | ID  | Phase                       | Status         | Progress  | Size | Last updated |
 | --- | --------------------------- | -------------- | --------- | ---- | ------------ |
 | P0  | repo-foundation             | ✅ Done        | 5/5 tasks | M    | 2026-07-09   |
-| P1  | library-consumption         | 🔄 In Progress | 2/4 tasks | S    | 2026-07-09   |
+| P1  | library-consumption         | 🔄 In Progress | 3/4 tasks | S    | 2026-07-09   |
 | P2  | api-skeleton-wiring         | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
 | P3  | enqueue-surface-admin-api   | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
 | P4  | workers-events              | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
