@@ -1,6 +1,6 @@
 # Phase 2: api-skeleton-wiring
 
-> **Status**: 🔄 In Progress · **Progress**: 3 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
@@ -27,7 +27,7 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 | 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done    | P0       | M    | Phase 1    |
 | 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 🟡 Partial | P0       | M    | 2.1        |
 | 2.3 | Audit processor + smoke enqueue endpoint                         | 🟡 Partial | P0       | S    | 2.2        |
-| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 📋 ToDo    | P0       | S    | 2.3        |
+| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 🟡 Partial | P0       | S    | 2.3        |
 | 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo    | P0       | S    | 2.4        |
 
 ## Tasks
@@ -224,7 +224,7 @@ Completion Protocol: standard 5 steps, id 2.3, commit
 
 ### Task 2.4: Health endpoints + diagnostics skeleton + CI unit gate for real
 
-- **Status**: 📋 ToDo
+- **Status**: 🟡 Partial
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 2.3
@@ -235,10 +235,10 @@ Completion Protocol: standard 5 steps, id 2.3, commit
 
 #### Acceptance criteria
 
-- [ ] `/health/live` returns 200 `{ status: 'up' }`; `/health/ready` returns 200 when Redis answers and 503 with a reason when down.
-- [ ] `GET /admin/diagnostics` injects `BYMAX_QUEUE_OPTIONS` and `BYMAX_QUEUE_CONNECTION_MODE` tokens and reports `{ mode, prefix, flowsEnabled, metricsEnabled }` (no secrets echoed).
-- [ ] `ci.yml` unit job runs the real suite (`--passWithNoTests` removed).
-- [ ] Unit tests for both controllers.
+- [x] `/health/live` returns 200 `{ status: 'up' }`; `/health/ready` returns 200 when Redis answers and 503 with a reason when down. (Behavior unit-verified; the live boot check is deferred to the upstream library fix.)
+- [x] `GET /admin/diagnostics` injects `BYMAX_QUEUE_OPTIONS` and `BYMAX_QUEUE_CONNECTION_MODE` tokens and reports `{ mode, prefix, flowsEnabled, metricsEnabled }` (no secrets echoed).
+- [x] `ci.yml` unit job runs the real suite (`--passWithNoTests` removed).
+- [x] Unit tests for both controllers.
 
 #### Files to create / modify
 
@@ -348,3 +348,4 @@ main: `docs(plan): mark P2 complete`.
 - 2.1 ✅ 2026-07-09 NestJS 11 skeleton (main.ts, AppModule) + typed env parsing (zod, frozen APP_ENV token, fail-fast on bad env).
 - 2.2 🟡 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot blocked upstream (library dist omits decorator metadata).
 - 2.3 🟡 2026-07-09 Audit `@Processor` (no-concurrency fallback proof), in-memory trail, and smoke enqueue/inspect controller (proves `isGlobal`); 100% coverage. Live curl journey blocked upstream.
+- 2.4 🟡 2026-07-09 `/health/live` + `/health/ready` (timeout-bounded, secret-safe 503) and `/admin/diagnostics` (token probe, no credential echo); CI unit job now runs the real suite; 100% coverage. Live boot verification blocked upstream.

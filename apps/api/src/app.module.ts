@@ -9,6 +9,7 @@ import { BymaxQueueModule } from '@bymax-one/nest-queue'
 import { ConfigModule } from './config/config.module.js'
 import { APP_ENV } from './config/env.js'
 import { buildQueueOptions } from './config/queue.config.js'
+import { AdminModule } from './admin/admin.module.js'
 import { ProcessorsModule } from './processors/processors.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
 
@@ -22,6 +23,7 @@ import { SmokeModule } from './smoke/smoke.module.js'
     }),
     ProcessorsModule,
     SmokeModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
