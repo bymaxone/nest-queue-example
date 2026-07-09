@@ -1,6 +1,6 @@
 # Phase 2: api-skeleton-wiring
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
@@ -24,7 +24,7 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 
 | ID  | Task                                                             | Status  | Priority | Size | Depends on |
 | --- | ---------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 2.1 | Branch + NestJS skeleton + typed env parsing                     | 📋 ToDo | P0       | M    | Phase 1    |
+| 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done | P0       | M    | Phase 1    |
 | 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 📋 ToDo | P0       | M    | 2.1        |
 | 2.3 | Audit processor + smoke enqueue endpoint                         | 📋 ToDo | P0       | S    | 2.2        |
 | 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 📋 ToDo | P0       | S    | 2.3        |
@@ -34,7 +34,7 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 
 ### Task 2.1: Branch + NestJS skeleton + typed env parsing
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 1
@@ -45,11 +45,11 @@ Bootstrap NestJS 11 in `apps/api`: `main.ts` (shutdown hooks enabled, CORS from 
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-02-api-skeleton-wiring` created with `git switch -c`.
-- [ ] `apps/api` gains `@nestjs/platform-express` (or fastify per sibling convention: express), `zod`, `nest-cli.json`, `tsconfig.build.json`; `pnpm --filter api build` green.
-- [ ] `src/config/env.ts`: zod schema for every §9 variable with defaults; parse-once at bootstrap; exported `APP_ENV` Symbol token + provider; `app.enableShutdownHooks()` in `main.ts`.
-- [ ] Bad env (e.g. `QUEUE_DRAIN_TIMEOUT_MS=abc`) fails boot with a readable aggregated error.
-- [ ] Phase 1 probes deleted (`library-probe.ts` still present until 2.2 replaces the import usage; delete here if unused).
+- [x] Branch `feat/phase-02-api-skeleton-wiring` created with `git switch -c`.
+- [x] `apps/api` gains `@nestjs/platform-express` (or fastify per sibling convention: express), `zod`, `nest-cli.json`, `tsconfig.build.json`; `pnpm --filter api build` green.
+- [x] `src/config/env.ts`: zod schema for every §9 variable with defaults; parse-once at bootstrap; exported `APP_ENV` Symbol token + provider; `app.enableShutdownHooks()` in `main.ts`.
+- [x] Bad env (e.g. `QUEUE_DRAIN_TIMEOUT_MS=abc`) fails boot with a readable aggregated error.
+- [x] Phase 1 probes deleted (`library-probe.ts` still present until 2.2 replaces the import usage; delete here if unused).
 
 #### Files to create / modify
 
@@ -344,3 +344,5 @@ main: `docs(plan): mark P2 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 2.1 ✅ 2026-07-09 NestJS 11 skeleton (main.ts, AppModule) + typed env parsing (zod, frozen APP_ENV token, fail-fast on bad env).

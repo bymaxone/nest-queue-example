@@ -1,7 +1,7 @@
 # nest-queue-example: Development Plan
 
 > **Status:** 🔄 In execution
-> **Last updated:** 2026-07-06
+> **Last updated:** 2026-07-09
 > **Source spec:** [TECHNICAL_SPECIFICATION.md](./TECHNICAL_SPECIFICATION.md) (v1.0.0; §7 Feature Coverage Matrix is the completion contract)
 > **Scope:** build the reference implementation of `@bymax-one/nest-queue` in 10 phases, one PR per phase, with the GitHub Copilot code review on every PR and CI green from the first commit.
 
@@ -11,22 +11,22 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 2 / 10 phases complete (20%) · 9 / 53 tasks
+> **Progress:** 2 / 10 phases complete (20%) · 10 / 53 tasks
 > **Active phase:** P2 api-skeleton-wiring
 > **Blockers:** none
 
-| ID  | Phase                       | Status  | Progress  | Size | Last updated |
-| --- | --------------------------- | ------- | --------- | ---- | ------------ |
-| P0  | repo-foundation             | ✅ Done | 5/5 tasks | M    | 2026-07-09   |
-| P1  | library-consumption         | ✅ Done | 4/4 tasks | S    | 2026-07-09   |
-| P2  | api-skeleton-wiring         | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
-| P3  | enqueue-surface-admin-api   | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P4  | workers-events              | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P5  | flows-schedulers-dynamic    | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P6  | metrics-errors-modes        | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
-| P7  | web-dashboard               | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
-| P8  | testing                     | 📋 ToDo | 0/5 tasks | L    | 2026-07-06   |
-| P9  | hardening-release-readiness | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
+| ID  | Phase                       | Status         | Progress  | Size | Last updated |
+| --- | --------------------------- | -------------- | --------- | ---- | ------------ |
+| P0  | repo-foundation             | ✅ Done        | 5/5 tasks | M    | 2026-07-09   |
+| P1  | library-consumption         | ✅ Done        | 4/4 tasks | S    | 2026-07-09   |
+| P2  | api-skeleton-wiring         | 🔄 In Progress | 1/5 tasks | M    | 2026-07-09   |
+| P3  | enqueue-surface-admin-api   | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P4  | workers-events              | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P5  | flows-schedulers-dynamic    | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P6  | metrics-errors-modes        | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
+| P7  | web-dashboard               | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
+| P8  | testing                     | 📋 ToDo        | 0/5 tasks | L    | 2026-07-06   |
+| P9  | hardening-release-readiness | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
 
 ### External prerequisite (not a phase of this plan)
 
