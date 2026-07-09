@@ -1,6 +1,6 @@
 # Phase 2: api-skeleton-wiring
 
-> **Status**: 👀 Review · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: ✅ Done · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
@@ -30,7 +30,7 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 | 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | ✅ Done | P0       | M    | 2.1        |
 | 2.3 | Audit processor + smoke enqueue endpoint                         | ✅ Done | P0       | S    | 2.2        |
 | 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | ✅ Done | P0       | S    | 2.3        |
-| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo | P0       | S    | 2.4        |
+| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | ✅ Done | P0       | S    | 2.4        |
 
 ## Tasks
 
@@ -351,4 +351,4 @@ main: `docs(plan): mark P2 complete`.
 - 2.2 ✅ 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot verified after the upstream DI + prefix fixes.
 - 2.3 ✅ 2026-07-09 Audit `@Processor` (no-concurrency fallback proof), in-memory trail, and smoke enqueue/inspect controller (proves `isGlobal`); 100% coverage. Live enqueue-to-complete journey verified after the upstream fixes.
 - 2.4 ✅ 2026-07-09 `/health/live` + `/health/ready` (timeout-bounded, secret-safe 503) and `/admin/diagnostics` (token probe, no credential echo); CI unit job now runs the real suite; 100% coverage. Live boot verified after the upstream fixes.
-- 2.5 🔄 2026-07-09 Phase-close audit + dashboards; PR opened and Copilot review requested. Merge/branch-deletion owned by the orchestrator. Boot DoD met after the upstream library fixes.
+- 2.5 ✅ 2026-07-09 Phase-close audit + dashboards; PR opened and Copilot review requested. Merge/branch-deletion owned by the orchestrator. Boot DoD met after the upstream library fixes.
