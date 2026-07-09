@@ -1,0 +1,57 @@
+name: Setup workspace
+description: >-
+  Set up Node + pnpm (corepack), provision the local @bymax-one/nest-queue
+  library (checked out beside the repo to satisfy the `file:` dependency and
+  built with tsup), then install the workspace with a frozen lockfile.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        node-version: 24
+
+    # pnpm comes from Node's bundled corepack rather than a third-party action, so
+    # the workflow uses only GitHub-owned actions. The version is taken from each
+    # package.json `packageManager` field, so it never drifts from the repo pin.
+    - name: Enable pnpm via corepack
+      shell: bash
+      env:
+        COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      run: |
+        corepack enable
+        pnpm --version
+
+    # The apps consume @bymax-one/nest-queue via `file:../../../nest-queue`, a
+    # sibling of the repo checkout, so the lockfile cannot resolve until the library
+    # is on disk. Check it out (public repo, tokenless), move it into place beside the
+    # workspace, then build it (it ships `dist/` via tsup). Once the library is
+    # published to npm and the dependency becomes a registry range, these three steps
+    # can be dropped and jobs install straight from the store.
+    - name: Check out the @bymax-one/nest-queue library
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      with:
+        repository: bymaxone/nest-queue
+        # Pinned to a specific commit for reproducible builds; bump intentionally
+        # to consume upstream library changes (a floating ref would let upstream
+        # silently change what CI builds).
+        ref: e6f44aaf99e78f0602c724c2a79c70eed6d0b861
+        path: .nest-queue-lib
+
+    - name: Position the library beside the workspace
+      shell: bash
+      run: |
+        rm -rf "${GITHUB_WORKSPACE}/../nest-queue"
+        mv "${GITHUB_WORKSPACE}/.nest-queue-lib" "${GITHUB_WORKSPACE}/../nest-queue"
+
+    - name: Build the library
+      shell: bash
+      working-directory: ${{ github.workspace }}/../nest-queue
+      run: |
+        pnpm install --frozen-lockfile
+        pnpm build
+
+    - name: Install workspace dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
