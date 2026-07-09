@@ -36,7 +36,7 @@ runs:
         # Pinned to a specific commit for reproducible builds; bump intentionally
         # to consume upstream library changes (a floating ref would let upstream
         # silently change what CI builds).
-        ref: e6f44aaf99e78f0602c724c2a79c70eed6d0b861
+        ref: 617c96c35988881e38ddda4feb60152043bdaedc
         path: .nest-queue-lib
 
     - name: Position the library beside the workspace

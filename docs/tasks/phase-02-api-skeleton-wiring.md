@@ -1,10 +1,10 @@
 # Phase 2: api-skeleton-wiring
 
-> **Status**: 🔄 In Progress · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 👀 Review · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P2)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §9, §10; matrix rows 1, 4, 5, 6, 10, 11
 
-> **Known blocker (runtime boot):** all consumer code is complete, statically green, and unit-tested at 100%, but the app cannot boot against the current built library. The `@bymax-one/nest-queue` dist is bundled with tsup/esbuild, which strips `emitDecoratorMetadata`; several of the library's own providers (`QueueService`, `WorkerRegistry`, `QueueEventsRegistry`, `QueueLifecycle`, and the non-exported `ProcessorDiscoveryService`) rely on class-reflection metadata for constructor params that are not `@Inject`-decorated, so `BymaxQueueModule` fails DI resolution. Reproduce with `BymaxQueueModule.forRoot({ connection: { url } })` alone. No consumer-side fix is possible (the affected `ProcessorDiscoveryService` is not exported). Upstream fix: decorate those params with `@Inject(...)` or build the library with a metadata-preserving compiler (e.g. `tsc`). The boot + smoke DoD unblocks the moment the library ships decorator metadata; the wiring in this phase is correct as-is.
+> **Boot blocker (resolved):** the boot + smoke DoD is met. It was briefly blocked by two upstream defects in `@bymax-one/nest-queue`, both fixed and released before this phase merged: (1) the tsup/esbuild bundle stripped `emitDecoratorMetadata`, so providers with non-`@Inject` constructor params failed DI resolution — fixed by decorating those params with explicit `@Inject`; (2) the configured key prefix was not propagated to the `Worker`, `QueueEvents`, or `FlowProducer`, so with a custom `QUEUE_PREFIX` producers and consumers diverged and jobs went unconsumed — fixed by passing the resolved prefix to all three. With the rebuilt library, the app boots against Redis and the smoke job enqueues and completes.
 
 ## Context
 
@@ -24,13 +24,13 @@ Phases 0 and 1 delivered governance and package resolution. This phase turns `ap
 
 ## Task index
 
-| ID  | Task                                                             | Status     | Priority | Size | Depends on |
-| --- | ---------------------------------------------------------------- | ---------- | -------- | ---- | ---------- |
-| 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done    | P0       | M    | Phase 1    |
-| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | 🟡 Partial | P0       | M    | 2.1        |
-| 2.3 | Audit processor + smoke enqueue endpoint                         | 🟡 Partial | P0       | S    | 2.2        |
-| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | 🟡 Partial | P0       | S    | 2.3        |
-| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo    | P0       | S    | 2.4        |
+| ID  | Task                                                             | Status  | Priority | Size | Depends on |
+| --- | ---------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 2.1 | Branch + NestJS skeleton + typed env parsing                     | ✅ Done | P0       | M    | Phase 1    |
+| 2.2 | `buildQueueOptions` factory + `forRootAsync` wiring + unit tests | ✅ Done | P0       | M    | 2.1        |
+| 2.3 | Audit processor + smoke enqueue endpoint                         | ✅ Done | P0       | S    | 2.2        |
+| 2.4 | Health endpoints + diagnostics skeleton + CI unit gate for real  | ✅ Done | P0       | S    | 2.3        |
+| 2.5 | Phase close: audit, dashboards, PR with Copilot review           | 📋 ToDo | P0       | S    | 2.4        |
 
 ## Tasks
 
@@ -99,7 +99,7 @@ completion log), commit `feat(api): nest skeleton with typed env parsing (2.1)`.
 
 ### Task 2.2: `buildQueueOptions` factory + `forRootAsync` wiring + unit tests
 
-- **Status**: 🟡 Partial
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 2.1
@@ -113,7 +113,7 @@ Implement spec §9.1: the pure `buildQueueOptions(env)` factory (Mode B url, pre
 - [x] `src/config/queue.config.ts` exports pure `buildQueueOptions(env: AppEnv): BymaxQueueModuleOptions` per spec §9.1 (Mode A/options-style branches arrive in Phase 6; leave documented TODO-free seams, the union just falls through to url).
 - [x] `AppModule` wires `BymaxQueueModule.forRootAsync({ inject: [APP_ENV], useFactory: buildQueueOptions })`.
 - [x] Jest unit config (`jest.config.cjs`, `maxWorkers: '50%'`) + tests covering: url connection shape, prefix propagation, defaultJobOptions override, flows/metrics enabled, shutdown values from env. (Config uses `.cjs`, not `.ts`: Jest 30 cannot load a TS config without `ts-node`; this matches the sibling-example convention.)
-- [ ] App boots against compose Redis: `pnpm --filter api start:dev` logs a ready state. **BLOCKED upstream**: the built `@bymax-one/nest-queue` package cannot be DI-instantiated because its tsup/esbuild bundle omits `design:paramtypes`, and `QueueService` (plus `WorkerRegistry`, `QueueEventsRegistry`, `QueueLifecycle`, `ProcessorDiscoveryService`) rely on class reflection for constructor params that are not `@Inject`-decorated. The wiring here is correct and boots once the library ships decorator metadata.
+- [x] App boots against compose Redis: `pnpm --filter api start:dev` logs a ready state. Verified — the app boots and `/health/ready` returns `{"status":"up"}` after the upstream library DI + prefix fixes.
 
 #### Files to create / modify
 
@@ -162,7 +162,7 @@ Completion Protocol: standard 5 steps, id 2.2, commit
 
 ### Task 2.3: Audit processor + smoke enqueue endpoint
 
-- **Status**: 🟡 Partial
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 2.2
@@ -175,7 +175,7 @@ Prove the enqueue-to-process loop: an `audit` queue with a minimal `@Processor` 
 
 - [x] `processors/audit.processor.ts`: `@Processor('audit')` class, `@Process()` handler appending entries to an in-memory ring buffer; no `concurrency` passed (documented why in a timeless comment: it demonstrates the library's warning fallback).
 - [x] `smoke/smoke.controller.ts` in a feature module that does NOT import `BymaxQueueModule`, injecting `QueueService` (row 4) and enqueuing `audit`/`entry` jobs typed `AuditJobData`.
-- [ ] Manual journey green: `curl -X POST :3080/smoke/audit` returns the job id; the ring buffer endpoint shows the processed entry. **BLOCKED upstream** (same cause as 2.2: the built library cannot boot); the code is complete and unit-tested.
+- [x] Manual journey green: `curl -X POST :3080/smoke/audit` returns the job id; the ring buffer endpoint shows the processed entry. Verified end-to-end (enqueue → complete within ~1s) with `QUEUE_PREFIX=nqex` after the upstream library fixes.
 - [x] Unit tests for the processor handler and controller (mocked `QueueService`).
 
 #### Files to create / modify
@@ -226,7 +226,7 @@ Completion Protocol: standard 5 steps, id 2.3, commit
 
 ### Task 2.4: Health endpoints + diagnostics skeleton + CI unit gate for real
 
-- **Status**: 🟡 Partial
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 2.3
@@ -298,7 +298,7 @@ Standard phase close: re-verify 2.1 to 2.4, update dashboards, open the PR, Copi
 
 #### Acceptance criteria
 
-- [x] All 2.1 to 2.4 static verifications re-run green (lint, typecheck, build, api unit at 100%). Boot journey blocked upstream (see the phase-level known blocker).
+- [x] All 2.1 to 2.4 static verifications re-run green (lint, typecheck, build, api unit at 100%). Boot + smoke journey verified after the upstream library fixes.
 - [x] Dashboards updated (this file, plan §1 P2 row, tasks README).
 - [ ] PR merged squash, branch deleted, CI green, Copilot findings resolved. (Owned by the orchestrator; this agent stops after opening the PR and requesting review.)
 
@@ -348,7 +348,7 @@ main: `docs(plan): mark P2 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 2.1 ✅ 2026-07-09 NestJS 11 skeleton (main.ts, AppModule) + typed env parsing (zod, frozen APP_ENV token, fail-fast on bad env).
-- 2.2 🟡 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot blocked upstream (library dist omits decorator metadata).
-- 2.3 🟡 2026-07-09 Audit `@Processor` (no-concurrency fallback proof), in-memory trail, and smoke enqueue/inspect controller (proves `isGlobal`); 100% coverage. Live curl journey blocked upstream.
-- 2.4 🟡 2026-07-09 `/health/live` + `/health/ready` (timeout-bounded, secret-safe 503) and `/admin/diagnostics` (token probe, no credential echo); CI unit job now runs the real suite; 100% coverage. Live boot verification blocked upstream.
-- 2.5 🔄 2026-07-09 Phase-close audit + dashboards; PR opened and Copilot review requested. Merge/branch-deletion owned by the orchestrator. Boot DoD blocked upstream (library dist omits decorator metadata).
+- 2.2 ✅ 2026-07-09 Pure `buildQueueOptions` factory + `forRootAsync` wiring + Jest unit config; 100% coverage. Boot verified after the upstream DI + prefix fixes.
+- 2.3 ✅ 2026-07-09 Audit `@Processor` (no-concurrency fallback proof), in-memory trail, and smoke enqueue/inspect controller (proves `isGlobal`); 100% coverage. Live enqueue-to-complete journey verified after the upstream fixes.
+- 2.4 ✅ 2026-07-09 `/health/live` + `/health/ready` (timeout-bounded, secret-safe 503) and `/admin/diagnostics` (token probe, no credential echo); CI unit job now runs the real suite; 100% coverage. Live boot verified after the upstream fixes.
+- 2.5 🔄 2026-07-09 Phase-close audit + dashboards; PR opened and Copilot review requested. Merge/branch-deletion owned by the orchestrator. Boot DoD met after the upstream library fixes.
