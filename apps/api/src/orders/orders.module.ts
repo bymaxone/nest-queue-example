@@ -5,13 +5,15 @@
  * @layer app/orders
  */
 import { Module } from '@nestjs/common'
+import { OnboardingController } from './onboarding.controller.js'
+import { OnboardingService } from './onboarding.service.js'
 import { OrdersController } from './orders.controller.js'
 import { OrdersRepository } from './orders.repository.js'
 import { OrdersService } from './orders.service.js'
 
-/** Module exposing the order placement surface. */
+/** Module exposing the order placement and onboarding surfaces. */
 @Module({
-  controllers: [OrdersController],
-  providers: [OrdersService, OrdersRepository],
+  controllers: [OrdersController, OnboardingController],
+  providers: [OrdersService, OrdersRepository, OnboardingService],
 })
 export class OrdersModule {}

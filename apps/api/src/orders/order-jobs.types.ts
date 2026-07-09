@@ -21,3 +21,15 @@ export interface ReceiptEmailJobResult {
   /** Provider message id of the sent receipt. */
   messageId: string
 }
+
+/** Payload of a `send-welcome` job on the `email` queue. */
+export interface WelcomeEmailJobData {
+  /** Identifier of the user being onboarded. */
+  userId: string
+}
+
+/** Result returned by the `send-welcome` handler once the welcome is dispatched. */
+export interface WelcomeEmailJobResult {
+  /** Provider message id of the sent welcome email. */
+  messageId: string
+}

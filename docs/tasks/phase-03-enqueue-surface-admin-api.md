@@ -1,6 +1,6 @@
 # Phase 3: enqueue-surface-admin-api
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P3)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.2, §7.3, §11; matrix rows 12 to 27, 31, 32
 
@@ -24,7 +24,7 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 | ID  | Task                                                        | Status  | Priority | Size | Depends on |
 | --- | ----------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done | P0       | M    | Phase 2    |
-| 3.2 | Priority, delay, and `jobId` idempotency endpoints          | 📋 ToDo | P0       | S    | 3.1        |
+| 3.2 | Priority, delay, and `jobId` idempotency endpoints          | ✅ Done | P0       | S    | 3.1        |
 | 3.3 | Four deduplication modes + dedup inspector                  | 📋 ToDo | P0       | M    | 3.1        |
 | 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | 📋 ToDo | P0       | S    | 3.1        |
 | 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | 📋 ToDo | P0       | M    | 3.1        |
@@ -100,7 +100,7 @@ completion log), commit `feat(api): orderly domain with typed receipt enqueue (3
 
 ### Task 3.2: Priority, delay, and `jobId` idempotency endpoints
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 3.1
@@ -111,10 +111,10 @@ Per-job options in anger: `POST /orders/:id/remind` (delayed job, row 15), VIP p
 
 #### Acceptance criteria
 
-- [ ] `POST /orders` accepts `vip: true` mapping to `priority: 1` (documented: lower is higher priority in BullMQ).
-- [ ] `POST /orders/:id/remind` enqueues with `delay: 60_000` (env-tunable); the job is visible under `delayed` status.
-- [ ] `POST /onboarding/:userId` enqueues with `jobId: welcome:<userId>`; a second call returns `{ created: false, jobId }` (compare returned job id / existing state, no error).
-- [ ] Unit tests cover the three option paths (assert the options object passed to `enqueue`).
+- [x] `POST /orders` accepts `vip: true` mapping to `priority: 1` (documented: lower is higher priority in BullMQ).
+- [x] `POST /orders/:id/remind` enqueues with `delay: 60_000` (env-tunable); the job is visible under `delayed` status.
+- [x] `POST /onboarding/:userId` enqueues with `jobId: welcome-<userId>` (hyphen: BullMQ rejects a single-colon custom id); a second call returns `{ created: false, jobId }` (compare existing state, no error).
+- [x] Unit tests cover the three option paths (assert the options object passed to `enqueue`).
 
 #### Files to create / modify
 
@@ -399,3 +399,4 @@ main: `docs(plan): mark P3 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 3.1 ✅ 2026-07-09 Orderly domain: bounded in-memory OrdersRepository, POST /orders typed send-receipt enqueue, AdminQueuesService per-queue override + caching, shared zod validation surfacing queue.invalid_job_data.
+- 3.2 ✅ 2026-07-09 Per-job options: VIP priority on placement, env-tunable delayed reminder (delayed set), idempotent POST /onboarding/:userId welcome via hyphenated jobId returning created:true/false.
