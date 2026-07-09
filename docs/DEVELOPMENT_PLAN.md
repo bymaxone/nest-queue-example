@@ -12,12 +12,12 @@
 ## 1. Progress dashboard
 
 > **Progress:** 0 / 10 phases complete (0%) · 0 / 53 tasks
-> **Active phase:** none (awaiting kick-off)
+> **Active phase:** P0 repo-foundation
 > **Blockers:** none
 
 | ID | Phase | Status | Progress | Size | Last updated |
 |---|---|---|---|---|---|
-| P0 | repo-foundation | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
+| P0 | repo-foundation | 🔄 In Progress | 0/5 tasks | M | 2026-07-09 |
 | P1 | library-consumption | 📋 ToDo | 0/4 tasks | S | 2026-07-06 |
 | P2 | api-skeleton-wiring | 📋 ToDo | 0/5 tasks | M | 2026-07-06 |
 | P3 | enqueue-surface-admin-api | 📋 ToDo | 0/6 tasks | L | 2026-07-06 |
