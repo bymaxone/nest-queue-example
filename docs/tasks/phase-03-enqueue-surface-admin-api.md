@@ -1,6 +1,6 @@
 # Phase 3: enqueue-surface-admin-api
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P3)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.2, §7.3, §11; matrix rows 12 to 27, 31, 32
 
@@ -25,7 +25,7 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 | --- | ----------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done | P0       | M    | Phase 2    |
 | 3.2 | Priority, delay, and `jobId` idempotency endpoints          | ✅ Done | P0       | S    | 3.1        |
-| 3.3 | Four deduplication modes + dedup inspector                  | 📋 ToDo | P0       | M    | 3.1        |
+| 3.3 | Four deduplication modes + dedup inspector                  | ✅ Done | P0       | M    | 3.1        |
 | 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | 📋 ToDo | P0       | S    | 3.1        |
 | 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | 📋 ToDo | P0       | M    | 3.1        |
 | 3.6 | Phase close: audit, dashboards, PR with Copilot review      | 📋 ToDo | P0       | S    | 3.2 to 3.5 |
@@ -160,7 +160,7 @@ Completion Protocol: standard 5 steps, id 3.2, commit
 
 ### Task 3.3: Four deduplication modes + dedup inspector
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 3.1
@@ -171,10 +171,10 @@ The dedup lab (matrix rows 17 to 21): `POST /search/reindex` with `mode` selecti
 
 #### Acceptance criteria
 
-- [ ] `search/` module: `POST /search/reindex { term, mode }` maps modes exactly per the library spec table: simple `{ id }`, throttle `{ id, ttl: 5000 }`, debounce `{ id, ttl: 5000, extend: true, replace: true }` + `delay: 2000`, keepLast `{ id, keepLastIfActive: true }`; dedup id is `reindex:<term>`.
-- [ ] `GET /admin/dedup/:queue/:id` returns the deduplication job id (or null); `DELETE /admin/dedup/:queue/:id` clears the key.
-- [ ] Response includes `{ jobId, deduplicated: boolean }` (comparing requested vs returned id) so the lab is observable without the dashboard.
-- [ ] Unit tests per mode asserting the exact `deduplication` option shape.
+- [x] `search/` module: `POST /search/reindex { term, mode }` maps modes exactly per the library spec table: simple `{ id }`, throttle `{ id, ttl: 5000 }`, debounce `{ id, ttl: 5000, extend: true, replace: true }` + `delay: 2000`, keepLast `{ id, keepLastIfActive: true }`; dedup id is `reindex:<term>`.
+- [x] `GET /admin/dedup/:queue/:id` returns the deduplication job id (or null); `DELETE /admin/dedup/:queue/:id` clears the key.
+- [x] Response includes `{ jobId, deduplicated: boolean }` (comparing requested vs returned id) so the lab is observable without the dashboard.
+- [x] Unit tests per mode asserting the exact `deduplication` option shape.
 
 #### Files to create / modify
 
@@ -400,3 +400,4 @@ main: `docs(plan): mark P3 complete`.
 
 - 3.1 ✅ 2026-07-09 Orderly domain: bounded in-memory OrdersRepository, POST /orders typed send-receipt enqueue, AdminQueuesService per-queue override + caching, shared zod validation surfacing queue.invalid_job_data.
 - 3.2 ✅ 2026-07-09 Per-job options: VIP priority on placement, env-tunable delayed reminder (delayed set), idempotent POST /onboarding/:userId welcome via hyphenated jobId returning created:true/false.
+- 3.3 ✅ 2026-07-09 Dedup lab: POST /search/reindex maps all four modes to the exact BullMQ deduplication shapes with { jobId, deduplicated }; GET/DELETE /admin/dedup/:queue/:id inspector over the native getDeduplicationJobId/removeDeduplicationKey.
