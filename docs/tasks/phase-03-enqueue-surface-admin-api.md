@@ -1,6 +1,6 @@
 # Phase 3: enqueue-surface-admin-api
 
-> **Status**: 👀 Review · **Progress**: 5 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: ✅ Done · **Progress**: 6 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P3)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.2, §7.3, §11; matrix rows 12 to 27, 31, 32
 
@@ -21,14 +21,14 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 
 ## Task index
 
-| ID  | Task                                                        | Status    | Priority | Size | Depends on |
-| --- | ----------------------------------------------------------- | --------- | -------- | ---- | ---------- |
-| 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done   | P0       | M    | Phase 2    |
-| 3.2 | Priority, delay, and `jobId` idempotency endpoints          | ✅ Done   | P0       | S    | 3.1        |
-| 3.3 | Four deduplication modes + dedup inspector                  | ✅ Done   | P0       | M    | 3.1        |
-| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | ✅ Done   | P0       | S    | 3.1        |
-| 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | ✅ Done   | P0       | M    | 3.1        |
-| 3.6 | Phase close: audit, dashboards, PR with Copilot review      | 👀 Review | P0       | S    | 3.2 to 3.5 |
+| ID  | Task                                                        | Status  | Priority | Size | Depends on |
+| --- | ----------------------------------------------------------- | ------- | -------- | ---- | ---------- |
+| 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done | P0       | M    | Phase 2    |
+| 3.2 | Priority, delay, and `jobId` idempotency endpoints          | ✅ Done | P0       | S    | 3.1        |
+| 3.3 | Four deduplication modes + dedup inspector                  | ✅ Done | P0       | M    | 3.1        |
+| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | ✅ Done | P0       | S    | 3.1        |
+| 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | ✅ Done | P0       | M    | 3.1        |
+| 3.6 | Phase close: audit, dashboards, PR with Copilot review      | ✅ Done | P0       | S    | 3.2 to 3.5 |
 
 ## Tasks
 
@@ -403,4 +403,4 @@ main: `docs(plan): mark P3 complete`.
 - 3.3 ✅ 2026-07-09 Dedup lab: POST /search/reindex maps all four modes to the exact BullMQ deduplication shapes with { jobId, deduplicated }; GET/DELETE /admin/dedup/:queue/:id inspector over the native getDeduplicationJobId/removeDeduplicationKey.
 - 3.4 ✅ 2026-07-09 Bulk campaigns: POST /campaigns/receipts fans out N ordered send-receipt jobs via enqueueBulk; zod ceiling 1200 lets 1001 reach the library's queue.bulk_enqueue_failed guard with zero partial enqueue.
 - 3.5 ✅ 2026-07-09 Admin plane: GET /admin/queues (direct getMetrics), GET /admin/queues/:name/jobs (status+pagination), pause/resume/clean, GET /admin/jobs/:queue/:id; allow-list guard surfaces queue.queue_not_found and consumer-raised queue.job_not_found via the library's stable envelope.
-- 3.6 👀 2026-07-09 Phase close: security review clean, code-review findings (2 MEDIUM + 2 LOW) all resolved, gates re-run green; PR opened and Copilot review requested (merge owned by the orchestrator).
+- 3.6 ✅ 2026-07-09 Phase close: security review clean, code-review findings (2 MEDIUM + 2 LOW) all resolved, gates re-run green; PR opened and Copilot review requested (merge owned by the orchestrator).
