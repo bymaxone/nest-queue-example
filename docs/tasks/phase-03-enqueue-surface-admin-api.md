@@ -1,6 +1,6 @@
 # Phase 3: enqueue-surface-admin-api
 
-> **Status**: 🔄 In Progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 4 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P3)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.2, §7.3, §11; matrix rows 12 to 27, 31, 32
 
@@ -26,7 +26,7 @@ The api boots with one smoke queue. This phase builds the producer side of the O
 | 3.1 | Branch + Orderly domain + typed order placement enqueue     | ✅ Done | P0       | M    | Phase 2    |
 | 3.2 | Priority, delay, and `jobId` idempotency endpoints          | ✅ Done | P0       | S    | 3.1        |
 | 3.3 | Four deduplication modes + dedup inspector                  | ✅ Done | P0       | M    | 3.1        |
-| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | 📋 ToDo | P0       | S    | 3.1        |
+| 3.4 | `enqueueBulk` campaigns + bounded-bulk error path           | ✅ Done | P0       | S    | 3.1        |
 | 3.5 | Admin inspection/control API (jobs, queues, metrics direct) | 📋 ToDo | P0       | M    | 3.1        |
 | 3.6 | Phase close: audit, dashboards, PR with Copilot review      | 📋 ToDo | P0       | S    | 3.2 to 3.5 |
 
@@ -222,7 +222,7 @@ Completion Protocol: standard 5 steps, id 3.3, commit
 
 ### Task 3.4: `enqueueBulk` campaigns + bounded-bulk error path
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 3.1
@@ -233,9 +233,9 @@ Fan-out in one roundtrip (rows 22, 23): `POST /campaigns/receipts { count }` bul
 
 #### Acceptance criteria
 
-- [ ] `POST /campaigns/receipts` builds `BulkJob<ReceiptEmailJobData>[]` and calls `enqueueBulk`; returns `{ enqueued, jobIds }`.
-- [ ] `count: 1001` yields the library error envelope (`error.code: 'queue.bulk_enqueue_failed'`) and queue counts prove zero new jobs.
-- [ ] Unit tests: happy path order preservation, oversized rejection.
+- [x] `POST /campaigns/receipts` builds `BulkJob<ReceiptEmailJobData>[]` and calls `enqueueBulk`; returns `{ enqueued, jobIds }`.
+- [x] `count: 1001` yields the library error envelope (`error.code: 'queue.bulk_enqueue_failed'`) and queue counts prove zero new jobs.
+- [x] Unit tests: happy path order preservation, oversized rejection.
 
 #### Files to create / modify
 
@@ -401,3 +401,4 @@ main: `docs(plan): mark P3 complete`.
 - 3.1 ✅ 2026-07-09 Orderly domain: bounded in-memory OrdersRepository, POST /orders typed send-receipt enqueue, AdminQueuesService per-queue override + caching, shared zod validation surfacing queue.invalid_job_data.
 - 3.2 ✅ 2026-07-09 Per-job options: VIP priority on placement, env-tunable delayed reminder (delayed set), idempotent POST /onboarding/:userId welcome via hyphenated jobId returning created:true/false.
 - 3.3 ✅ 2026-07-09 Dedup lab: POST /search/reindex maps all four modes to the exact BullMQ deduplication shapes with { jobId, deduplicated }; GET/DELETE /admin/dedup/:queue/:id inspector over the native getDeduplicationJobId/removeDeduplicationKey.
+- 3.4 ✅ 2026-07-09 Bulk campaigns: POST /campaigns/receipts fans out N ordered send-receipt jobs via enqueueBulk; zod ceiling 1200 lets 1001 reach the library's queue.bulk_enqueue_failed guard with zero partial enqueue.

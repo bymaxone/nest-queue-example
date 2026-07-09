@@ -5,15 +5,17 @@
  * @layer app/orders
  */
 import { Module } from '@nestjs/common'
+import { CampaignController } from './campaign.controller.js'
+import { CampaignService } from './campaign.service.js'
 import { OnboardingController } from './onboarding.controller.js'
 import { OnboardingService } from './onboarding.service.js'
 import { OrdersController } from './orders.controller.js'
 import { OrdersRepository } from './orders.repository.js'
 import { OrdersService } from './orders.service.js'
 
-/** Module exposing the order placement and onboarding surfaces. */
+/** Module exposing the order placement, onboarding, and campaign surfaces. */
 @Module({
-  controllers: [OrdersController, OnboardingController],
-  providers: [OrdersService, OrdersRepository, OnboardingService],
+  controllers: [OrdersController, OnboardingController, CampaignController],
+  providers: [OrdersService, OrdersRepository, OnboardingService, CampaignService],
 })
 export class OrdersModule {}
