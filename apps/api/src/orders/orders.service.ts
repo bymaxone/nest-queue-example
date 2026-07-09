@@ -2,7 +2,7 @@
  * @fileoverview Order placement service. Stores the order in memory and enqueues
  * strongly-typed email jobs: a `send-receipt` on placement (VIP orders jump the
  * queue via priority) and a delayed reminder on demand. The email processor
- * arrives later, so the jobs wait — a visible, correct producer/consumer split.
+ * arrives later, so the jobs wait: a visible, correct producer/consumer split.
  * @layer app/orders
  */
 import { randomUUID } from 'node:crypto'

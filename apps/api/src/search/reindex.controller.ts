@@ -8,11 +8,15 @@ import { z } from 'zod'
 import { parseJobData } from '../http/validation.js'
 import { ReindexService } from './reindex.service.js'
 import type { ReindexResult } from './reindex.service.js'
+import { DEDUP_MODES } from './search.constants.js'
+
+/** Maximum accepted search-term length; a demo guardrail against absurd input. */
+const MAX_TERM_LENGTH = 128
 
 /** Body accepted by `POST /search/reindex`. */
 const reindexSchema = z.object({
-  term: z.string().min(1).max(128),
-  mode: z.enum(['simple', 'throttle', 'debounce', 'keepLast']),
+  term: z.string().min(1).max(MAX_TERM_LENGTH),
+  mode: z.enum(DEDUP_MODES),
 })
 
 /** Enqueue surface for the deduplication laboratory. */

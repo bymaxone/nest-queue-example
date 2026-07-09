@@ -5,9 +5,6 @@
  * @layer app/search
  */
 
-/** The four BullMQ-native deduplication strategies the reindex lab exposes. */
-export type DedupMode = 'simple' | 'throttle' | 'debounce' | 'keepLast'
-
 /** Payload of a `reindex` job on the `search` queue. */
 export interface ReindexJobData {
   /** The search term whose index is being rebuilt. */

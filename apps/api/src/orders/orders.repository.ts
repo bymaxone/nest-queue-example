@@ -58,13 +58,4 @@ export class OrdersRepository {
   find(id: string): StoredOrder | undefined {
     return this.orders.get(id)
   }
-
-  /**
-   * Snapshot every stored order, oldest first.
-   *
-   * @returns A read-only copy of the current orders.
-   */
-  list(): readonly StoredOrder[] {
-    return [...this.orders.values()]
-  }
 }

@@ -11,7 +11,8 @@ import { QueueService } from '@bymax-one/nest-queue'
 import type { JobsOptions } from '@bymax-one/nest-queue'
 import { SEARCH_QUEUE } from '../queues/queue-names.js'
 import { REINDEX_JOB } from './search.constants.js'
-import type { DedupMode, ReindexJobData, ReindexJobResult } from './search-jobs.types.js'
+import type { DedupMode } from './search.constants.js'
+import type { ReindexJobData, ReindexJobResult } from './search-jobs.types.js'
 
 /** Deduplication window (ms) for the throttle and debounce modes. */
 const DEDUP_TTL_MS = 5000

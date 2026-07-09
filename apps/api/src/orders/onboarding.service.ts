@@ -39,6 +39,12 @@ export class OnboardingService {
    * Enqueue a welcome email for a user, idempotently by `jobId`. A second call
    * while the first job still exists neither errors nor double-inserts.
    *
+   * The `created` flag comes from a non-atomic check-then-act (read via `getJob`,
+   * then `enqueue`), so under two concurrent identical requests both may report
+   * `created: true`. The enqueue itself stays idempotent: BullMQ still creates at
+   * most one job for the id, so only the reported flag, never the job count, can
+   * be affected.
+   *
    * @param userId - The user to onboard.
    * @returns Whether the job was newly created and its stable id.
    */

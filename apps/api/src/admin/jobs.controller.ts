@@ -10,8 +10,11 @@ import { parseRequest } from '../http/validation.js'
 import { AdminQueuesService } from './queues.service.js'
 import type { JobView } from './queues.service.js'
 
+/** Upper bound on a job-id length; a demo guardrail against absurd input. */
+const MAX_JOB_ID_LENGTH = 128
+
 /** Bounds the job-id path param before lookup. */
-const jobIdSchema = z.string().min(1).max(128)
+const jobIdSchema = z.string().min(1).max(MAX_JOB_ID_LENGTH)
 
 /** Job detail surface for the managed queues. */
 @Controller('admin/jobs')

@@ -20,8 +20,22 @@ import type { KnownQueue } from '../queues/queue-names.js'
  */
 const EMAIL_QUEUE_ATTEMPTS = 5
 
-/** Statuses BullMQ's `clean` accepts (mirrors the library's internal type). */
-export type CleanStatus = 'completed' | 'failed' | 'delayed' | 'wait' | 'active' | 'paused'
+/**
+ * Statuses BullMQ's `clean` accepts (mirrors the library's internal type). The
+ * single source of truth for both the {@link CleanStatus} union and the clean
+ * request schema, so the accepted set is declared once.
+ */
+export const CLEAN_STATUSES = [
+  'completed',
+  'failed',
+  'delayed',
+  'wait',
+  'active',
+  'paused',
+] as const
+
+/** A status accepted by {@link AdminQueuesService.clean}. */
+export type CleanStatus = (typeof CLEAN_STATUSES)[number]
 
 /** A serializable projection of a BullMQ `Job` for the admin surface. */
 export interface JobView {

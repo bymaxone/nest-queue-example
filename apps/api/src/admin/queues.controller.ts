@@ -11,7 +11,7 @@ import { JOB_STATUS } from '@bymax-one/nest-queue'
 import type { QueueMetrics } from '@bymax-one/nest-queue'
 import { z } from 'zod'
 import { parseRequest } from '../http/validation.js'
-import { AdminQueuesService } from './queues.service.js'
+import { AdminQueuesService, CLEAN_STATUSES } from './queues.service.js'
 import type { JobView } from './queues.service.js'
 
 /** Query accepted by the jobs listing: status filter plus pagination window. */
@@ -25,9 +25,7 @@ const jobsQuerySchema = z.object({
 const cleanSchema = z.object({
   gracePeriodMs: z.number().int().nonnegative().default(0),
   limit: z.number().int().nonnegative().default(0),
-  status: z
-    .enum(['completed', 'failed', 'delayed', 'wait', 'active', 'paused'])
-    .default('completed'),
+  status: z.enum(CLEAN_STATUSES).default('completed'),
 })
 
 /** Inspection and control surface for the managed queues. */

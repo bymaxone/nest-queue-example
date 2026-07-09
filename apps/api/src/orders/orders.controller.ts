@@ -13,8 +13,11 @@ import type { PlacedOrder } from './orders.service.js'
 /** Upper bound on an order total; a demo guardrail against absurd input. */
 const MAX_ORDER_TOTAL = 1_000_000
 
+/** Upper bound on an order-id length; a demo guardrail against absurd input. */
+const MAX_ORDER_ID_LENGTH = 128
+
 /** Bounds the order-id path param so a malformed id is rejected before lookup. */
-const orderIdSchema = z.string().min(1).max(128)
+const orderIdSchema = z.string().min(1).max(MAX_ORDER_ID_LENGTH)
 
 /**
  * Body accepted by `POST /orders`. The email uses the HTML5 pattern (matching a

@@ -10,8 +10,11 @@ import { z } from 'zod'
 import { parseRequest } from '../http/validation.js'
 import { AdminQueuesService } from './queues.service.js'
 
+/** Upper bound on a dedup key length; a demo guardrail against absurd input. */
+const MAX_DEDUP_KEY_LENGTH = 256
+
 /** Bounds the dedup key path param; keys may legitimately contain colons. */
-const dedupKeySchema = z.string().min(1).max(256)
+const dedupKeySchema = z.string().min(1).max(MAX_DEDUP_KEY_LENGTH)
 
 /** View and clear deduplication keys on a managed queue. */
 @Controller('admin/dedup')

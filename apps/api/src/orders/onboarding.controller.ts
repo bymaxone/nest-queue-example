@@ -9,6 +9,9 @@ import { parseRequest } from '../http/validation.js'
 import { OnboardingService } from './onboarding.service.js'
 import type { OnboardingResult } from './onboarding.service.js'
 
+/** Upper bound on a user-id length; a demo guardrail against absurd input. */
+const MAX_USER_ID_LENGTH = 64
+
 /**
  * Bounds the user-id path param to a safe charset. Colons are excluded so the
  * derived welcome job id stays valid for BullMQ.
@@ -16,7 +19,7 @@ import type { OnboardingResult } from './onboarding.service.js'
 const userIdSchema = z
   .string()
   .regex(/^[A-Za-z0-9_-]+$/)
-  .max(64)
+  .max(MAX_USER_ID_LENGTH)
 
 /** Enqueue surface for idempotent user onboarding. */
 @Controller('onboarding')

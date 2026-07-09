@@ -34,7 +34,7 @@ describe('OrdersRepository (unit)', () => {
   it('stores an order and reads it back by id', () => {
     /*
      * Scenario: save then find.
-     * Rule it protects: a saved order is retrievable by its id and list reflects it.
+     * Rule it protects: a saved order is retrievable by its id.
      */
     const repo = new OrdersRepository()
 
@@ -42,7 +42,6 @@ describe('OrdersRepository (unit)', () => {
 
     expect(saved.id).toBe('a')
     expect(repo.find('a')).toEqual(order('a'))
-    expect(repo.list()).toHaveLength(1)
   })
 
   it('returns undefined for an unknown id', () => {
@@ -56,24 +55,25 @@ describe('OrdersRepository (unit)', () => {
   it('evicts the oldest order once capacity is exceeded', () => {
     /*
      * Scenario: insert one more than the capacity.
-     * Rule it protects: the store stays bounded and drops the oldest entry so a
-     * long-running demo cannot grow without limit.
+     * Rule it protects: the store stays bounded, dropping exactly the oldest entry
+     * (id-0) while keeping the next-oldest and newest, so a long-running demo
+     * cannot grow without limit.
      */
     const repo = new OrdersRepository()
     for (let index = 0; index < CAPACITY + 1; index += 1) {
       repo.save(order(`id-${String(index)}`))
     }
 
-    expect(repo.list()).toHaveLength(CAPACITY)
     expect(repo.find('id-0')).toBeUndefined()
+    expect(repo.find('id-1')).toBeDefined()
     expect(repo.find(`id-${String(CAPACITY)}`)).toBeDefined()
   })
 
   it('updates an existing order in place without evicting', () => {
     /*
      * Scenario: fill to capacity, then re-save an existing id.
-     * Rule it protects: overwriting an existing key is not a growth event, so it
-     * must not evict a different entry.
+     * Rule it protects: overwriting an existing key is not a growth event, so the
+     * oldest untouched entry (id-1) must survive and the update must apply.
      */
     const repo = new OrdersRepository()
     for (let index = 0; index < CAPACITY; index += 1) {
@@ -82,7 +82,8 @@ describe('OrdersRepository (unit)', () => {
 
     repo.save({ ...order('id-0'), total: 99 })
 
-    expect(repo.list()).toHaveLength(CAPACITY)
     expect(repo.find('id-0')?.total).toBe(99)
+    expect(repo.find('id-1')).toBeDefined()
+    expect(repo.find(`id-${String(CAPACITY - 1)}`)).toBeDefined()
   })
 })
