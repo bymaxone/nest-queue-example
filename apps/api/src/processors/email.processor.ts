@@ -11,7 +11,7 @@
  * dependency-free while making the pattern visible.
  * @layer app/processors
  */
-import { Process, Processor } from '@bymax-one/nest-queue'
+import { OnWorkerEvent, Process, Processor } from '@bymax-one/nest-queue'
 import type { Job } from '@bymax-one/nest-queue'
 import { EMAIL_QUEUE } from '../queues/queue-names.js'
 import { RECEIPT_JOB, WELCOME_JOB } from '../orders/order-jobs.constants.js'
@@ -21,6 +21,8 @@ import type {
   WelcomeEmailJobData,
   WelcomeEmailJobResult,
 } from '../orders/order-jobs.types.js'
+import { EventFeed } from '../events/event-feed.service.js'
+import { redact } from '../events/redact.js'
 import { AuditTrail } from './audit-trail.service.js'
 import { MailerStub } from './mailer.stub.js'
 
@@ -43,6 +45,7 @@ export class EmailProcessor {
   constructor(
     private readonly mailer: MailerStub,
     private readonly trail: AuditTrail,
+    private readonly feed: EventFeed,
   ) {}
 
   /**
@@ -83,6 +86,86 @@ export class EmailProcessor {
   @Process()
   handleUnknown(job: Job<unknown>): void {
     this.trail.append({ at: new Date().toISOString(), payload: `unhandled email job: ${job.name}` })
+  }
+
+  /**
+   * Worker-local `completed` listener. Receives the full `Job`, so it bridges the
+   * redacted payload, attempts, and the actual return value onto the feed.
+   *
+   * @param job - The completed job.
+   * @param returnValue - The handler's return value.
+   */
+  @OnWorkerEvent('completed')
+  onCompleted(job: Job<unknown, unknown>, returnValue: unknown): void {
+    this.feed.push({
+      source: 'worker',
+      queue: EMAIL_QUEUE,
+      event: 'completed',
+      jobId: job.id,
+      at: new Date().toISOString(),
+      data: redact(job.data),
+      returnvalue: returnValue,
+      attemptsMade: job.attemptsMade,
+    })
+  }
+
+  /**
+   * Worker-local `failed` listener. The job may be undefined if it failed before
+   * the worker fetched it, so payload and attempts are bridged only when present.
+   *
+   * @param job - The failed job, or undefined when unavailable.
+   * @param error - The error that failed the job.
+   */
+  @OnWorkerEvent('failed')
+  onFailed(job: Job<unknown> | undefined, error: Error): void {
+    const base = {
+      source: 'worker' as const,
+      queue: EMAIL_QUEUE,
+      event: 'failed',
+      jobId: job?.id,
+      at: new Date().toISOString(),
+      failedReason: error.message,
+    }
+    this.feed.push(job ? { ...base, data: redact(job.data), attemptsMade: job.attemptsMade } : base)
+  }
+
+  /**
+   * Worker-local `progress` listener. Bridges the reported progress (a number or
+   * a structured object) onto the feed.
+   *
+   * @param job - The job reporting progress.
+   * @param progress - The reported progress value.
+   */
+  @OnWorkerEvent('progress')
+  onProgress(job: Job<unknown>, progress: number | object): void {
+    this.feed.push({
+      source: 'worker',
+      queue: EMAIL_QUEUE,
+      event: 'progress',
+      jobId: job.id,
+      at: new Date().toISOString(),
+      progress,
+      attemptsMade: job.attemptsMade,
+    })
+  }
+
+  /**
+   * Worker-local `active` listener. Bridges the redacted payload of a job that has
+   * just started processing.
+   *
+   * @param job - The job that became active.
+   */
+  @OnWorkerEvent('active')
+  onActive(job: Job<unknown>): void {
+    this.feed.push({
+      source: 'worker',
+      queue: EMAIL_QUEUE,
+      event: 'active',
+      jobId: job.id,
+      at: new Date().toISOString(),
+      data: redact(job.data),
+      attemptsMade: job.attemptsMade,
+    })
   }
 
   /**

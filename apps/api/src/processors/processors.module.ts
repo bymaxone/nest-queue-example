@@ -5,6 +5,7 @@
  * @layer app/processors
  */
 import { Module } from '@nestjs/common'
+import { EventsModule } from '../events/events.module.js'
 import { AuditTrail } from './audit-trail.service.js'
 import { AuditProcessor } from './audit.processor.js'
 import { EmailProcessor } from './email.processor.js'
@@ -13,8 +14,13 @@ import { ReportProcessor } from './report.processor.js'
 import { WebhookLog } from './webhook-log.service.js'
 import { WebhookProcessor } from './webhook.processor.js'
 
-/** Module holding the queue processors and their inspectable in-memory state. */
+/**
+ * Module holding the queue processors and their inspectable in-memory state.
+ * Imports the events module so the processors can bridge worker-local and global
+ * queue events into the shared feed.
+ */
 @Module({
+  imports: [EventsModule],
   providers: [
     AuditTrail,
     AuditProcessor,

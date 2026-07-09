@@ -1,6 +1,6 @@
 # Phase 4: workers-events
 
-> **Status**: 🔄 In progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In progress · **Progress**: 4 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P4)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4; matrix rows 34 to 46
 
@@ -27,7 +27,7 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 | 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | ✅ Done | P0       | M    | Phase 3    |
 | 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done | P0       | M    | 4.1        |
 | 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | ✅ Done | P0       | S    | 4.1        |
-| 4.4 | Event decorators bridged to the SSE stream                                            | 📋 ToDo | P0       | M    | 4.1        |
+| 4.4 | Event decorators bridged to the SSE stream                                            | ✅ Done | P0       | M    | 4.1        |
 | 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | 📋 ToDo | P1       | S    | 4.2        |
 | 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 📋 ToDo | P0       | S    | 4.2 to 4.5 |
 
@@ -222,7 +222,7 @@ Completion Protocol: standard 5 steps, id 4.3, commit
 
 ### Task 4.4: Event decorators bridged to the SSE stream
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 4.1
@@ -233,10 +233,12 @@ Rows 44, 45: `@OnWorkerEvent` listeners (completed, failed, progress, active: fu
 
 #### Acceptance criteria
 
-- [ ] `events/` module: `EventFeed` service (ring buffer cap 200, RxJS Subject for live push), `worker-events` listeners on the email processor class (completed/failed/progress/active) capturing `job.data`, `attemptsMade`, `returnvalue`, and `queue-events` listeners (completed/failed/drained on `webhooks`) capturing `jobId` + string `returnvalue` with a `getJob` fallback lookup demonstrated once.
-- [ ] Feed entries are discriminated (`source: 'worker' | 'global'`) so the UI can badge them (and the serialized-vs-full contrast is visible).
-- [ ] `GET /events/stream` is a NestJS `@Sse()` endpoint replaying the last 20 then live entries; `GET /events/recent` returns the buffer.
-- [ ] Unit tests: listeners push correctly shaped entries; buffer caps; SSE controller maps entries to MessageEvents.
+- [x] `events/` module: `EventFeed` service (ring buffer cap 200, RxJS Subject for live push), `worker-events` listeners on the email processor class (completed/failed/progress/active) capturing redacted `job.data`, `attemptsMade`, `returnvalue`, and `queue-events` listeners (completed/failed/active on `webhooks`) capturing `jobId` + `returnvalue` with a `getJob` fallback lookup demonstrated once.
+- [x] Feed entries are discriminated (`source: 'worker' | 'global'`) so the UI can badge them (and the serialized-vs-full contrast is visible); sensitive payload keys are redacted before streaming.
+- [x] `GET /events/stream` is a NestJS `@Sse()` endpoint replaying the last 20 then live entries; `GET /events/recent` returns the buffer.
+- [x] Unit tests: listeners push correctly shaped entries; buffer caps; SSE controller maps entries to MessageEvents. Verified live at boot: worker and global entries appear with distinct `source` values and redacted addresses.
+
+> Reconciliations vs the spec/task wording (see PR body): (1) the shipped `QueueEventName` union has no `drained`, so the third global listener uses `active`; (2) the library discovers `@OnQueueEvent` only on `@Processor` classes and binds them to that queue, so the global webhook listeners live on `WebhookProcessor` rather than a standalone listener class; (3) the global `completed` `returnvalue` is delivered deserialized at runtime, so it is typed `unknown` and passed through.
 
 #### Files to create / modify
 
@@ -408,3 +410,4 @@ main: `docs(plan): mark P4 complete`.
 - 4.1 ✅ 2026-07-09 email processor: named `send-welcome`/`send-receipt` dispatch, catch-all to the audit trail, and an at-least-once idempotency marker (result-memoizing `Map` keyed by `job.id`); mailer stub; 100% coverage.
 - 4.2 ✅ 2026-07-09 webhook processor: concurrency 5 + limiter 2/s, deterministic in-process failure injection (`WEBHOOK_FAILURES`) with N-then-success and N+1 attempts recorded in `WebhookLog`; `POST /orders` fan-out; 100% coverage.
 - 4.3 ✅ 2026-07-09 report processor: staged `updateProgress` (25/50/75 then `{ stage: 'render', pct: 90 }`) with a raised `lockDuration`; `POST /reports`; audit missing-concurrency warn-and-fallback proven via registration metadata; shared `sleep`; 100% coverage.
+- 4.4 ✅ 2026-07-09 events bridge: `EventFeed` ring buffer + RxJS subject, `@OnWorkerEvent` on the email processor (full Job, redacted) and `@OnQueueEvent` on the webhook processor (serialized + `getJob` fallback), `GET /events/stream` SSE + `GET /events/recent`; PII redaction; boot-verified live; 100% coverage. Reconciled `drained` absence, on-`@Processor` discovery, and deserialized `returnvalue`.

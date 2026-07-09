@@ -13,6 +13,8 @@ import type { Job } from '@bymax-one/nest-queue'
 import type { AuditTrail } from './audit-trail.service.js'
 import { EmailProcessor } from './email.processor.js'
 import type { MailerStub, MailResult } from './mailer.stub.js'
+import type { EventFeed } from '../events/event-feed.service.js'
+import type { FeedEntry } from '../events/event-feed.types.js'
 import type {
   ReceiptEmailJobData,
   ReceiptEmailJobResult,
@@ -54,15 +56,32 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Build the processor with spyable collaborators.
  *
- * @returns The processor plus the mailer and trail spies.
+ * @returns The processor plus the mailer, trail, and feed spies.
  */
 function setup() {
   const send = jest.fn<MailerStub['send']>()
   const append = jest.fn<AuditTrail['append']>()
+  const push = jest.fn<EventFeed['push']>()
   const mailer: Pick<MailerStub, 'send'> = { send }
   const trail: Pick<AuditTrail, 'append'> = { append }
-  const processor = new EmailProcessor(mailer as MailerStub, trail as AuditTrail)
-  return { processor, send, append }
+  const feed: Pick<EventFeed, 'push'> = { push }
+  const processor = new EmailProcessor(mailer as MailerStub, trail as AuditTrail, feed as EventFeed)
+  return { processor, send, append, push }
+}
+
+/**
+ * Extract the single feed entry pushed by a listener.
+ *
+ * @param push - The push spy.
+ * @returns The pushed entry.
+ */
+function pushedEntry(push: jest.Mock<EventFeed['push']>): FeedEntry {
+  expect(push).toHaveBeenCalledTimes(1)
+  const call = push.mock.calls[0]
+  if (call === undefined) {
+    throw new Error('expected a pushed entry')
+  }
+  return call[0]
 }
 
 describe('EmailProcessor (unit)', () => {
@@ -177,5 +196,98 @@ describe('EmailProcessor (unit)', () => {
       at: '2026-07-09T00:00:00.000Z',
       payload: 'unhandled email job: send-digest',
     })
+  })
+
+  it('bridges a worker completed event with redacted data and the return value', () => {
+    /*
+     * Scenario: the worker completes a job.
+     * Rule it protects: the listener pushes a worker-sourced entry with the full
+     * Job fields, but the sensitive `to` address is redacted before it reaches the
+     * feed.
+     */
+    const { processor, push } = setup()
+    const job = {
+      id: 'j1',
+      data: { orderId: 'o1', to: 'x@example.com', total: 5 },
+      attemptsMade: 1,
+    } as Job<unknown, unknown>
+
+    processor.onCompleted(job, { messageId: 'm1' })
+
+    const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
+    expect(entry.event).toBe('completed')
+    expect(entry.jobId).toBe('j1')
+    expect(entry.returnvalue).toEqual({ messageId: 'm1' })
+    expect(entry.attemptsMade).toBe(1)
+    expect(entry.data).toEqual({ orderId: 'o1', to: '[redacted]', total: 5 })
+  })
+
+  it('bridges a worker failed event with the redacted job and reason', () => {
+    /*
+     * Scenario: the worker fails a job it had fetched.
+     * Rule it protects: the failed listener records the redacted payload, attempts,
+     * and the error message.
+     */
+    const { processor, push } = setup()
+    const job = { id: 'j2', data: { to: 'y@example.com' }, attemptsMade: 3 } as Job<unknown>
+
+    processor.onFailed(job, new Error('smtp down'))
+
+    const entry = pushedEntry(push)
+    expect(entry.event).toBe('failed')
+    expect(entry.jobId).toBe('j2')
+    expect(entry.failedReason).toBe('smtp down')
+    expect(entry.attemptsMade).toBe(3)
+    expect(entry.data).toEqual({ to: '[redacted]' })
+  })
+
+  it('bridges a worker failed event without a job', () => {
+    /*
+     * Boundary: the job failed before the worker fetched it (undefined job).
+     * Rule it protects: the listener still records the reason without a job id,
+     * payload, or attempts.
+     */
+    const { processor, push } = setup()
+
+    processor.onFailed(undefined, new Error('fetch failed'))
+
+    const entry = pushedEntry(push)
+    expect(entry.event).toBe('failed')
+    expect(entry.jobId).toBeUndefined()
+    expect(entry.failedReason).toBe('fetch failed')
+    expect(entry.data).toBeUndefined()
+    expect(entry.attemptsMade).toBeUndefined()
+  })
+
+  it('bridges a worker progress event with the reported value', () => {
+    /*
+     * Scenario: a job reports progress.
+     * Rule it protects: the progress listener records the reported value on the feed.
+     */
+    const { processor, push } = setup()
+    const job = { id: 'j3', attemptsMade: 0 } as Job<unknown>
+
+    processor.onProgress(job, 42)
+
+    const entry = pushedEntry(push)
+    expect(entry.event).toBe('progress')
+    expect(entry.progress).toBe(42)
+  })
+
+  it('bridges a worker active event with redacted data', () => {
+    /*
+     * Scenario: a job becomes active.
+     * Rule it protects: the active listener records the redacted payload as the job
+     * starts processing.
+     */
+    const { processor, push } = setup()
+    const job = { id: 'j4', data: { email: 'z@example.com' }, attemptsMade: 0 } as Job<unknown>
+
+    processor.onActive(job)
+
+    const entry = pushedEntry(push)
+    expect(entry.event).toBe('active')
+    expect(entry.data).toEqual({ email: '[redacted]' })
   })
 })
