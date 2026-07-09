@@ -14,7 +14,7 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 | P0    | [`phase-00-repo-foundation.md`](./phase-00-repo-foundation.md)                         | 5 / 5       | ✅ Done        |
 | P1    | [`phase-01-library-consumption.md`](./phase-01-library-consumption.md)                 | 4 / 4       | ✅ Done        |
 | P2    | [`phase-02-api-skeleton-wiring.md`](./phase-02-api-skeleton-wiring.md)                 | 5 / 5       | ✅ Done        |
-| P3    | [`phase-03-enqueue-surface-admin-api.md`](./phase-03-enqueue-surface-admin-api.md)     | 5 / 6       | 🔄 In Progress |
+| P3    | [`phase-03-enqueue-surface-admin-api.md`](./phase-03-enqueue-surface-admin-api.md)     | 5 / 6       | 👀 Review      |
 | P4    | [`phase-04-workers-events.md`](./phase-04-workers-events.md)                           | 0 / 6       | 📋 ToDo        |
 | P5    | [`phase-05-flows-schedulers-dynamic.md`](./phase-05-flows-schedulers-dynamic.md)       | 0 / 6       | 📋 ToDo        |
 | P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 0 / 5       | 📋 ToDo        |
