@@ -1,6 +1,6 @@
 # Phase 4: workers-events
 
-> **Status**: 🔄 In progress · **Progress**: 1 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P4)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4; matrix rows 34 to 46
 
@@ -25,7 +25,7 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 | ID  | Task                                                                                  | Status  | Priority | Size | Depends on |
 | --- | ------------------------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | ✅ Done | P0       | M    | Phase 3    |
-| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | 📋 ToDo | P0       | M    | 4.1        |
+| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done | P0       | M    | 4.1        |
 | 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | 📋 ToDo | P0       | S    | 4.1        |
 | 4.4 | Event decorators bridged to the SSE stream                                            | 📋 ToDo | P0       | M    | 4.1        |
 | 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | 📋 ToDo | P1       | S    | 4.2        |
@@ -101,7 +101,7 @@ completion log), commit `feat(api): email processor with dispatch and idempotenc
 
 ### Task 4.2: Webhook processor: concurrency, limiter, failure injection, backoff
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 4.1
@@ -112,10 +112,10 @@ The retry theater (rows 37, 39, 40): `@Processor('webhooks', { concurrency: 5, l
 
 #### Acceptance criteria
 
-- [ ] `WebhookProcessor` registered with concurrency 5 and limiter 2/s; a timeless comment explains both knobs.
-- [ ] Handler throws while `job.attemptsMade < env.WEBHOOK_FAILURES`, then succeeds recording the delivery in an in-memory `WebhookLog`.
-- [ ] `POST /orders` also enqueues `webhooks/order-created` (attempts inherited from module defaults).
-- [ ] Unit tests: failure-then-success sequence via mocked `job.attemptsMade`, limiter/concurrency options asserted on the decorator metadata or registration call.
+- [x] `WebhookProcessor` registered with concurrency 5 and limiter 2/s; a timeless comment explains both knobs.
+- [x] Handler throws (in-process only, never a real request) while `job.attemptsMade < env.WEBHOOK_FAILURES`, then succeeds recording the delivery in an in-memory `WebhookLog`.
+- [x] `POST /orders` also enqueues `webhooks/order-created` (attempts inherited from module defaults).
+- [x] Unit tests: failure-then-success sequence via mocked `job.attemptsMade`, limiter/concurrency options asserted on the decorator metadata.
 
 #### Files to create / modify
 
@@ -406,3 +406,4 @@ main: `docs(plan): mark P4 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 4.1 ✅ 2026-07-09 email processor: named `send-welcome`/`send-receipt` dispatch, catch-all to the audit trail, and an at-least-once idempotency marker (result-memoizing `Map` keyed by `job.id`); mailer stub; 100% coverage.
+- 4.2 ✅ 2026-07-09 webhook processor: concurrency 5 + limiter 2/s, deterministic in-process failure injection (`WEBHOOK_FAILURES`) with N-then-success and N+1 attempts recorded in `WebhookLog`; `POST /orders` fan-out; 100% coverage.

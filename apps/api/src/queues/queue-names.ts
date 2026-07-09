@@ -15,12 +15,15 @@ export const SEARCH_QUEUE = 'search'
 /** The `audit` queue backs the boot-time smoke journey. */
 export const AUDIT_QUEUE = 'audit'
 
+/** The `webhooks` queue carries order-created fan-out jobs (the retry theater). */
+export const WEBHOOKS_QUEUE = 'webhooks'
+
 /**
  * Every queue name the example registers. The admin plane validates a requested
  * queue name against this set before touching Redis, surfacing
  * `queue.queue_not_found` for anything else instead of lazily creating it.
  */
-export const KNOWN_QUEUES = [EMAIL_QUEUE, SEARCH_QUEUE, AUDIT_QUEUE] as const
+export const KNOWN_QUEUES = [EMAIL_QUEUE, SEARCH_QUEUE, AUDIT_QUEUE, WEBHOOKS_QUEUE] as const
 
 /** Union of the known queue names. */
 export type KnownQueue = (typeof KNOWN_QUEUES)[number]

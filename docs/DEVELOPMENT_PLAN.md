@@ -21,7 +21,7 @@
 | P1  | library-consumption         | ✅ Done        | 4/4 tasks | S    | 2026-07-09   |
 | P2  | api-skeleton-wiring         | ✅ Done        | 5/5 tasks | M    | 2026-07-09   |
 | P3  | enqueue-surface-admin-api   | ✅ Done        | 6/6 tasks | L    | 2026-07-09   |
-| P4  | workers-events              | 🔄 In progress | 1/6 tasks | L    | 2026-07-09   |
+| P4  | workers-events              | 🔄 In progress | 2/6 tasks | L    | 2026-07-09   |
 | P5  | flows-schedulers-dynamic    | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
 | P6  | metrics-errors-modes        | 📋 ToDo        | 0/5 tasks | M    | 2026-07-06   |
 | P7  | web-dashboard               | 📋 ToDo        | 0/6 tasks | L    | 2026-07-06   |
