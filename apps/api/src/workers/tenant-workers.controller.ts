@@ -6,7 +6,7 @@
  * one tenant's request can never target another tenant's worker.
  * @layer app/workers
  */
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common'
 import { z } from 'zod'
 import { parseRequest } from '../http/validation.js'
 import { tenantQueueName } from './tenant.constants.js'
@@ -32,6 +32,9 @@ const registerSchema = z.object({ tenantId: tenantIdSchema, tier: z.enum(['premi
 
 /** Body accepted when sending a notification. */
 const notifySchema = z.object({ message: z.string().min(1).max(MAX_MESSAGE_LENGTH) })
+
+/** Query accepted by the read endpoints: an optional tenant id to scope the result. */
+const scopeQuerySchema = z.object({ tenantId: tenantIdSchema.optional() })
 
 /** Outcome of registering a tenant worker. */
 export interface TenantRegistered {
@@ -64,23 +67,30 @@ export class TenantWorkersController {
   }
 
   /**
-   * List the registered tenant workers.
+   * List the registered tenant workers, optionally scoped to one tenant.
    *
-   * @returns One view per registered tenant worker.
+   * @param query - The unknown query carrying an optional tenant id.
+   * @returns One view per matching registered tenant worker.
+   * @throws {BadRequestException} When the query is malformed.
    */
   @Get()
-  list(): { workers: TenantWorkerView[] } {
-    return { workers: this.tenants.list() }
+  list(@Query() query: unknown): { workers: TenantWorkerView[] } {
+    const { tenantId } = parseRequest(scopeQuerySchema, query)
+    return { workers: this.tenants.list(tenantId) }
   }
 
   /**
-   * Return the recorded delivery trail, oldest first.
+   * Return the recorded delivery trail, oldest first, optionally scoped to one
+   * tenant.
    *
-   * @returns The recorded deliveries across all tenants.
+   * @param query - The unknown query carrying an optional tenant id.
+   * @returns The recorded deliveries.
+   * @throws {BadRequestException} When the query is malformed.
    */
   @Get('deliveries')
-  deliveries(): { deliveries: readonly TenantDelivery[] } {
-    return { deliveries: this.tenants.listDeliveries() }
+  deliveries(@Query() query: unknown): { deliveries: readonly TenantDelivery[] } {
+    const { tenantId } = parseRequest(scopeQuerySchema, query)
+    return { deliveries: this.tenants.listDeliveries(tenantId) }
   }
 
   /**
@@ -106,7 +116,7 @@ export class TenantWorkersController {
    * Tear down a tenant's worker, stopping consumption of its queue.
    *
    * @param tenantId - The tenant whose worker to remove (validated).
-   * @returns The tenant and that its worker was unregistered.
+   * @returns The tenant and whether a worker actually existed and was removed.
    * @throws {BadRequestException} When the id is malformed.
    */
   @Delete(':tenantId')
@@ -114,7 +124,7 @@ export class TenantWorkersController {
     @Param('tenantId') tenantId: unknown,
   ): Promise<{ tenantId: string; unregistered: boolean }> {
     const id = parseRequest(tenantIdSchema, tenantId)
-    await this.tenants.unregister(id)
-    return { tenantId: id, unregistered: true }
+    const unregistered = await this.tenants.unregister(id)
+    return { tenantId: id, unregistered }
   }
 }

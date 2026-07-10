@@ -7,6 +7,7 @@
  * @layer app/workers
  */
 import { Injectable } from '@nestjs/common'
+import { BoundedRingBuffer } from '../common/bounded-ring-buffer.js'
 import type { TenantDelivery } from './tenant.types.js'
 
 /** Maximum number of deliveries retained; older entries are evicted first. */
@@ -15,19 +16,15 @@ const DELIVERIES_CAPACITY = 500
 /** Bounded, in-memory store of recorded tenant deliveries. */
 @Injectable()
 export class TenantDeliveries {
-  private readonly deliveries: TenantDelivery[] = []
+  private readonly deliveries = new BoundedRingBuffer<TenantDelivery>(DELIVERIES_CAPACITY)
 
   /**
-   * Append a delivery, evicting the oldest once capacity is exceeded so memory
-   * stays bounded no matter how many notifications flow.
+   * Record a delivery in order.
    *
    * @param delivery - The recorded delivery.
    */
   record(delivery: TenantDelivery): void {
     this.deliveries.push(delivery)
-    if (this.deliveries.length > DELIVERIES_CAPACITY) {
-      this.deliveries.shift()
-    }
   }
 
   /**
@@ -36,6 +33,6 @@ export class TenantDeliveries {
    * @returns A copy of the current deliveries; mutating it never affects the store.
    */
   list(): readonly TenantDelivery[] {
-    return [...this.deliveries]
+    return this.deliveries.snapshot()
   }
 }

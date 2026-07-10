@@ -48,28 +48,44 @@ describe('TenantWorkersController (unit)', () => {
     expect(() => controller.register({ tenantId: 't1', tier: 'gold' })).toThrow(BadRequestException)
   })
 
-  it('lists the registered tenant workers', () => {
+  it('lists the registered tenant workers, forwarding an optional scope', () => {
     /*
-     * Scenario: listing tenant workers.
-     * Rule it protects: the endpoint mirrors the service projection.
+     * Scenario: listing tenant workers with a scope query.
+     * Rule it protects: the endpoint mirrors the service projection and forwards the
+     * validated tenant id (or undefined) so scoped reads work.
      */
     const workers: TenantWorkerView[] = [
       { tenantId: 't1', queue: 'notifications:t1', tier: 'free' },
     ]
-    const controller = build({ list: jest.fn(() => workers) })
+    const list = jest.fn(() => workers)
+    const controller = build({ list })
 
-    expect(controller.list()).toEqual({ workers })
+    expect(controller.list({ tenantId: 't1' })).toEqual({ workers })
+    expect(list).toHaveBeenCalledWith('t1')
   })
 
-  it('returns the delivery trail', () => {
+  it('rejects a malformed scope on list', () => {
     /*
-     * Scenario: reading deliveries.
-     * Rule it protects: the endpoint mirrors the service delivery trail.
+     * Boundary: a scope query with an illegal tenant id.
+     * Rule it protects: the scope is validated before the service is touched.
+     */
+    const controller = build({ list: jest.fn(() => []) })
+
+    expect(() => controller.list({ tenantId: 'a:b' })).toThrow(BadRequestException)
+  })
+
+  it('returns the delivery trail, forwarding an optional scope', () => {
+    /*
+     * Scenario: reading deliveries with a scope query.
+     * Rule it protects: the endpoint mirrors the service delivery trail and forwards
+     * the validated tenant id so a scoped read is possible.
      */
     const deliveries: TenantDelivery[] = [{ tenantId: 't1', notification: 'hi', at: 1 }]
-    const controller = build({ listDeliveries: jest.fn(() => deliveries) })
+    const listDeliveries = jest.fn(() => deliveries)
+    const controller = build({ listDeliveries })
 
-    expect(controller.deliveries()).toEqual({ deliveries })
+    expect(controller.deliveries({})).toEqual({ deliveries })
+    expect(listDeliveries).toHaveBeenCalledWith(undefined)
   })
 
   it('notifies a tenant and returns the enqueued job id', async () => {
@@ -100,12 +116,13 @@ describe('TenantWorkersController (unit)', () => {
     )
   })
 
-  it('removes a tenant worker', async () => {
+  it('removes a tenant worker and surfaces whether it existed', async () => {
     /*
-     * Scenario: a valid remove request.
-     * Rule it protects: the validated id reaches unregister so consumption stops.
+     * Scenario: a valid remove request for a registered worker.
+     * Rule it protects: the validated id reaches unregister and its existed result
+     * is surfaced honestly.
      */
-    const unregister = jest.fn<() => Promise<void>>().mockResolvedValue(undefined)
+    const unregister = jest.fn<() => Promise<boolean>>().mockResolvedValue(true)
     const controller = build({ unregister })
 
     const result = await controller.remove('t1')

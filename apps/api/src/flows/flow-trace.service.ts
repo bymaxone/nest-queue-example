@@ -7,6 +7,7 @@
  * @layer app/flows
  */
 import { Injectable } from '@nestjs/common'
+import { BoundedRingBuffer } from '../common/bounded-ring-buffer.js'
 
 /** Maximum number of trace entries retained; older entries are evicted first. */
 const TRACE_CAPACITY = 500
@@ -22,19 +23,15 @@ export interface FlowTraceEntry {
 /** Bounded, in-memory record of flow-node executions in the order they occurred. */
 @Injectable()
 export class FlowTrace {
-  private readonly entries: FlowTraceEntry[] = []
+  private readonly entries = new BoundedRingBuffer<FlowTraceEntry>(TRACE_CAPACITY)
 
   /**
-   * Append a node execution, evicting the oldest entry once capacity is exceeded
-   * so memory stays bounded no matter how many flows run.
+   * Record a node execution in order.
    *
    * @param node - The flow node (job) name that executed.
    */
   record(node: string): void {
     this.entries.push({ node, at: Date.now() })
-    if (this.entries.length > TRACE_CAPACITY) {
-      this.entries.shift()
-    }
   }
 
   /**
@@ -43,6 +40,6 @@ export class FlowTrace {
    * @returns A copy of the current entries; mutating it never affects the trace.
    */
   list(): readonly FlowTraceEntry[] {
-    return [...this.entries]
+    return this.entries.snapshot()
   }
 }

@@ -53,26 +53,35 @@ export class TenantWorkersService {
    * no worker is registered for the tenant.
    *
    * @param tenantId - The validated tenant id.
+   * @returns `true` when a worker existed and was removed, `false` when there was
+   *   nothing to remove.
    */
-  async unregister(tenantId: string): Promise<void> {
+  async unregister(tenantId: string): Promise<boolean> {
+    const queueName = tenantQueueName(tenantId)
+    const existed = this.registry.list().includes(queueName)
     this.tiers.delete(tenantId)
-    await this.registry.unregister(tenantQueueName(tenantId))
+    await this.registry.unregister(queueName)
+    return existed
   }
 
   /**
    * Project the live tenant workers from the registry, enriched with each tenant's
-   * tier. The registry is the source of truth for which workers exist.
+   * tier. The registry is the source of truth for which workers exist. Passing a
+   * `tenantId` scopes the result to that tenant; omitting it returns the full
+   * aggregate (this reference app has no auth, so reads are unscoped by default).
    *
-   * @returns One view per registered tenant worker.
+   * @param tenantId - Optional tenant id to scope the result to.
+   * @returns One view per matching registered tenant worker.
    */
-  list(): TenantWorkerView[] {
-    return this.registry
+  list(tenantId?: string): TenantWorkerView[] {
+    const views = this.registry
       .list()
       .filter((queue) => queue.startsWith(TENANT_QUEUE_PREFIX))
       .map((queue) => {
-        const tenantId = queue.slice(TENANT_QUEUE_PREFIX.length)
-        return { tenantId, queue, tier: this.tiers.get(tenantId) ?? null }
+        const id = queue.slice(TENANT_QUEUE_PREFIX.length)
+        return { tenantId: id, queue, tier: this.tiers.get(id) ?? null }
       })
+    return tenantId === undefined ? views : views.filter((view) => view.tenantId === tenantId)
   }
 
   /**
@@ -89,12 +98,16 @@ export class TenantWorkersService {
   }
 
   /**
-   * Return the recorded deliveries across all tenants, oldest first.
+   * Return the recorded deliveries, oldest first. Passing a `tenantId` scopes the
+   * trail to that tenant; omitting it returns the full aggregate (this reference
+   * app has no auth, so reads are unscoped by default).
    *
-   * @returns A snapshot of the delivery trail.
+   * @param tenantId - Optional tenant id to scope the trail to.
+   * @returns A snapshot of the matching delivery trail.
    */
-  listDeliveries(): readonly TenantDelivery[] {
-    return this.deliveries.list()
+  listDeliveries(tenantId?: string): readonly TenantDelivery[] {
+    const all = this.deliveries.list()
+    return tenantId === undefined ? all : all.filter((entry) => entry.tenantId === tenantId)
   }
 
   /**

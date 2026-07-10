@@ -103,17 +103,29 @@ describe('TenantWorkersService (unit)', () => {
     expect(result).toMatchObject({ tenantId: 't1', notification: 'hello' })
   })
 
-  it('unregisters the tenant worker by its queue name', async () => {
+  it('unregisters a registered worker and reports that it existed', async () => {
     /*
-     * Scenario: removing a tenant worker.
+     * Scenario: removing a worker that is registered.
      * Rule it protects: unregister stops consumption by tearing down the worker for
-     * the tenant's queue (row 48).
+     * the tenant's queue and truthfully reports it existed (row 48).
      */
-    const harness = build()
+    const harness = build(['notifications:t1'])
 
-    await harness.service.unregister('t1')
+    const existed = await harness.service.unregister('t1')
 
     expect(harness.unregister).toHaveBeenCalledWith('notifications:t1')
+    expect(existed).toBe(true)
+  })
+
+  it('reports false when unregistering a tenant that was never registered', async () => {
+    /*
+     * Edge case: removing a worker that does not exist.
+     * Rule it protects: a no-op teardown is reported honestly as false rather than
+     * claiming a removal that never happened.
+     */
+    const harness = build([])
+
+    expect(await harness.service.unregister('ghost')).toBe(false)
   })
 
   it('projects only tenant workers from the registry and enriches known tiers', () => {
@@ -129,6 +141,20 @@ describe('TenantWorkersService (unit)', () => {
     expect(harness.service.list()).toEqual([
       { tenantId: 't1', queue: 'notifications:t1', tier: 'premium' },
       { tenantId: 't2', queue: 'notifications:t2', tier: null },
+    ])
+  })
+
+  it('scopes the list to a single tenant when an id is given', () => {
+    /*
+     * Scenario: a scoped list read.
+     * Rule it protects: passing a tenant id returns only that tenant's worker, so a
+     * scoped read is possible in the otherwise-aggregate demo surface.
+     */
+    const harness = build(['notifications:t1', 'notifications:t2'])
+    harness.service.register('t1', 'free')
+
+    expect(harness.service.list('t1')).toEqual([
+      { tenantId: 't1', queue: 'notifications:t1', tier: 'free' },
     ])
   })
 
@@ -157,5 +183,22 @@ describe('TenantWorkersService (unit)', () => {
 
     expect(harness.service.listDeliveries()).toEqual(recorded)
     expect(harness.deliveriesList).toHaveBeenCalledTimes(1)
+  })
+
+  it('scopes the delivery trail to a single tenant when an id is given', () => {
+    /*
+     * Scenario: a scoped delivery read.
+     * Rule it protects: passing a tenant id filters the trail to that tenant so one
+     * tenant's messages are not returned under another's scope.
+     */
+    const recorded: TenantDelivery[] = [
+      { tenantId: 't1', notification: 'a', at: 1 },
+      { tenantId: 't2', notification: 'b', at: 2 },
+    ]
+    const harness = build([], recorded)
+
+    expect(harness.service.listDeliveries('t2')).toEqual([
+      { tenantId: 't2', notification: 'b', at: 2 },
+    ])
   })
 })

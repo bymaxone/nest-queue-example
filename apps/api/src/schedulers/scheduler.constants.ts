@@ -20,9 +20,6 @@ export const MONITORING_QUEUE = 'monitoring'
  */
 export const SCHEDULER_QUEUES = [MAINTENANCE_QUEUE, MONITORING_QUEUE] as const
 
-/** Union of the scheduler-managed queue names. */
-export type SchedulerQueue = (typeof SCHEDULER_QUEUES)[number]
-
 /** Stable id (upsert key) of the nightly cleanup scheduler. */
 export const NIGHTLY_CLEANUP_ID = 'nightly-cleanup'
 

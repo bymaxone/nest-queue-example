@@ -149,6 +149,22 @@ describe('SchedulersController (unit)', () => {
     expect(upsertJobScheduler).toHaveBeenCalledWith('monitoring', 'demo', { every: 1_000 }, {})
   })
 
+  it('rejects a template whose data exceeds the key cap', async () => {
+    /*
+     * Boundary: a template data object with too many keys.
+     * Rule it protects: the job template's data is bounded so an oversized object
+     * cannot bloat the Redis-stored scheduler; the request is a safe 400.
+     */
+    const controller = build({ upsertJobScheduler: jest.fn() })
+    const data = Object.fromEntries(
+      Array.from({ length: 33 }, (_, index) => [`k${String(index)}`, 1]),
+    )
+
+    await expect(
+      controller.upsert('monitoring', 'demo', { repeat: { every: 1_000 }, template: { data } }),
+    ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
   it('returns a null first job id when the library produced none', async () => {
     /*
      * Edge case: an upsert that yields no immediate job.

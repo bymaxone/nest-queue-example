@@ -165,24 +165,23 @@ export class FulfillmentService {
 }
 
 /**
- * Map a variant to the payment child's BullMQ options. Returns `undefined` for the
- * happy path (module defaults apply) and, for each demo variant, a single-attempt
- * option set carrying the matching failure-propagation flag: `stuck` sets no flag
- * (BullMQ's default leaves the parent waiting), `failParent` propagates the
- * failure up, and `ignoreDependency` lets the parent proceed.
+ * Map a variant to the payment child's BullMQ options via an exhaustive lookup.
+ * Returns `undefined` for the happy path (module defaults apply) and, for each demo
+ * variant, a single-attempt option set carrying the matching failure-propagation
+ * flag: `stuck` sets no flag (BullMQ's default leaves the parent waiting),
+ * `failParent` propagates the failure up, and `ignoreDependency` lets the parent
+ * proceed. The `Record` keyed by the variant union makes the mapping exhaustive:
+ * adding a variant without a mapping is a compile error.
  *
  * @param variant - The failure-propagation posture.
  * @returns The child options, or `undefined` when no override is needed.
  */
 function paymentChildOpts(variant: FulfillmentVariant): FulfillmentChild['opts'] {
-  switch (variant) {
-    case 'default':
-      return undefined
-    case 'stuck':
-      return { attempts: DEMO_FAILURE_ATTEMPTS }
-    case 'failParent':
-      return { attempts: DEMO_FAILURE_ATTEMPTS, failParentOnFailure: true }
-    case 'ignoreDependency':
-      return { attempts: DEMO_FAILURE_ATTEMPTS, ignoreDependencyOnFailure: true }
+  const optsByVariant: Record<FulfillmentVariant, FulfillmentChild['opts']> = {
+    default: undefined,
+    stuck: { attempts: DEMO_FAILURE_ATTEMPTS },
+    failParent: { attempts: DEMO_FAILURE_ATTEMPTS, failParentOnFailure: true },
+    ignoreDependency: { attempts: DEMO_FAILURE_ATTEMPTS, ignoreDependencyOnFailure: true },
   }
+  return optsByVariant[variant]
 }

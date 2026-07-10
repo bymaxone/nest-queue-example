@@ -31,6 +31,9 @@ const MAX_TEMPLATE_NAME_LENGTH = 128
 /** Upper bound on a pagination index, capping how much Redis is read at once. */
 const MAX_PAGE_INDEX = 10_000
 
+/** Upper bound on the number of keys in a job template's data, bounding its size. */
+const MAX_TEMPLATE_DATA_KEYS = 32
+
 /** Default page end index (inclusive). */
 const DEFAULT_PAGE_END = 50
 
@@ -66,11 +69,16 @@ const repeatSchema = z
   })
   .strict()
 
-/** Optional job template carried by the scheduler. */
+/** Optional job template carried by the scheduler; `data` is bounded in key count. */
 const templateSchema = z
   .object({
     name: z.string().min(1).max(MAX_TEMPLATE_NAME_LENGTH).optional(),
-    data: z.record(z.string(), z.unknown()).optional(),
+    data: z
+      .record(z.string(), z.unknown())
+      .refine((value) => Object.keys(value).length <= MAX_TEMPLATE_DATA_KEYS, {
+        message: `data must have at most ${String(MAX_TEMPLATE_DATA_KEYS)} keys`,
+      })
+      .optional(),
   })
   .strict()
 

@@ -17,8 +17,12 @@ import type { LagSample } from './lag-probe.service.js'
 /** Upper bound on an invoice id length; a demo guardrail against absurd input. */
 const MAX_INVOICE_ID_LENGTH = 128
 
-/** Upper bound on the number of invoice lines per render. */
-const MAX_INVOICE_LINES = 5_000
+/**
+ * Upper bound on the number of invoice lines per render. Bounds the per-job CPU
+ * cost of the sandboxed hashing loop (rounds x lines) so a single request cannot
+ * enqueue an unboundedly expensive job.
+ */
+const MAX_INVOICE_LINES = 1_000
 
 /** Upper bound on a single invoice line length. */
 const MAX_LINE_LENGTH = 512
