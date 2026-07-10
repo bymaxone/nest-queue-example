@@ -6,8 +6,8 @@
  * @layer app/workers
  */
 
-/** Prefix for every per-tenant notification queue: `notifications:<tenantId>`. */
-export const TENANT_QUEUE_PREFIX = 'notifications:'
+/** Prefix for every per-tenant notification queue: `notifications.<tenantId>`. */
+export const TENANT_QUEUE_PREFIX = 'notifications.'
 
 /** Job name enqueued onto a tenant queue. */
 export const NOTIFY_JOB = 'notify'
@@ -23,8 +23,8 @@ export const TIER_CONCURRENCY: Record<TenantTier, number> = {
 
 /**
  * Derive the queue name for a tenant. The id is validated at the trust boundary
- * (alphanumeric plus dash/underscore, never a colon), so the derived name always
- * stays inside the `notifications:` namespace and cannot target another queue.
+ * (alphanumeric plus dash/underscore, never a dot or colon), so the derived name always
+ * stays inside the `notifications.` namespace and cannot target another queue.
  *
  * @param tenantId - The validated tenant id.
  * @returns The tenant's notification queue name.

@@ -32,7 +32,7 @@ export class TenantWorkersService {
 
   /**
    * Register a worker for a tenant at the given tier. The worker consumes
-   * `notifications:<tenantId>` at the tier's concurrency and records every
+   * `notifications.<tenantId>` at the tier's concurrency and records every
    * delivery. Records the tier only after a successful registration.
    *
    * @param tenantId - The validated tenant id.
