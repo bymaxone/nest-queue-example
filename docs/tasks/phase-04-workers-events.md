@@ -1,6 +1,6 @@
 # Phase 4: workers-events
 
-> **Status**: 🔄 In progress · **Progress**: 4 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In progress · **Progress**: 5 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P4)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4; matrix rows 34 to 46
 
@@ -28,7 +28,7 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 | 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done | P0       | M    | 4.1        |
 | 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | ✅ Done | P0       | S    | 4.1        |
 | 4.4 | Event decorators bridged to the SSE stream                                            | ✅ Done | P0       | M    | 4.1        |
-| 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | 📋 ToDo | P1       | S    | 4.2        |
+| 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | ✅ Done | P1       | S    | 4.2        |
 | 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 📋 ToDo | P0       | S    | 4.2 to 4.5 |
 
 ## Tasks
@@ -289,7 +289,7 @@ Completion Protocol: standard 5 steps, id 4.4, commit
 
 ### Task 4.5: Stalled-recovery demo + graceful-shutdown demo script
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P1
 - **Size**: S
 - **Depends on**: 4.2
@@ -300,9 +300,11 @@ Rows 42 (stalled side), 63: a documented, reproducible stalled-job demonstration
 
 #### Acceptance criteria
 
-- [ ] `POST /demos/stall` enqueues a `demos` job whose handler sleeps beyond a deliberately short `lockDuration` (5s) configured on the demos processor; README documents the journey: kill the app mid-job (`docker`-free: plain process kill), restart, watch the job recover via the events feed (stalled then completed elsewhere).
-- [ ] `scripts/demo-shutdown.mjs`: boots the api as a child process, enqueues a slow job, sends SIGTERM, prints the drain log lines and the exit code; documented in the README.
-- [ ] Both demos referenced from the plan's scenario list; nothing flaky lands in unit tests (these are manual/e2e journeys; e2e hardening comes in Phase 8).
+- [x] `POST /demos/stall` enqueues a `demos` job whose handler sleeps beyond a deliberately short `lockDuration` (5s) configured on the demos processor; README documents the journey: kill the app mid-job (`docker`-free: plain process kill), restart, watch the job recover via the events feed (the `demos` queue emits `active`, `stalled`, then `completed`). The stall processor's worker-event listeners bridge that timeline onto the feed.
+- [x] `scripts/demo-shutdown.mjs`: boots the api as a child process, enqueues a slow job, sends SIGTERM, forwards the drain log lines, and asserts a zero-forced drain plus a prompt signal-driven exit within the budget; documented in the README. Verified locally (PASS).
+- [x] Both demos referenced from the README operational journeys; nothing flaky lands in unit tests (these are manual/e2e journeys; e2e hardening comes in the testing phase). The stall processor handler and listeners are covered by deterministic fake-timer unit tests.
+
+> Reconciliation: Nest runs its shutdown hooks then re-raises the termination signal, so a graceful shutdown exits via `SIGTERM` (code `null`), not code `0`. The script therefore asserts a zero-forced drain (from the library's `shutdown complete ... forced 0 worker(s)` log) plus a signal-driven exit inside the drain budget, rather than a literal exit code 0.
 
 #### Files to create / modify
 
@@ -411,3 +413,4 @@ main: `docs(plan): mark P4 complete`.
 - 4.2 ✅ 2026-07-09 webhook processor: concurrency 5 + limiter 2/s, deterministic in-process failure injection (`WEBHOOK_FAILURES`) with N-then-success and N+1 attempts recorded in `WebhookLog`; `POST /orders` fan-out; 100% coverage.
 - 4.3 ✅ 2026-07-09 report processor: staged `updateProgress` (25/50/75 then `{ stage: 'render', pct: 90 }`) with a raised `lockDuration`; `POST /reports`; audit missing-concurrency warn-and-fallback proven via registration metadata; shared `sleep`; 100% coverage.
 - 4.4 ✅ 2026-07-09 events bridge: `EventFeed` ring buffer + RxJS subject, `@OnWorkerEvent` on the email processor (full Job, redacted) and `@OnQueueEvent` on the webhook processor (serialized + `getJob` fallback), `GET /events/stream` SSE + `GET /events/recent`; PII redaction; boot-verified live; 100% coverage. Reconciled `drained` absence, on-`@Processor` discovery, and deserialized `returnvalue`.
+- 4.5 ✅ 2026-07-09 operational demos: `demos` stall processor (short lock/stalled-interval, worker-event timeline on the feed) + `POST /demos/stall`; `scripts/demo-shutdown.mjs` (zero-dep) asserting a zero-forced drain and prompt signal exit (verified PASS); README operational journeys; 100% coverage on the processor.

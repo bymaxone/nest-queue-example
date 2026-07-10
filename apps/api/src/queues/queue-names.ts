@@ -21,6 +21,9 @@ export const WEBHOOKS_QUEUE = 'webhooks'
 /** The `reports` queue carries long-running report-generation jobs (progress + lock tuning). */
 export const REPORTS_QUEUE = 'reports'
 
+/** The `demos` queue backs the stalled-recovery operational demonstration. */
+export const DEMOS_QUEUE = 'demos'
+
 /**
  * Every queue name the example registers. The admin plane validates a requested
  * queue name against this set before touching Redis, surfacing
@@ -32,6 +35,7 @@ export const KNOWN_QUEUES = [
   AUDIT_QUEUE,
   WEBHOOKS_QUEUE,
   REPORTS_QUEUE,
+  DEMOS_QUEUE,
 ] as const
 
 /** Union of the known queue names. */

@@ -11,6 +11,7 @@ import { AuditProcessor } from './audit.processor.js'
 import { EmailProcessor } from './email.processor.js'
 import { MailerStub } from './mailer.stub.js'
 import { ReportProcessor } from './report.processor.js'
+import { StallProcessor } from './stall.processor.js'
 import { WebhookLog } from './webhook-log.service.js'
 import { WebhookProcessor } from './webhook.processor.js'
 
@@ -29,6 +30,7 @@ import { WebhookProcessor } from './webhook.processor.js'
     WebhookLog,
     WebhookProcessor,
     ReportProcessor,
+    StallProcessor,
   ],
   exports: [AuditTrail, MailerStub, WebhookLog],
 })
