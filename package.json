@@ -11,6 +11,8 @@
     "typecheck": "pnpm -r --workspace-concurrency=1 run --if-present typecheck",
     "build": "pnpm -r --workspace-concurrency=1 run --if-present build",
     "test": "pnpm -r --workspace-concurrency=1 run --if-present test",
+    "test:cov": "pnpm -r --workspace-concurrency=1 run --if-present test:cov",
+    "test:e2e": "pnpm --filter @nest-queue-example/api test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

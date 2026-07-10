@@ -32,3 +32,9 @@ reports/
 
 # TypeScript incremental compilation cache
 *.tsbuildinfo
+
+# Generated e2e-only artifact: the sandboxed invoice processor needs a compiled
+# .js sibling next to its .ts source (BullMQ resolves it relative to
+# import.meta.url, which ts-jest points at src/ instead of dist/); staged by
+# `pnpm --filter api test:e2e` right before the suite runs, never committed.
+apps/api/src/workers/invoice.sandboxed.js

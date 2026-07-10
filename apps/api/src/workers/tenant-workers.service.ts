@@ -5,7 +5,7 @@
  * delivery into {@link TenantDeliveries} so a tenant's consumption is observable.
  * @layer app/workers
  */
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { QueueService, WorkerRegistry } from '@bymax-one/nest-queue'
 import type { Job } from '@bymax-one/nest-queue'
 import {
@@ -21,6 +21,8 @@ import type { NotificationData, TenantDelivery, TenantWorkerView } from './tenan
 /** Registers, tears down, lists, and feeds the dynamic per-tenant workers. */
 @Injectable()
 export class TenantWorkersService {
+  private readonly logger = new Logger(TenantWorkersService.name)
+
   /** Tier each registered tenant runs at, used to enrich the list projection. */
   private readonly tiers = new Map<string, TenantTier>()
 
@@ -35,15 +37,24 @@ export class TenantWorkersService {
    * `notifications.<tenantId>` at the tier's concurrency and records every
    * delivery. Records the tier only after a successful registration.
    *
+   * A programmatically registered worker (unlike a `@Processor` class) has no
+   * decorator-driven event binding, so this attaches an explicit `error`
+   * listener: BullMQ's `Worker` extends `EventEmitter`, and an `error` event
+   * with zero listeners crashes the process instead of just logging, which a
+   * connection blip during `unregister()` can otherwise trigger.
+   *
    * @param tenantId - The validated tenant id.
    * @param tier - The service tier (`premium` or `free`).
    * @throws {QueueException} `queue.duplicate_processor` when already registered.
    */
   register(tenantId: string, tier: TenantTier): void {
-    this.registry.register<NotificationData, TenantDelivery>({
+    const worker = this.registry.register<NotificationData, TenantDelivery>({
       queueName: tenantQueueName(tenantId),
       handler: (job) => this.deliver(tenantId, job),
       options: { concurrency: TIER_CONCURRENCY[tier] },
+    })
+    worker.on('error', (error: Error) => {
+      this.logger.warn(`Tenant worker "${tenantId}" reported a connection error: ${error.message}`)
     })
     this.tiers.set(tenantId, tier)
   }
