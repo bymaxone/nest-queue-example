@@ -12,11 +12,14 @@ import { buildQueueOptions } from './config/queue.config.js'
 import { AdminModule } from './admin/admin.module.js'
 import { DemosModule } from './demos/demos.module.js'
 import { EventsModule } from './events/events.module.js'
+import { FlowsModule } from './flows/flows.module.js'
 import { OrdersModule } from './orders/orders.module.js'
 import { ProcessorsModule } from './processors/processors.module.js'
 import { ReportsModule } from './reports/reports.module.js'
+import { SchedulersModule } from './schedulers/schedulers.module.js'
 import { SearchModule } from './search/search.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
+import { WorkersModule } from './workers/workers.module.js'
 
 /** Root module wiring configuration and the globally-registered queue library. */
 @Module({
@@ -33,6 +36,9 @@ import { SmokeModule } from './smoke/smoke.module.js'
     ReportsModule,
     DemosModule,
     SearchModule,
+    FlowsModule,
+    SchedulersModule,
+    WorkersModule,
     AdminModule,
   ],
 })

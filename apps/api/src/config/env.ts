@@ -32,6 +32,10 @@ export const envSchema = z.object({
   QUEUE_DRAIN_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   QUEUE_DRAIN_ON_SHUTDOWN: booleanFlag,
   QUEUE_OTEL: booleanFlag,
+  // Run the sandboxed invoice processor on worker threads instead of child
+  // processes. Off by default: child processes are the safer, more isolated
+  // baseline; threads trade isolation for lower per-job spawn cost.
+  INVOICE_WORKER_THREADS: booleanFlag,
   WEBHOOK_FAILURES: z.coerce.number().int().min(0).default(2),
   REMINDER_DELAY_MS: z.coerce.number().int().positive().default(60000),
   // Normalize to the URL origin (scheme + host + port). A configured value with a
