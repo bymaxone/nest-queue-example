@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 🔄 In Progress · **Progress**: 3 / 5 tasks · **Last updated**: 2026-07-10
+> **Status**: 🔄 In Progress · **Progress**: 4 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -27,7 +27,7 @@ Everything works and everything is tested. This phase completes governance (the 
 | 9.1 | Branch + the four Copilot review files                    | ✅ Done | P0       | S    | Phase 8    |
 | 9.2 | README final + docs cross-check                           | ✅ Done | P0       | M    | Phase 8    |
 | 9.3 | Stryker mutation gate on `apps/api`                       | ✅ Done | P0       | L    | Phase 8    |
-| 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
+| 9.4 | Full matrix audit + npm-switch and public-flip checklists | ✅ Done | P0       | M    | 9.1 to 9.3 |
 | 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 📋 ToDo | P0       | S    | 9.4        |
 
 ## Tasks
@@ -210,7 +210,7 @@ Completion Protocol: standard 5 steps, id 9.3, commit
 
 ### Task 9.4: Full matrix audit + npm-switch and public-flip checklists
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 9.1 to 9.3
@@ -221,9 +221,9 @@ The completion contract: audit all 70 spec §7 rows with evidence (file, route, 
 
 #### Acceptance criteria
 
-- [ ] `docs/COVERAGE_AUDIT.md`: 70 rows, each with status (✅ or gap) and evidence pointer; zero unexplained gaps (a documented gap references the limitation note that sanctions it).
-- [ ] Any gap found is fixed in this task (small) or filed as an explicit follow-up in the audit with rationale.
-- [ ] `docs/RELEASE_CHECKLISTS.md`: the npm-switch steps and the public-flip steps, each command-exact.
+- [x] `docs/COVERAGE_AUDIT.md`: 70 rows, each with status (✅) and evidence pointer (code path + spec name); zero unexplained gaps. The four sanctioned §18 limitations are noted inline (rows 8, 49, 62, 67).
+- [x] Small gaps fixed: the spec §7 path drift (rows 14, 44, 45, 52, 56, 69) was corrected in 9.2; all cited paths and spec names verified to exist and the e2e suite passes against them.
+- [x] `docs/RELEASE_CHECKLISTS.md`: the npm-switch steps and the public-flip steps, each command-exact.
 
 #### Files to create / modify
 
@@ -332,3 +332,4 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 - 9.1 ✅ 2026-07-10 four Copilot review files authored, stack-true and under the 4000-char limit
 - 9.2 ✅ 2026-07-10 final README plus governance files; spec section 7 path drift fixed, docs cross-checked
 - 9.3 ✅ 2026-07-10 Stryker mutation gate on apps/api at 99.71 (break 95), survivors killed or documented as equivalents
+- 9.4 ✅ 2026-07-10 coverage audit (70/70 rows with evidence) and the npm-switch and public-flip release checklists
