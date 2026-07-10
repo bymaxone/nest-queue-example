@@ -20,7 +20,7 @@ range in a single dedicated PR.
 Precondition, verify the library is on npm:
 
 ```bash
-npm view @bymax-one/nest-queue version   # must print a version (currently fails: not yet published)
+npm view @bymax-one/nest-queue version   # must print a version before proceeding
 ```
 
 Steps:
