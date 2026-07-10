@@ -1,6 +1,6 @@
 # Phase 5: flows-schedulers-dynamic
 
-> **Status**: 🔄 In Progress · **Progress**: 4 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 5 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P5)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4 rows 47 to 49, §7.5; matrix rows 47 to 62
 
@@ -28,7 +28,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 | 5.2 | Failure-propagation variants + `addBulk`                           | ✅ Done | P0       | M    | 5.1           |
 | 5.3 | Boot schedulers + management endpoints + validation errors         | ✅ Done | P0       | M    | Phase 4       |
 | 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | ✅ Done | P0       | S    | Phase 4       |
-| 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | 📋 ToDo | P0       | M    | 5.4           |
+| 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | ✅ Done | P0       | M    | 5.4           |
 | 5.6 | Phase close: audit, dashboards, PR with Copilot review             | 📋 ToDo | P0       | S    | 5.2, 5.3, 5.5 |
 
 ## Tasks
@@ -285,7 +285,7 @@ Completion Protocol: standard 5 steps, id 5.4, commit
 
 ### Task 5.5: Sandboxed invoice processor (`registerSandboxed`)
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 5.4
@@ -296,11 +296,11 @@ Row 49: CPU-bound work out of process. A standalone `invoice.sandboxed.ts` (no N
 
 #### Acceptance criteria
 
-- [ ] `workers/invoice.sandboxed.ts`: default-export async function over `SandboxedJob` doing deterministic CPU work (e.g. iterative hashing of `job.data.lines`), returning `{ invoiceId, checksum, durationMs }`; ZERO NestJS imports; documented constraints (no DI, serializable data only).
-- [ ] Build wiring guarantees the compiled `.js` lands in `dist` and the registration resolves it via a URL relative to the compiled module (works in dev and build).
-- [ ] Boot registration via `registerSandboxed({ queueName: 'invoices', processorFile, options: { concurrency: 2 } })`; `useWorkerThreads` exposed through env `INVOICE_WORKER_THREADS` (default false).
-- [ ] `POST /workers/invoices/render { invoiceId, lines }` enqueues; an event-loop-lag probe endpoint shows lag stays low during a render (demonstration, not a benchmark).
-- [ ] Unit tests: the sandboxed function's logic (imported directly), registration options.
+- [x] `workers/invoice.sandboxed.ts`: default-export async function over `SandboxedJob` doing deterministic CPU work (e.g. iterative hashing of `job.data.lines`), returning `{ invoiceId, checksum, durationMs }`; ZERO NestJS imports; documented constraints (no DI, serializable data only).
+- [x] Build wiring guarantees the compiled `.js` lands in `dist` and the registration resolves it via a URL relative to the compiled module (works in dev and build).
+- [x] Boot registration via `registerSandboxed({ queueName: 'invoices', processorFile, options: { concurrency: 2 } })`; `useWorkerThreads` exposed through env `INVOICE_WORKER_THREADS` (default false).
+- [x] `POST /workers/invoices/render { invoiceId, lines }` enqueues; an event-loop-lag probe endpoint shows lag stays low during a render (demonstration, not a benchmark).
+- [x] Unit tests: the sandboxed function's logic (imported directly), registration options.
 
 #### Files to create / modify
 
@@ -416,3 +416,4 @@ main: `docs(plan): mark P5 complete`.
 - 5.2 ✅ 2026-07-09 three failure-propagation variants (stuck pitfall, failParentOnFailure, ignoreDependencyOnFailure) with deterministic payment failure injection and the addBulk launcher
 - 5.3 ✅ 2026-07-09 boot-registered job schedulers (5-field cron+tz, 6-field seconds, every+offset+limit) with idempotent reboot, management endpoints, tick clock, and the four invalid_repeat_options validation triggers
 - 5.4 ✅ 2026-07-09 dynamic per-tenant workers via WorkerRegistry (tier-mapped concurrency, tenant-scoped queue names, delivery trail, register/unregister/list/notify endpoints)
+- 5.5 ✅ 2026-07-09 sandboxed invoice processor via registerSandboxed (standalone built artifact, env-driven useWorkerThreads, render endpoint, event-loop-delay probe)

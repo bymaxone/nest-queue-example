@@ -25,6 +25,7 @@ describe('parseEnv (unit)', () => {
       QUEUE_DRAIN_TIMEOUT_MS: 30000,
       QUEUE_DRAIN_ON_SHUTDOWN: false,
       QUEUE_OTEL: false,
+      INVOICE_WORKER_THREADS: false,
       WEBHOOK_FAILURES: 2,
       REMINDER_DELAY_MS: 60000,
       WEB_ORIGIN: 'http://localhost:3000',
