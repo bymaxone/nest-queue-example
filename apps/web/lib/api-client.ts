@@ -79,7 +79,11 @@ async function parseError(res: Response): Promise<ApiError> {
 /** Core fetch wrapper: resolves on 2xx, rejects with ApiError otherwise. */
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
-  headers.set('Content-Type', 'application/json')
+  // Only declare a JSON body when one is actually sent: setting Content-Type on
+  // GETs and body-less requests forces a CORS preflight (dev runs cross-origin).
+  if (init.body !== undefined && init.body !== null) {
+    headers.set('Content-Type', 'application/json')
+  }
   const res = await fetch(`${API_BASE_URL}${path}`, { ...init, headers })
   if (!res.ok) throw await parseError(res)
   if (res.status === 204 || res.headers.get('Content-Length') === '0') return undefined as T

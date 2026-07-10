@@ -1,7 +1,7 @@
 /**
  * @fileoverview Schedulers (`/schedulers`) - lists the Job Schedulers on the
- * two managed queues, an upsert form (pattern-or-every toggle), and delete
- * with confirm. A validation failure (`queue.invalid_repeat_options`) renders
+ * two managed queues, an upsert form (pattern-or-every toggle), and immediate
+ * scheduler removal. A validation failure (`queue.invalid_repeat_options`) renders
  * the API envelope inline rather than only as a toast.
  * @layer app/schedulers/page
  */
@@ -261,7 +261,7 @@ function UpsertSchedulerForm({ queue }: { queue: SchedulerQueue }) {
   )
 }
 
-/** Schedulers page: per-queue list, upsert form, and delete-with-confirm. */
+/** Schedulers page: per-queue list, upsert form, and immediate removal. */
 export default function SchedulersPage() {
   const [queue, setQueue] = useState<SchedulerQueue>('maintenance')
 

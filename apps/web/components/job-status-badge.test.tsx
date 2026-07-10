@@ -25,7 +25,7 @@ describe('JobStatusBadge', () => {
     expect(icon).toHaveClass('animate-isPulsing')
   })
 
-  it('does not isPulsing the icon for a terminal status', () => {
+  it('does not pulse the icon for a terminal status', () => {
     // Scenario: completed jobs are done; no pulsing animation should linger.
     render(<JobStatusBadge status={JOB_STATUS.COMPLETED} />)
     const icon = document.querySelector('svg')

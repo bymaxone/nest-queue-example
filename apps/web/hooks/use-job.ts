@@ -1,8 +1,8 @@
 /**
  * @fileoverview Polls one job's detail (`GET /admin/jobs/:queue/:id`) while it
- * looks non-final. The job-detail DTO carries no explicit status field, so
- * finality is approximated as "has a return value or a failure reason
- * recorded yet" - the closest signal the endpoint actually exposes.
+ * is in-flight. Finality is read from the DTO's `finishedOn` timestamp, which
+ * BullMQ sets when a job completes or fails, so polling stops even for handlers
+ * that return void on success (where `returnValue` stays undefined).
  * @layer hooks/use-job
  */
 'use client'
@@ -13,14 +13,15 @@ import type { JobView } from '@/lib/api-types'
 import { METRICS_POLL_INTERVAL_MS } from '@/lib/constants'
 
 /**
- * Whether a job view looks terminal: it has recorded a return value (completed)
- * or a failure reason (failed at least once).
+ * Whether a job view is terminal: BullMQ records `finishedOn` when a job
+ * completes or fails, so it is reliable even for handlers that return void on
+ * success (where `returnValue` stays undefined).
  *
  * @param job - The job view to inspect.
- * @returns `true` when the job looks done, `false` while it still looks in-flight.
+ * @returns `true` when the job has finished, `false` while it is still in-flight.
  */
 export function looksFinal(job: JobView): boolean {
-  return job.returnValue !== undefined || job.failedReason !== undefined
+  return job.finishedOn !== undefined
 }
 
 /**

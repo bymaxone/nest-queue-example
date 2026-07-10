@@ -29,11 +29,16 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(16px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        isPulsing: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.4' },
+        },
       },
       animation: {
         'glow-float': 'glow-float 10s ease-in-out infinite',
         'glow-drift': 'glow-drift 12s ease-in-out infinite',
         'fade-in': 'fade-in 0.5s ease-out forwards',
+        isPulsing: 'isPulsing 1.5s ease-in-out infinite',
       },
     },
   },

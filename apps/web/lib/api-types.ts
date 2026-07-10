@@ -21,6 +21,8 @@ export interface JobView {
   progress: unknown
   returnValue: unknown
   failedReason: string | undefined
+  /** Epoch ms when the job finished (completed or failed); undefined while in-flight. */
+  finishedOn: number | undefined
 }
 
 /** Statuses BullMQ's `clean` action accepts. */

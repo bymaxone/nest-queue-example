@@ -29,22 +29,24 @@ const baseJob: JobView = {
   progress: 0,
   returnValue: undefined,
   failedReason: undefined,
+  finishedOn: undefined,
 }
 
 describe('looksFinal', () => {
-  it('is false for a job with neither a return value nor a failure reason', () => {
-    // Scenario: a still-processing job must not look final.
+  it('is false while the job has not finished', () => {
+    // Scenario: a still-processing job (no finishedOn) must not look final.
     expect(looksFinal(baseJob)).toBe(false)
   })
 
-  it('is true once a return value is recorded', () => {
-    // Scenario: a completed job carries a return value.
-    expect(looksFinal({ ...baseJob, returnValue: { ok: true } })).toBe(true)
+  it('is true once finishedOn is recorded, even without a return value', () => {
+    // Scenario: a void-returning processor still finishes; finishedOn marks it done
+    // where a returnValue-only check would poll forever.
+    expect(looksFinal({ ...baseJob, finishedOn: 1000 })).toBe(true)
   })
 
-  it('is true once a failure reason is recorded', () => {
-    // Scenario: a failed job carries a failure reason.
-    expect(looksFinal({ ...baseJob, failedReason: 'boom' })).toBe(true)
+  it('is true for a finished job that also carries a failure reason', () => {
+    // Scenario: a failed job records finishedOn alongside its failure reason.
+    expect(looksFinal({ ...baseJob, finishedOn: 1000, failedReason: 'boom' })).toBe(true)
   })
 })
 
@@ -64,10 +66,10 @@ describe('useJob', () => {
     expect(mockGet).toHaveBeenCalledWith('/admin/jobs/email/1')
   })
 
-  it('stops polling once the job looks final (a return value has landed)', async () => {
-    // Scenario: refetchInterval must resolve to false for a completed job, so
+  it('stops polling once the job looks final (finishedOn has landed)', async () => {
+    // Scenario: refetchInterval must resolve to false for a finished job, so
     // the browser does not keep polling a job that will never change again.
-    mockGet.mockResolvedValueOnce({ ...baseJob, returnValue: { ok: true } })
+    mockGet.mockResolvedValueOnce({ ...baseJob, finishedOn: 1000, returnValue: { ok: true } })
     const { result } = renderHook(() => useJob('email', '1'), { wrapper: wrapper() })
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)

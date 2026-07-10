@@ -95,16 +95,19 @@ function DiagnosticsCard({ diagnostics }: { diagnostics: DiagnosticsSnapshot | u
 
 /** Health page: liveness/readiness, metrics freshness, and connection diagnostics. */
 export default function HealthPage() {
-  const { data: live } = useLiveness()
-  const { data: ready } = useReadiness()
+  const { data: live, isError: liveError } = useLiveness()
+  const { data: ready, isError: readyError } = useReadiness()
   const { data: diagnostics } = useDiagnostics()
 
   return (
     <AppShell>
       <h1 className="mb-6 text-2xl font-bold">Health</h1>
       <div className="mb-6 flex gap-2">
-        <ProbeChip label="live" isUp={live !== undefined} />
-        <ProbeChip label="ready" isUp={ready !== undefined ? true : undefined} />
+        <ProbeChip label="live" isUp={live !== undefined ? true : liveError ? false : undefined} />
+        <ProbeChip
+          label="ready"
+          isUp={ready !== undefined ? true : readyError ? false : undefined}
+        />
       </div>
       <FreshnessCard ready={ready} />
       <DiagnosticsCard diagnostics={diagnostics} />
