@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -24,7 +24,7 @@ Everything works and everything is tested. This phase completes governance (the 
 
 | ID  | Task                                                      | Status  | Priority | Size | Depends on |
 | --- | --------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 9.1 | Branch + the four Copilot review files                    | 📋 ToDo | P0       | S    | Phase 8    |
+| 9.1 | Branch + the four Copilot review files                    | ✅ Done | P0       | S    | Phase 8    |
 | 9.2 | README final + docs cross-check                           | 📋 ToDo | P0       | M    | Phase 8    |
 | 9.3 | Stryker mutation gate on `apps/api`                       | 📋 ToDo | P0       | L    | Phase 8    |
 | 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
@@ -34,7 +34,7 @@ Everything works and everything is tested. This phase completes governance (the 
 
 ### Task 9.1: Branch + the four Copilot review files
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: Phase 8
@@ -45,10 +45,10 @@ Everything works and everything is tested. This phase completes governance (the 
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-09-hardening-release-readiness` created with `git switch -c`.
-- [ ] The three instruction files < 4000 chars each; every rule verifiable against a real repo config (`package.json`, `tsconfig`, `eslint.config.mjs`, jest configs).
-- [ ] The reviewer agent file covers: coverage-matrix discipline, library-external rule (no workspace/paths), `./shared`-only in web, timeless comments, no suppressions, sequential test rule, design-system parity, and flags any AI-attribution line.
-- [ ] Files reference no plan phases or task ids (timeless).
+- [x] Branch `feat/phase-09-hardening-release-readiness` created with `git switch -c`.
+- [x] The three instruction files < 4000 chars each (3949 / 3506 / 2732); every rule verifiable against a real repo config (`package.json`, `tsconfig.base.json`, `eslint.config.mjs`, `apps/api/jest.config.cjs`, `apps/web/vitest.config.ts`).
+- [x] The reviewer agent file covers: coverage-matrix discipline, library-external rule (no workspace/paths), `./shared`-only in web, timeless comments, no suppressions, sequential test rule, design-system parity, and flags any AI-attribution line.
+- [x] Files reference no plan phases or task ids (timeless).
 
 #### Files to create / modify
 
@@ -328,3 +328,5 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 9.1 ✅ 2026-07-10 four Copilot review files authored, stack-true and under the 4000-char limit
