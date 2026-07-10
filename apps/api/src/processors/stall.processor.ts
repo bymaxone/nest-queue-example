@@ -17,6 +17,7 @@ import { DEMOS_QUEUE } from '../queues/queue-names.js'
 import { STALL_JOB } from '../demos/demo-jobs.constants.js'
 import type { StallJobData, StallJobResult } from '../demos/demo-jobs.types.js'
 import { EventFeed } from '../events/event-feed.service.js'
+import { redact } from '../events/redact.js'
 import { sleep } from '../timing/sleep.js'
 
 /** Concurrency for the demo worker: a single slow job at a time keeps the demo clear. */
@@ -105,7 +106,7 @@ export class StallProcessor {
       event: 'completed',
       jobId: job.id,
       at: new Date().toISOString(),
-      returnvalue: returnValue,
+      returnvalue: redact(returnValue),
       attemptsMade: job.attemptsMade,
     })
   }

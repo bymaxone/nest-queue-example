@@ -15,7 +15,7 @@ export type FeedSource = 'worker' | 'global'
 /**
  * A single feed entry. Situational fields are present only when the source
  * provides them: worker entries carry `data`/`returnvalue`/`attemptsMade`, while
- * global entries carry the serialized `returnvalue` string and, when the job was
+ * global entries carry `returnvalue` (which BullMQ may deliver already deserialized) and, when the job was
  * still resolvable, `resolvedData` from the `getJob` fallback.
  */
 export interface FeedEntry {

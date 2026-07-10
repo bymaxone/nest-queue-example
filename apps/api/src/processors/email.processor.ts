@@ -104,7 +104,7 @@ export class EmailProcessor {
       jobId: job.id,
       at: new Date().toISOString(),
       data: redact(job.data),
-      returnvalue: returnValue,
+      returnvalue: redact(returnValue),
       attemptsMade: job.attemptsMade,
     })
   }
@@ -144,7 +144,7 @@ export class EmailProcessor {
       event: 'progress',
       jobId: job.id,
       at: new Date().toISOString(),
-      progress,
+      progress: redact(progress),
       attemptsMade: job.attemptsMade,
     })
   }

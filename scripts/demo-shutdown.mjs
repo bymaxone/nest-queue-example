@@ -138,7 +138,12 @@ function spawnApi() {
  * @returns {Promise<{ code: number | null, signal: NodeJS.Signals | null }>} The exit outcome.
  */
 function awaitExit(child) {
-  return new Promise((resolvePromise) => {
+  return new Promise((resolvePromise, rejectPromise) => {
+    // A spawn failure (e.g. a missing entry file) emits `error`, not `exit`;
+    // reject so the top-level try/catch reports FAIL instead of hanging.
+    child.on('error', (error) => {
+      rejectPromise(error)
+    })
     child.on('exit', (code, signal) => {
       resolvePromise({ code, signal })
     })

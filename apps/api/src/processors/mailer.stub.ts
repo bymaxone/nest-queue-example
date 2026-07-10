@@ -14,7 +14,7 @@ const SENT_BUFFER_CAPACITY = 500
 
 /** A single recorded send: who it went to, which template, and when. */
 export interface MailRecord {
-  /** Destination address the message was addressed to. */
+  /** Recipient identifier or address the message was addressed to. */
   to: string
   /** Template (job name) that produced the message. */
   template: string
@@ -38,7 +38,7 @@ export class MailerStub {
    * message is dispatched: the record is appended to a bounded buffer so memory
    * stays flat regardless of how many jobs run.
    *
-   * @param to - Destination address for the message.
+   * @param to - Recipient identifier or address for the message.
    * @param template - Template (job name) that produced the message.
    * @returns The synthetic provider message id.
    */

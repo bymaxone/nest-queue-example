@@ -122,7 +122,7 @@ export class WebhookProcessor {
       event: 'completed',
       jobId: event.jobId,
       at: new Date().toISOString(),
-      returnvalue: event.returnvalue,
+      returnvalue: redact(event.returnvalue),
     }
     const job = await this.queueService.getJob(WEBHOOKS_QUEUE, event.jobId)
     this.feed.push(job ? { ...base, resolvedData: redact(job.data) } : base)
