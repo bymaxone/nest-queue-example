@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 👀 Review · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-10
+> **Status**: ✅ Done · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -333,4 +333,4 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 - 9.2 ✅ 2026-07-10 final README plus governance files; spec section 7 path drift fixed, docs cross-checked
 - 9.3 ✅ 2026-07-10 Stryker mutation gate on apps/api at 99.71 (break 95), survivors killed or documented as equivalents
 - 9.4 ✅ 2026-07-10 coverage audit (70/70 rows with evidence) and the npm-switch and public-flip release checklists
-- 9.5 👀 2026-07-10 acceptance criteria audited, dashboards updated, PR opened with the Copilot review requested (merge owned by the orchestrator)
+- 9.5 ✅ 2026-07-10 PR #12 squash-merged (e805a53) with CI green; eight Copilot review threads resolved (two false positives, six fixes including a shared processor-metadata test module extracted from five specs); roadmap complete at 10/10 phases, 53/53 tasks
