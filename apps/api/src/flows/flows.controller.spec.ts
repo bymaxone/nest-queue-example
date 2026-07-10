@@ -158,7 +158,13 @@ describe('FlowsController (unit)', () => {
       readTree: jest.fn<FulfillmentService['readTree']>().mockResolvedValue(null),
     })
 
-    await expect(controller.tree('missing')).rejects.toBeInstanceOf(QueueException)
+    const error = await controller.tree('missing').catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(QueueException)
+    // The envelope names the queue and the requested id so the client can act; a
+    // blanked details object would strip that context.
+    expect((error as QueueException).getResponse()).toMatchObject({
+      error: { code: 'queue.job_not_found', details: { jobId: 'missing' } },
+    })
   })
 
   it('rejects a malformed root id at the boundary', async () => {

@@ -40,6 +40,9 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
       promise,
       new Promise<never>((_resolve, reject) => {
         timer = setTimeout(() => {
+          // Stryker disable next-line StringLiteral: the readiness handler catches
+          // this rejection and rethrows a fixed 503; the timeout message is never
+          // surfaced, so its text is unobservable.
           reject(new Error('readiness probe timed out'))
         }, ms)
       }),

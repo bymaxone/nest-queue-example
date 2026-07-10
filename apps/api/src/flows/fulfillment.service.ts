@@ -47,6 +47,9 @@ export class FulfillmentService {
    * @param variant - The failure-propagation posture encoded on the payment child.
    * @returns The root `FlowJob` with its children and grandchildren.
    */
+  // Stryker disable next-line StringLiteral: paymentChildOpts maps any unlisted variant
+  // key to undefined, exactly what 'default' resolves to, so blanking this default
+  // produces the identical flow (no payment-child override).
   buildFulfillmentFlow(orderId: string, variant: FulfillmentVariant = 'default'): FlowJob {
     const data: FulfillmentNodeData = { orderId }
     return {

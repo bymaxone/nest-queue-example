@@ -11,7 +11,7 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 9 / 10 phases complete (90%) · 50 / 53 tasks
+> **Progress:** 9 / 10 phases complete (90%) · 51 / 53 tasks
 > **Active phase:** P9 hardening-release-readiness
 > **Blockers:** none
 
@@ -26,7 +26,7 @@
 | P6  | metrics-errors-modes        | ✅ Done        | 5/5 tasks | M    | 2026-07-10   |
 | P7  | web-dashboard               | ✅ Done        | 6/6 tasks | L    | 2026-07-10   |
 | P8  | testing                     | ✅ Done        | 5/5 tasks | L    | 2026-07-10   |
-| P9  | hardening-release-readiness | 🔄 In Progress | 2/5 tasks | M    | 2026-07-10   |
+| P9  | hardening-release-readiness | 🔄 In Progress | 3/5 tasks | M    | 2026-07-10   |
 
 ### External prerequisite (not a phase of this plan)
 

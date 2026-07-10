@@ -54,6 +54,24 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * Read the worker-event-listener metadata (`eventName` + `methodKey`) attached by
+ * the library's `@OnWorkerEvent` decorators. This surfaces each decorator's event
+ * name, which a direct method call cannot observe.
+ *
+ * @param ctor - The processor class constructor.
+ * @returns The registered `{ eventName, methodKey }` entries.
+ */
+function readWorkerEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
+  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
+    const value: unknown = Reflect.getOwnMetadata(key, ctor)
+    if (Array.isArray(value) && value.every((e) => isRecord(e) && 'eventName' in e)) {
+      return value as { eventName: string; methodKey: string }[]
+    }
+  }
+  return []
+}
+
+/**
  * Build the processor with spyable collaborators.
  *
  * @returns The processor plus the mailer, trail, and feed spies.
@@ -97,6 +115,21 @@ describe('EmailProcessor (unit)', () => {
     expect(handlers).toContainEqual({ jobName: 'send-welcome', methodKey: 'sendWelcome' })
     expect(handlers).toContainEqual({ jobName: 'send-receipt', methodKey: 'sendReceipt' })
     expect(handlers).toContainEqual({ methodKey: 'handleUnknown' })
+  })
+
+  it('wires each worker-event listener to its BullMQ event name', () => {
+    /*
+     * Scenario: the @OnWorkerEvent decorator arguments.
+     * Rule it protects: each listener subscribes to the exact event name (completed,
+     * failed, progress, active); a wrong or blank name would silently detach the
+     * listener so its bridged entry never reaches the SSE feed.
+     */
+    expect(readWorkerEventListeners(EmailProcessor)).toEqual([
+      { eventName: 'completed', methodKey: 'onCompleted' },
+      { eventName: 'failed', methodKey: 'onFailed' },
+      { eventName: 'progress', methodKey: 'onProgress' },
+      { eventName: 'active', methodKey: 'onActive' },
+    ])
   })
 
   it('sends the welcome email for a send-welcome job', () => {
@@ -178,6 +211,31 @@ describe('EmailProcessor (unit)', () => {
 
     expect(sendsAfterFill).toBe(1001)
     expect(send).toHaveBeenCalledTimes(1002)
+  })
+
+  it('retains the oldest marker at exactly the capacity boundary', () => {
+    /*
+     * Boundary: filling the map to exactly the capacity (1000), not one past it.
+     * Rule it protects: eviction triggers only once the map EXCEEDS capacity (`<=`),
+     * so at exactly 1000 markers the oldest is still cached; a strict `<` would evict
+     * one entry early and re-send a receipt that should have been memoized.
+     */
+    const { processor, send } = setup()
+    send.mockReturnValue({ messageId: 'm' })
+    for (let index = 0; index < 1000; index += 1) {
+      processor.sendReceipt({
+        id: `receipt-${String(index)}`,
+        data: { orderId: 'o', to: 'x@example.com', total: 1 },
+      } as Job<ReceiptEmailJobData, ReceiptEmailJobResult>)
+    }
+
+    processor.sendReceipt({
+      id: 'receipt-0',
+      data: { orderId: 'o', to: 'x@example.com', total: 1 },
+    } as Job<ReceiptEmailJobData, ReceiptEmailJobResult>)
+
+    // receipt-0 was memoized and never evicted, so its redelivery sends nothing new.
+    expect(send).toHaveBeenCalledTimes(1000)
   })
 
   it('records an unknown email job into the audit trail', () => {
@@ -271,6 +329,7 @@ describe('EmailProcessor (unit)', () => {
     processor.onProgress(job, 42)
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
     expect(entry.event).toBe('progress')
     expect(entry.progress).toBe(42)
   })
@@ -287,6 +346,7 @@ describe('EmailProcessor (unit)', () => {
     processor.onActive(job)
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
     expect(entry.event).toBe('active')
     expect(entry.data).toEqual({ email: '[redacted]' })
   })

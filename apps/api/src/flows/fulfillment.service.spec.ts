@@ -46,16 +46,19 @@ describe('FulfillmentService (unit)', () => {
 
     expect(flow.name).toBe(SHIP_ORDER_JOB)
     expect(flow.queueName).toBe(FULFILLMENT_QUEUE)
+    // Every node carries the order id as its data so each processor knows which order
+    // it is fulfilling; a blanked data object would strip that correlation.
+    expect(flow.data).toEqual({ orderId: 'order-1' })
     const children = flow.children ?? []
-    expect(children.map((child) => [child.name, child.queueName])).toEqual([
-      [RESERVE_STOCK_JOB, STOCK_QUEUE],
-      [CHARGE_PAYMENT_JOB, PAYMENTS_QUEUE],
-      [RENDER_INVOICE_JOB, FULFILLMENT_QUEUE],
+    expect(children.map((child) => [child.name, child.queueName, child.data])).toEqual([
+      [RESERVE_STOCK_JOB, STOCK_QUEUE, { orderId: 'order-1' }],
+      [CHARGE_PAYMENT_JOB, PAYMENTS_QUEUE, { orderId: 'order-1' }],
+      [RENDER_INVOICE_JOB, FULFILLMENT_QUEUE, { orderId: 'order-1' }],
     ])
     const invoice = children[2]
-    expect(invoice?.children?.map((grand) => [grand.name, grand.queueName])).toEqual([
-      [FETCH_LINES_JOB, INVOICES_DATA_QUEUE],
-      [FETCH_CUSTOMER_JOB, INVOICES_DATA_QUEUE],
+    expect(invoice?.children?.map((grand) => [grand.name, grand.queueName, grand.data])).toEqual([
+      [FETCH_LINES_JOB, INVOICES_DATA_QUEUE, { orderId: 'order-1' }],
+      [FETCH_CUSTOMER_JOB, INVOICES_DATA_QUEUE, { orderId: 'order-1' }],
     ])
   })
 

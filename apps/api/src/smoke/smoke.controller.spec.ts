@@ -54,7 +54,12 @@ describe('SmokeController (unit)', () => {
      */
     const { controller, enqueue } = setup()
 
-    await expect(controller.enqueue({})).rejects.toBeInstanceOf(BadRequestException)
+    const error = await controller.enqueue({}).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(BadRequestException)
+    // The 400 states the exact constraint so a blanked message cannot pass unnoticed.
+    expect((error as BadRequestException).message).toBe(
+      'payload must be a non-empty string of at most 1000 characters',
+    )
     expect(enqueue).not.toHaveBeenCalled()
   })
 

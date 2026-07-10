@@ -109,6 +109,7 @@ describe('ErrorExplorerController (unit)', () => {
       expect((error as BadRequestException).getResponse()).toMatchObject({
         error: {
           code: 'errors.not_reproducible',
+          message: 'This code is covered outside the error explorer',
           details: { code: QUEUE_ERROR_CODES.CONNECTION_TIMEOUT },
         },
       })
@@ -130,6 +131,9 @@ describe('ErrorExplorerController (unit)', () => {
       throw new Error('expected a rejection')
     } catch (error) {
       expect(error).toBeInstanceOf(NotFoundException)
+      expect((error as NotFoundException).getResponse()).toEqual({
+        error: { code: 'errors.unknown_code', message: 'Unknown error code', details: null },
+      })
       expect(JSON.stringify((error as NotFoundException).getResponse())).not.toContain(
         'totally.unknown',
       )

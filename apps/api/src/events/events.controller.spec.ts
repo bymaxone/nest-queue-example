@@ -38,11 +38,18 @@ describe('EventsController (unit)', () => {
     feed.push(entry('a'))
     const controller = new EventsController(feed)
     const received: MessageEvent[] = []
+    const errors: unknown[] = []
 
-    const subscription = controller.stream().subscribe((message) => received.push(message))
+    const subscription = controller.stream().subscribe({
+      next: (message) => received.push(message),
+      // Capture instead of letting an error surface as an uncaught rejection: the
+      // stream must never error, so any error here fails the assertion below.
+      error: (streamError) => errors.push(streamError),
+    })
     feed.push(entry('b'))
     subscription.unsubscribe()
 
+    expect(errors).toEqual([])
     expect(received.map((message) => (message.data as FeedEntry).jobId)).toEqual(['a', 'b'])
     expect(received[0]).toEqual({ data: entry('a') })
   })

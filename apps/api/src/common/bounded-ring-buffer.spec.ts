@@ -37,6 +37,22 @@ describe('BoundedRingBuffer (unit)', () => {
     expect(buffer.snapshot()).toEqual([2, 3])
   })
 
+  it('keeps the newest window in order after wrapping past capacity', () => {
+    /*
+     * Boundary: pushing well past capacity so the head wraps around the ring.
+     * Rule it protects: the head advances forward by exactly one slot per push, so
+     * the snapshot is the last `capacity` entries oldest-first. A backward or
+     * miscomputed head advance would reorder or drop the wrong entries.
+     */
+    const buffer = new BoundedRingBuffer<string>(3)
+
+    for (const entry of ['a', 'b', 'c', 'd', 'e']) {
+      buffer.push(entry)
+    }
+
+    expect(buffer.snapshot()).toEqual(['c', 'd', 'e'])
+  })
+
   it('returns a snapshot that cannot mutate the buffer', () => {
     /*
      * Scenario: a caller mutates the returned array.

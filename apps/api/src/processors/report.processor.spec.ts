@@ -80,5 +80,8 @@ describe('ReportProcessor (unit)', () => {
     expect(result.reportId).toBe('r1')
     expect(typeof result.durationMs).toBe('number')
     expect(result.durationMs).toBeGreaterThanOrEqual(0)
+    // An elapsed span is far smaller than the wall clock; a mutated `+` would make it
+    // ~2x the epoch, so this pins the subtraction that computes the real duration.
+    expect(result.durationMs).toBeLessThan(Date.now())
   })
 })

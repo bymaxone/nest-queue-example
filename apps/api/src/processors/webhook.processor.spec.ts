@@ -48,6 +48,33 @@ function readWorkerOptions(ctor: object): WorkerOptions {
 }
 
 /**
+ * Read the queue-event-listener metadata (`eventName` + `methodKey`) attached by
+ * the library's `@OnQueueEvent` decorators. This surfaces the decorator's event
+ * name, which a direct method call cannot observe.
+ *
+ * @param ctor - The processor class constructor.
+ * @returns The registered `{ eventName, methodKey }` entries.
+ */
+function readQueueEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
+  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
+    const value: unknown = Reflect.getOwnMetadata(key, ctor)
+    if (
+      Array.isArray(value) &&
+      value.every(
+        (entry) =>
+          typeof entry === 'object' &&
+          entry !== null &&
+          'eventName' in entry &&
+          'methodKey' in entry,
+      )
+    ) {
+      return value as { eventName: string; methodKey: string }[]
+    }
+  }
+  return []
+}
+
+/**
  * Build the processor with spyable collaborators and a fixed failure budget.
  *
  * @param failures - The configured number of injected failures.
@@ -96,6 +123,20 @@ function jobAt(
 }
 
 describe('WebhookProcessor (unit)', () => {
+  it('wires each global queue-event listener to its BullMQ event name', () => {
+    /*
+     * Scenario: the @OnQueueEvent decorator arguments.
+     * Rule it protects: each global listener subscribes to the exact event name
+     * (completed, failed, active); a wrong or blank name would silently detach the
+     * cross-instance listener so its serialized entry never reaches the feed.
+     */
+    expect(readQueueEventListeners(WebhookProcessor)).toEqual([
+      { eventName: 'completed', methodKey: 'onGlobalCompleted' },
+      { eventName: 'failed', methodKey: 'onGlobalFailed' },
+      { eventName: 'active', methodKey: 'onGlobalActive' },
+    ])
+  })
+
   it('registers concurrency 5 and a 2-per-second limiter', () => {
     /*
      * Scenario: worker registration.
@@ -190,6 +231,7 @@ describe('WebhookProcessor (unit)', () => {
     processor.onGlobalFailed({ jobId: 'j2', failedReason: 'boom' })
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('global')
     expect(entry.event).toBe('failed')
     expect(entry.jobId).toBe('j2')
     expect(entry.failedReason).toBe('boom')
@@ -205,6 +247,7 @@ describe('WebhookProcessor (unit)', () => {
     processor.onGlobalActive({ jobId: 'j3' })
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('global')
     expect(entry.event).toBe('active')
     expect(entry.jobId).toBe('j3')
   })

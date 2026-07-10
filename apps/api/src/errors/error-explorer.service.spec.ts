@@ -21,6 +21,19 @@ function codeOf(error: unknown): string {
   return (response as { error: { code: string } }).error.code
 }
 
+/** Read the `details` object off a thrown QueueException envelope. */
+function detailsOf(error: unknown): Record<string, unknown> {
+  const response = (error as QueueException).getResponse()
+  return (response as { error: { details: Record<string, unknown> } }).error.details
+}
+
+/**
+ * The `details` the fallback throw carries when a trigger operation does not
+ * raise. Asserting a real trigger's details are NOT this marker proves the real
+ * failing operation ran rather than the service short-circuiting to the fallback.
+ */
+const FALLBACK_DETAILS = { reason: 'operation did not raise' }
+
 /**
  * Build the service over a real AdminQueuesService and spied collaborators.
  *
@@ -65,6 +78,9 @@ describe('ErrorExplorerService (unit)', () => {
     const error = await service.trigger(QUEUE_ERROR_CODES.QUEUE_NOT_FOUND).catch((e: unknown) => e)
     expect(error).toBeInstanceOf(QueueException)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.QUEUE_NOT_FOUND)
+    // The real allow-list guard names the missing queue in details; the fallback
+    // never would, so this proves the actual operation ran rather than resolving.
+    expect(detailsOf(error)).toMatchObject({ queue: 'errors-explorer-unknown-queue' })
   })
 
   it('triggers job_not_found after a real null getJob', async () => {
@@ -87,6 +103,9 @@ describe('ErrorExplorerService (unit)', () => {
     const { service } = setup()
     const error = await service.trigger(QUEUE_ERROR_CODES.INVALID_JOB_DATA).catch((e: unknown) => e)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.INVALID_JOB_DATA)
+    // The real schema guard raised, so the details are the validation issues, not
+    // the fallback marker that a skipped operation would leave behind.
+    expect(detailsOf(error)).not.toMatchObject(FALLBACK_DETAILS)
   })
 
   it.each([
@@ -156,6 +175,9 @@ describe('ErrorExplorerService (unit)', () => {
     const { service } = setup()
     const error = await service.trigger(QUEUE_ERROR_CODES.INVALID_OPTIONS).catch((e: unknown) => e)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.INVALID_OPTIONS)
+    // forRoot rejected on the invalid drainTimeoutMs, so the details are the
+    // library's real validation detail, not the did-not-raise fallback marker.
+    expect(detailsOf(error)).not.toMatchObject(FALLBACK_DETAILS)
   })
 
   it('triggers duplicate_processor by colliding with a registered worker', async () => {
@@ -190,6 +212,9 @@ describe('ErrorExplorerService (unit)', () => {
       .trigger(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
       .catch((e: unknown) => e)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
+    // The defensive branch names why it fired, distinguishing it from both the
+    // real guard and the did-not-raise fallback.
+    expect(detailsOf(error)).toMatchObject({ reason: 'no registered worker to collide with' })
     expect(register).not.toHaveBeenCalled()
   })
 

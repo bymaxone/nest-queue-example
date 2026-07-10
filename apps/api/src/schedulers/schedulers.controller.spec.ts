@@ -146,7 +146,16 @@ describe('SchedulersController (unit)', () => {
 
     await controller.upsert('monitoring', 'demo', { repeat: { every: 1_000 }, template: {} })
 
-    expect(upsertJobScheduler).toHaveBeenCalledWith('monitoring', 'demo', { every: 1_000 }, {})
+    expect(upsertJobScheduler).toHaveBeenCalledWith(
+      'monitoring',
+      'demo',
+      { every: 1_000 },
+      expect.anything(),
+    )
+    // toStrictEqual (not the default equals) so an accidental `name: undefined` /
+    // `data: undefined` key from a broken conditional spread is caught rather than
+    // silently ignored: the template must be exactly empty, keys omitted.
+    expect(upsertJobScheduler.mock.calls[0]?.[3]).toStrictEqual({})
   })
 
   it('rejects a template whose data exceeds the key cap', async () => {
@@ -163,6 +172,23 @@ describe('SchedulersController (unit)', () => {
     await expect(
       controller.upsert('monitoring', 'demo', { repeat: { every: 1_000 }, template: { data } }),
     ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('accepts a template whose data has exactly the maximum key count', async () => {
+    /*
+     * Boundary: a template data object with exactly the cap (32 keys).
+     * Rule it protects: the cap is inclusive (<=), so a template at the limit is
+     * accepted; a strict `<` would reject the boundary and drop a valid request.
+     */
+    const upsertJobScheduler = jest.fn<UpsertMock>().mockResolvedValue({ id: 'j' } as Job)
+    const controller = build({ upsertJobScheduler })
+    const data = Object.fromEntries(
+      Array.from({ length: 32 }, (_, index) => [`k${String(index)}`, 1]),
+    )
+
+    await controller.upsert('monitoring', 'demo', { repeat: { every: 1_000 }, template: { data } })
+
+    expect(upsertJobScheduler).toHaveBeenCalledTimes(1)
   })
 
   it('returns a null first job id when the library produced none', async () => {

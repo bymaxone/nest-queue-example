@@ -20,8 +20,8 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 | P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 5 / 5       | ✅ Done        |
 | P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 6 / 6       | ✅ Done        |
 | P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 5 / 5       | ✅ Done        |
-| P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 2 / 5       | 🔄 In Progress |
-|       | **Total**                                                                              | **50 / 53** | 🔄 In Progress |
+| P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 3 / 5       | 🔄 In Progress |
+|       | **Total**                                                                              | **51 / 53** | 🔄 In Progress |
 
 ## Status legend
 

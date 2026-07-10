@@ -24,8 +24,14 @@ describe('invoice.sandboxed (unit)', () => {
 
     expect(first.invoiceId).toBe('inv-1')
     expect(first.checksum).toBe(second.checksum)
-    expect(first.checksum).toMatch(/^[0-9a-f]{64}$/)
+    // Pin the exact digest for a fixed input: the sha256 algorithm, the hex encoding,
+    // and the exact number of hashing rounds all fold into this value, so any change
+    // to them (not just to the lines) produces a different checksum.
+    expect(first.checksum).toBe('80f849ad5f65c0833a6c0b271d008a8f9be14200816322ee9fd7f896140d3cfb')
+    // An elapsed span is far smaller than the process clock; a mutated `+` would make
+    // durationMs ~2x performance.now(), so this pins the subtraction.
     expect(first.durationMs).toBeGreaterThanOrEqual(0)
+    expect(first.durationMs).toBeLessThan(performance.now())
   })
 
   it('yields a different checksum when the lines change', () => {

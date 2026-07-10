@@ -139,7 +139,17 @@ describe('OrdersService (unit)', () => {
     const { service, enqueue, find } = setup()
     find.mockReturnValue(undefined)
 
-    await expect(service.remind('missing')).rejects.toBeInstanceOf(NotFoundException)
+    const error = await service.remind('missing').catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(NotFoundException)
+    // The stable envelope names the code, a safe message, and the requested id, so a
+    // blanked body or message would leave the client without an actionable error.
+    expect((error as NotFoundException).getResponse()).toEqual({
+      error: {
+        code: 'order_not_found',
+        message: 'Order not found',
+        details: { orderId: 'missing' },
+      },
+    })
     expect(enqueue).not.toHaveBeenCalled()
   })
 })

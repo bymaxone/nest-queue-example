@@ -58,10 +58,14 @@ const COLLISION_HANDLER = (): Promise<void> => Promise.resolve()
  * @returns 1001 minimal bulk-job descriptors.
  */
 function buildOversizedBatch(): BulkJob<{ index: number }>[] {
+  // Stryker disable all: only the batch length (1001) is observable; the bulk guard
+  // rejects on size before any job name or data is read, so blanking the per-job
+  // name or data yields the identical BULK_ENQUEUE_FAILED rejection.
   return Array.from({ length: OVERSIZED_BATCH_SIZE }, (_value, index) => ({
     name: 'probe',
     data: { index },
   }))
+  // Stryker restore all
 }
 
 /**
@@ -174,7 +178,12 @@ export class ErrorExplorerService {
 
   /** Compile module options the library rejects, throwing synchronously. */
   private triggerInvalidOptions(): void {
+    // Stryker disable next-line ObjectLiteral: the invalid drainTimeoutMs below is the
+    // sole rejection trigger; forRoot raises INVALID_OPTIONS whether or not the outer
+    // wrapper is present, and the spec asserts that real, non-fallback rejection.
     BymaxQueueModule.forRoot({
+      // Stryker disable next-line ObjectLiteral: the connection is never reached; the
+      // drainTimeoutMs validation rejects first, so blanking the URL is equivalent.
       connection: { url: INVALID_OPTIONS_URL },
       shutdown: { drainTimeoutMs: 0 },
     })

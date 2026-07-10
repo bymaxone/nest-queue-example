@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-10
+> **Status**: 🔄 In Progress · **Progress**: 3 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -26,7 +26,7 @@ Everything works and everything is tested. This phase completes governance (the 
 | --- | --------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 9.1 | Branch + the four Copilot review files                    | ✅ Done | P0       | S    | Phase 8    |
 | 9.2 | README final + docs cross-check                           | ✅ Done | P0       | M    | Phase 8    |
-| 9.3 | Stryker mutation gate on `apps/api`                       | 📋 ToDo | P0       | L    | Phase 8    |
+| 9.3 | Stryker mutation gate on `apps/api`                       | ✅ Done | P0       | L    | Phase 8    |
 | 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
 | 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 📋 ToDo | P0       | S    | 9.4        |
 
@@ -149,7 +149,7 @@ Completion Protocol: standard 5 steps, id 9.2, commit
 
 ### Task 9.3: Stryker mutation gate on `apps/api`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: L
 - **Depends on**: Phase 8
@@ -160,10 +160,10 @@ The pre-release assertiveness gate: Stryker over `apps/api/src` with `break 95, 
 
 #### Acceptance criteria
 
-- [ ] `stryker.config.json` scoped to `apps/api/src` (jest runner, ignoreStatic decision documented either way).
-- [ ] Baseline run recorded; survivors triaged: killed by new tests or documented as equivalents with reasoning.
-- [ ] Final score >= 95 with the `break` threshold active; results summary committed to `docs/mutation_testing_results.md`.
-- [ ] Runtime bounded: single Stryker process, Jest workers capped.
+- [x] `stryker.config.json` scoped to `apps/api/src` (jest runner, `ignoreStatic: true` decision documented in `docs/mutation_testing_results.md`).
+- [x] Baseline run recorded; survivors triaged: killed by new tests (the majority) or documented as provable equivalents with inline `// Stryker disable` reasoning.
+- [x] Final score **99.71** with the `break 95` threshold active (exit 0); results summary committed to `docs/mutation_testing_results.md`.
+- [x] Runtime bounded: single Stryker process, `concurrency: 2`, `NODE_OPTIONS=--max-old-space-size=4096`.
 
 #### Files to create / modify
 
@@ -331,3 +331,4 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 
 - 9.1 ✅ 2026-07-10 four Copilot review files authored, stack-true and under the 4000-char limit
 - 9.2 ✅ 2026-07-10 final README plus governance files; spec section 7 path drift fixed, docs cross-checked
+- 9.3 ✅ 2026-07-10 Stryker mutation gate on apps/api at 99.71 (break 95), survivors killed or documented as equivalents

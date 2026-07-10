@@ -88,6 +88,9 @@ export class DiagnosticsController {
    */
   private readWorkerRoleMaxRetries(): number | null {
     const [firstConnection] = this.workers.getConnections().values()
+    // Stryker disable next-line ConditionalExpression: a Worker/QueueEvents connection
+    // always carries maxRetriesPerRequest: null (the library forces it for BullMQ's
+    // blocking commands), so readMaxRetries returns null too; both branches yield null.
     return firstConnection === undefined ? null : readMaxRetries(firstConnection)
   }
 }
