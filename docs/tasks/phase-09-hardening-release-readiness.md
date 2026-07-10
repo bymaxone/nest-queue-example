@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-10
+> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -25,7 +25,7 @@ Everything works and everything is tested. This phase completes governance (the 
 | ID  | Task                                                      | Status  | Priority | Size | Depends on |
 | --- | --------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 9.1 | Branch + the four Copilot review files                    | ✅ Done | P0       | S    | Phase 8    |
-| 9.2 | README final + docs cross-check                           | 📋 ToDo | P0       | M    | Phase 8    |
+| 9.2 | README final + docs cross-check                           | ✅ Done | P0       | M    | Phase 8    |
 | 9.3 | Stryker mutation gate on `apps/api`                       | 📋 ToDo | P0       | L    | Phase 8    |
 | 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
 | 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 📋 ToDo | P0       | S    | 9.4        |
@@ -94,7 +94,7 @@ completion log), commit `docs(repo): add copilot review configuration (9.1)`.
 
 ### Task 9.2: README final + docs cross-check
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 8
@@ -105,9 +105,9 @@ The public face: README with what/why, quick start (compose + env + two terminal
 
 #### Acceptance criteria
 
-- [ ] README sections: About (the library + the example contract), Quick start, Journeys (§12, each with commands), Connection matrix, Architecture sketch, Testing (how to run each suite sequentially), Docs index, License note.
-- [ ] Every command in the README executed once during this task (copy-paste truth).
-- [ ] Docs cross-check: spec §7 row locations match real files; plan §1 counters match task files; broken links fixed.
+- [x] README sections: About (the library + the example contract), Quick start, Journeys (§12, each with commands), Connection matrix, Architecture sketch, Testing (how to run each suite sequentially), Docs index, License note.
+- [x] Every command in the README executed once during this task (copy-paste truth): health, diagnostics, place-order, reindex, flows, and error-trigger journeys verified live against a dedicated Redis; test suites run in the phase-wide gates.
+- [x] Docs cross-check: spec §7 row locations match real files (rows 14, 44, 45, 52, 56, 69 corrected); plan §1 counters match task files (53 total); README links resolve (COVERAGE_AUDIT, RELEASE_CHECKLISTS, mutation_testing_results land in this same phase PR).
 
 #### Files to create / modify
 
@@ -330,3 +330,4 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 9.1 ✅ 2026-07-10 four Copilot review files authored, stack-true and under the 4000-char limit
+- 9.2 ✅ 2026-07-10 final README plus governance files; spec section 7 path drift fixed, docs cross-checked
