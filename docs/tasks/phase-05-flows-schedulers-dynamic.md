@@ -1,6 +1,6 @@
 # Phase 5: flows-schedulers-dynamic
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P5)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4 rows 47 to 49, §7.5; matrix rows 47 to 62
 
@@ -26,7 +26,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 | --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ------------- |
 | 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | ✅ Done | P0       | M    | Phase 4       |
 | 5.2 | Failure-propagation variants + `addBulk`                           | ✅ Done | P0       | M    | 5.1           |
-| 5.3 | Boot schedulers + management endpoints + validation errors         | 📋 ToDo | P0       | M    | Phase 4       |
+| 5.3 | Boot schedulers + management endpoints + validation errors         | ✅ Done | P0       | M    | Phase 4       |
 | 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | 📋 ToDo | P0       | S    | Phase 4       |
 | 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | 📋 ToDo | P0       | M    | 5.4           |
 | 5.6 | Phase close: audit, dashboards, PR with Copilot review             | 📋 ToDo | P0       | S    | 5.2, 5.3, 5.5 |
@@ -163,7 +163,7 @@ Completion Protocol: standard 5 steps, id 5.2, commit
 
 ### Task 5.3: Boot schedulers + management endpoints + validation errors
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 4
@@ -174,11 +174,11 @@ Rows 57 to 62: three boot-registered schedulers (nightly cron with tz, 6-field s
 
 #### Acceptance criteria
 
-- [ ] `schedulers/boot-schedulers.service.ts` (`OnApplicationBootstrap`) upserts: `nightly-cleanup` (`0 3 * * *`, `America/Sao_Paulo`) on `maintenance`; `demo-heartbeat` (`*/30 * * * * *`) on `monitoring`; `metrics-snapshot` (`every: 300000, offset: 15000, limit: 100`) on `monitoring`; templates carry names + data.
-- [ ] Reboot idempotency: a second bootstrap run yields the same three schedulers, no duplicates (`getJobSchedulers` count stable; asserted in a unit/integration test).
-- [ ] `GET /schedulers?queue=` (paginated), `PUT /schedulers/:queue/:id` (upsert from body), `DELETE /schedulers/:queue/:id` (returns `{ removed }`).
-- [ ] Validation triggers: PUT with both `pattern`+`every`, neither, `every: 0`, and unparseable cron each return the `queue.invalid_repeat_options` envelope (400).
-- [ ] Heartbeat processor records ticks so the scheduler clock is observable.
+- [x] `schedulers/boot-schedulers.service.ts` (`OnApplicationBootstrap`) upserts: `nightly-cleanup` (`0 3 * * *`, `America/Sao_Paulo`) on `maintenance`; `demo-heartbeat` (`*/30 * * * * *`) on `monitoring`; `metrics-snapshot` (`every: 300000, offset: 15000, limit: 100`) on `monitoring`; templates carry names + data.
+- [x] Reboot idempotency: a second bootstrap run yields the same three schedulers, no duplicates (`getJobSchedulers` count stable; asserted in a unit/integration test).
+- [x] `GET /schedulers?queue=` (paginated), `PUT /schedulers/:queue/:id` (upsert from body), `DELETE /schedulers/:queue/:id` (returns `{ removed }`).
+- [x] Validation triggers: PUT with both `pattern`+`every`, neither, `every: 0`, and unparseable cron each return the `queue.invalid_repeat_options` envelope (400).
+- [x] Heartbeat processor records ticks so the scheduler clock is observable.
 
 #### Files to create / modify
 
@@ -414,3 +414,4 @@ main: `docs(plan): mark P5 complete`.
 
 - 5.1 ✅ 2026-07-09 fulfillment flow (fan-out/fan-in + nested invoice branch), node processors with FlowTrace, and the live tree endpoint via getProducer
 - 5.2 ✅ 2026-07-09 three failure-propagation variants (stuck pitfall, failParentOnFailure, ignoreDependencyOnFailure) with deterministic payment failure injection and the addBulk launcher
+- 5.3 ✅ 2026-07-09 boot-registered job schedulers (5-field cron+tz, 6-field seconds, every+offset+limit) with idempotent reboot, management endpoints, tick clock, and the four invalid_repeat_options validation triggers

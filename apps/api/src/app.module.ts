@@ -16,6 +16,7 @@ import { FlowsModule } from './flows/flows.module.js'
 import { OrdersModule } from './orders/orders.module.js'
 import { ProcessorsModule } from './processors/processors.module.js'
 import { ReportsModule } from './reports/reports.module.js'
+import { SchedulersModule } from './schedulers/schedulers.module.js'
 import { SearchModule } from './search/search.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
 
@@ -35,6 +36,7 @@ import { SmokeModule } from './smoke/smoke.module.js'
     DemosModule,
     SearchModule,
     FlowsModule,
+    SchedulersModule,
     AdminModule,
   ],
 })
