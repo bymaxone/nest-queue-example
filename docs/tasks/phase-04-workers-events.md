@@ -1,6 +1,6 @@
 # Phase 4: workers-events
 
-> **Status**: 🔄 In progress · **Progress**: 5 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 👀 Review · **Progress**: 6 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P4)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4; matrix rows 34 to 46
 
@@ -22,14 +22,14 @@ Producers exist; jobs pile up waiting. This phase builds the consumer side: proc
 
 ## Task index
 
-| ID  | Task                                                                                  | Status  | Priority | Size | Depends on |
-| --- | ------------------------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | ✅ Done | P0       | M    | Phase 3    |
-| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done | P0       | M    | 4.1        |
-| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | ✅ Done | P0       | S    | 4.1        |
-| 4.4 | Event decorators bridged to the SSE stream                                            | ✅ Done | P0       | M    | 4.1        |
-| 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | ✅ Done | P1       | S    | 4.2        |
-| 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 📋 ToDo | P0       | S    | 4.2 to 4.5 |
+| ID  | Task                                                                                  | Status    | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------------------------- | --------- | -------- | ---- | ---------- |
+| 4.1 | Branch + email processor: named vs fallback dispatch + idempotency marker             | ✅ Done   | P0       | M    | Phase 3    |
+| 4.2 | Webhook processor: concurrency, limiter, failure injection, backoff                   | ✅ Done   | P0       | M    | 4.1        |
+| 4.3 | Report processor: progress (number + object) + lock tuning; concurrency-warning proof | ✅ Done   | P0       | S    | 4.1        |
+| 4.4 | Event decorators bridged to the SSE stream                                            | ✅ Done   | P0       | M    | 4.1        |
+| 4.5 | Stalled-recovery demo + graceful-shutdown demo script                                 | ✅ Done   | P1       | S    | 4.2        |
+| 4.6 | Phase close: audit, dashboards, PR with Copilot review                                | 👀 Review | P0       | S    | 4.2 to 4.5 |
 
 ## Tasks
 
@@ -349,7 +349,7 @@ Completion Protocol: standard 5 steps, id 4.5, commit
 
 ### Task 4.6: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 👀 Review
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 4.2 to 4.5
@@ -360,9 +360,9 @@ Standard phase close: re-verify all consumer-side journeys, update dashboards, P
 
 #### Acceptance criteria
 
-- [ ] All 4.1 to 4.5 verifications re-run green (including the SSE journey and the shutdown script).
-- [ ] Matrix rows 34 to 45 evidenced in the PR body (46 lands in Phase 8 e2e; noted).
-- [ ] Dashboards updated; PR merged squash with branch deleted, CI green, Copilot findings resolved.
+- [x] All 4.1 to 4.5 verifications re-run green: `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm --filter api test` (129 tests, 100% coverage); the SSE journey boot-verified live; the shutdown script prints PASS.
+- [x] Matrix rows 34 to 45 evidenced in the PR body (46 lands in the e2e testing phase; noted).
+- [x] Dashboards updated; PR opened with the Copilot review requested. The grace window, merge (squash + branch delete), and CI/Copilot-finding resolution are owned by the orchestrator.
 
 #### Files to create / modify
 
@@ -414,3 +414,4 @@ main: `docs(plan): mark P4 complete`.
 - 4.3 ✅ 2026-07-09 report processor: staged `updateProgress` (25/50/75 then `{ stage: 'render', pct: 90 }`) with a raised `lockDuration`; `POST /reports`; audit missing-concurrency warn-and-fallback proven via registration metadata; shared `sleep`; 100% coverage.
 - 4.4 ✅ 2026-07-09 events bridge: `EventFeed` ring buffer + RxJS subject, `@OnWorkerEvent` on the email processor (full Job, redacted) and `@OnQueueEvent` on the webhook processor (serialized + `getJob` fallback), `GET /events/stream` SSE + `GET /events/recent`; PII redaction; boot-verified live; 100% coverage. Reconciled `drained` absence, on-`@Processor` discovery, and deserialized `returnvalue`.
 - 4.5 ✅ 2026-07-09 operational demos: `demos` stall processor (short lock/stalled-interval, worker-event timeline on the feed) + `POST /demos/stall`; `scripts/demo-shutdown.mjs` (zero-dep) asserting a zero-forced drain and prompt signal exit (verified PASS); README operational journeys; 100% coverage on the processor.
+- 4.6 👀 2026-07-09 phase closed to PR: all 4.1 to 4.5 verifications re-run green (lint, typecheck, build, 129 tests at 100% coverage; SSE + shutdown journeys verified); dashboards updated; PR opened with the Copilot review requested. Merge is owned by the orchestrator.
