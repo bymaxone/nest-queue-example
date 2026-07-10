@@ -11,10 +11,8 @@
  *
  * @type {import('jest').Config}
  */
-const base = require('./jest.config.cjs')
+const base = { ...require('./jest.config.cjs') }
+delete base.coverageThreshold
+base.collectCoverage = false
 
-module.exports = {
-  ...base,
-  collectCoverage: false,
-  coverageThreshold: undefined,
-}
+module.exports = base
