@@ -21,7 +21,7 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 | P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 0 / 6       | 📋 ToDo        |
 | P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 0 / 5       | 📋 ToDo        |
 | P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 0 / 5       | 📋 ToDo        |
-|       | **Total**                                                                              | **32 / 53** | 🔄 In Progress |
+|       | **Total**                                                                              | **37 / 53** | 🔄 In Progress |
 
 ## Status legend
 
