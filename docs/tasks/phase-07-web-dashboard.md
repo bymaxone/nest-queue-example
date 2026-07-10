@@ -1,6 +1,6 @@
 # Phase 7: web-dashboard
 
-> **Status**: 👀 Review · **Progress**: 6 / 6 tasks · **Last updated**: 2026-07-10
+> **Status**: ✅ Done · **Progress**: 6 / 6 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P7)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §13, §14; matrix UI column across §7
 
@@ -22,14 +22,14 @@ The api exposes every library feature; this phase makes them visible. `apps/web`
 
 ## Task index
 
-| ID  | Task                                                   | Status         | Priority | Size | Depends on |
-| --- | ------------------------------------------------------ | -------------- | -------- | ---- | ---------- |
-| 7.1 | Branch + Next.js skeleton + design system + app shell  | ✅ Done        | P0       | M    | Phase 5    |
-| 7.2 | Data layer + overview + queue detail                   | ✅ Done        | P0       | M    | 7.1        |
-| 7.3 | Job detail + live events feed                          | ✅ Done        | P0       | M    | 7.2        |
-| 7.4 | Playground + flows + schedulers pages                  | ✅ Done        | P0       | M    | 7.2        |
-| 7.5 | Workers + errors + health pages                        | ✅ Done        | P0       | M    | 7.2        |
-| 7.6 | Phase close: audit, dashboards, PR with Copilot review | 🔄 In Progress | P0       | S    | 7.3 to 7.5 |
+| ID  | Task                                                   | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------ | ------- | -------- | ---- | ---------- |
+| 7.1 | Branch + Next.js skeleton + design system + app shell  | ✅ Done | P0       | M    | Phase 5    |
+| 7.2 | Data layer + overview + queue detail                   | ✅ Done | P0       | M    | 7.1        |
+| 7.3 | Job detail + live events feed                          | ✅ Done | P0       | M    | 7.2        |
+| 7.4 | Playground + flows + schedulers pages                  | ✅ Done | P0       | M    | 7.2        |
+| 7.5 | Workers + errors + health pages                        | ✅ Done | P0       | M    | 7.2        |
+| 7.6 | Phase close: audit, dashboards, PR with Copilot review | ✅ Done | P0       | S    | 7.3 to 7.5 |
 
 ## Tasks
 
@@ -397,4 +397,4 @@ main: `docs(plan): mark P7 complete`.
 - 7.3 ✅ 2026-07-10 Job detail page, SSE event-stream hook, live Events feed, AttemptsTimeline + EventFeedItem
 - 7.4 ✅ 2026-07-10 Playground (4 labs), Flows (variant launcher + live tree), Schedulers (list + upsert + inline validation)
 - 7.5 ✅ 2026-07-10 Workers (static inventory + tenant CRUD + sandboxed render/lag), Errors (catalog + EnvelopeViewer), Health page
-- 7.6 🔄 2026-07-10 phase-close audit in progress: click-through verified against a running api, code review and security review both clean, PR being opened
+- 7.6 ✅ 2026-07-10 phase-close audit in progress: click-through verified against a running api, code review and security review both clean, PR being opened
