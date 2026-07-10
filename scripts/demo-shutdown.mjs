@@ -97,30 +97,29 @@ async function waitForReady() {
  * @returns {{ drainedGracefully: () => boolean }} A probe for the graceful-drain signal.
  */
 function forwardShutdownLogs(child) {
-  let drained = false
+  let hasDrained = false
   const relay = (chunk) => {
     for (const line of chunk.toString().split('\n')) {
       if (SHUTDOWN_LINE.test(line)) {
         log(`[api] ${line.trim()}`)
       }
       if (GRACEFUL_DRAIN_LINE.test(line)) {
-        drained = true
+        hasDrained = true
       }
     }
   }
   child.stdout.on('data', relay)
   child.stderr.on('data', relay)
-  return { drainedGracefully: () => drained }
+  return { drainedGracefully: () => hasDrained }
 }
 
 /**
- * Run the demonstration and return a process exit code.
+ * Spawn the built API as a child process with the demo environment.
  *
- * @returns {Promise<number>} 0 on a clean drained shutdown, 1 otherwise.
+ * @returns {import('node:child_process').ChildProcessByStdio<null, import('node:stream').Readable, import('node:stream').Readable>} The spawned process.
  */
-async function run() {
-  log(`Starting API on port ${PORT} (drain budget ${String(DRAIN_TIMEOUT_MS)}ms) ...`)
-  const child = spawn(process.execPath, [API_ENTRY], {
+function spawnApi() {
+  return spawn(process.execPath, [API_ENTRY], {
     env: {
       ...process.env,
       PORT,
@@ -130,44 +129,88 @@ async function run() {
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   })
-  const logs = forwardShutdownLogs(child)
-  const exited = new Promise((resolvePromise) => {
+}
+
+/**
+ * Resolve once the child process exits, with its exit code and signal.
+ *
+ * @param {import('node:child_process').ChildProcess} child - The spawned process.
+ * @returns {Promise<{ code: number | null, signal: NodeJS.Signals | null }>} The exit outcome.
+ */
+function awaitExit(child) {
+  return new Promise((resolvePromise) => {
     child.on('exit', (code, signal) => {
       resolvePromise({ code, signal })
     })
   })
+}
 
-  try {
-    await waitForReady()
-    log('API ready; enqueuing a slow report job ...')
-    await httpStatus('POST', '/reports')
-    await delay(SIGTERM_DELAY_MS)
-    log('Sending SIGTERM mid-job ...')
-    const sentAt = Date.now()
-    child.kill('SIGTERM')
-
-    const timedOut = Symbol('timed-out')
-    const outcome = await Promise.race([exited, delay(DRAIN_TIMEOUT_MS + EXIT_MARGIN_MS, timedOut)])
-    const elapsed = Date.now() - sentAt
-    if (outcome === timedOut) {
-      log(`FAIL: process did not exit within ${String(DRAIN_TIMEOUT_MS + EXIT_MARGIN_MS)}ms`)
-      return 1
-    }
-    // Nest runs the drain hooks then re-raises the signal, so a graceful shutdown
-    // exits via SIGTERM (or code 0), not a forced kill. Success is a zero-forced
-    // drain plus a prompt, signal-driven exit well inside the budget.
-    await delay(FLUSH_DELAY_MS)
-    const exitedOnHandledSignal = outcome.code === 0 || outcome.signal === 'SIGTERM'
-    if (logs.drainedGracefully() && exitedOnHandledSignal) {
-      log(
-        `PASS: drained in-flight work with zero forced workers and exited in ${String(elapsed)}ms (code ${String(outcome.code)} / signal ${String(outcome.signal)})`,
-      )
-      return 0
-    }
+/**
+ * Report PASS/FAIL for a completed shutdown. Nest runs its drain hooks then
+ * re-raises the signal, so a graceful shutdown exits via SIGTERM (or code 0),
+ * not a forced kill; success is a zero-forced drain plus that prompt exit.
+ *
+ * @param {{ code: number | null, signal: NodeJS.Signals | null }} outcome - The exit outcome.
+ * @param {number} elapsed - Milliseconds from SIGTERM to exit.
+ * @param {boolean} drainedGracefully - Whether the library logged a zero-forced drain.
+ * @returns {number} 0 on success, 1 otherwise.
+ */
+function reportOutcome(outcome, elapsed, drainedGracefully) {
+  const isHandledSignalExit = outcome.code === 0 || outcome.signal === 'SIGTERM'
+  const suffix = `code ${String(outcome.code)} / signal ${String(outcome.signal)}`
+  if (drainedGracefully && isHandledSignalExit) {
     log(
-      `FAIL: graceful drain not confirmed (code ${String(outcome.code)} / signal ${String(outcome.signal)}, drained=${String(logs.drainedGracefully())}) after ${String(elapsed)}ms`,
+      `PASS: drained in-flight work with zero forced workers and exited in ${String(elapsed)}ms (${suffix})`,
     )
+    return 0
+  }
+  log(
+    `FAIL: graceful drain not confirmed (${suffix}, drained=${String(drainedGracefully)}) after ${String(elapsed)}ms`,
+  )
+  return 1
+}
+
+/**
+ * Enqueue a slow job, send SIGTERM mid-job, and evaluate the shutdown.
+ *
+ * @param {import('node:child_process').ChildProcess} child - The spawned process.
+ * @param {{ drainedGracefully: () => boolean }} logs - The shutdown-log probe.
+ * @param {Promise<{ code: number | null, signal: NodeJS.Signals | null }>} exited - The exit outcome promise.
+ * @returns {Promise<number>} 0 on a clean drained shutdown, 1 otherwise.
+ */
+async function driveShutdown(child, logs, exited) {
+  await waitForReady()
+  log('API ready; enqueuing a slow report job ...')
+  await httpStatus('POST', '/reports')
+  await delay(SIGTERM_DELAY_MS)
+  log('Sending SIGTERM mid-job ...')
+  const sentAt = Date.now()
+  child.kill('SIGTERM')
+
+  const timedOut = Symbol('timed-out')
+  const outcome = await Promise.race([exited, delay(DRAIN_TIMEOUT_MS + EXIT_MARGIN_MS, timedOut)])
+  const elapsed = Date.now() - sentAt
+  if (outcome === timedOut) {
+    log(`FAIL: process did not exit within ${String(DRAIN_TIMEOUT_MS + EXIT_MARGIN_MS)}ms`)
     return 1
+  }
+  await delay(FLUSH_DELAY_MS)
+  return reportOutcome(outcome, elapsed, logs.drainedGracefully())
+}
+
+/**
+ * Run the demonstration and return a process exit code, force-killing the child
+ * if it is somehow still alive when the run ends.
+ *
+ * @returns {Promise<number>} 0 on a clean drained shutdown, 1 otherwise.
+ */
+async function run() {
+  log(`Starting API on port ${PORT} (drain budget ${String(DRAIN_TIMEOUT_MS)}ms) ...`)
+  const child = spawnApi()
+  const logs = forwardShutdownLogs(child)
+  const exited = awaitExit(child)
+  try {
+    return await driveShutdown(child, logs, exited)
   } finally {
     if (child.exitCode === null && child.signalCode === null) {
       child.kill('SIGKILL')
