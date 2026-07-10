@@ -17,7 +17,7 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 | P3    | [`phase-03-enqueue-surface-admin-api.md`](./phase-03-enqueue-surface-admin-api.md)     | 6 / 6       | ✅ Done        |
 | P4    | [`phase-04-workers-events.md`](./phase-04-workers-events.md)                           | 6 / 6       | ✅ Done        |
 | P5    | [`phase-05-flows-schedulers-dynamic.md`](./phase-05-flows-schedulers-dynamic.md)       | 6 / 6       | ✅ Done        |
-| P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 0 / 5       | 📋 ToDo        |
+| P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 5 / 5       | ✅ Done        |
 | P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 0 / 6       | 📋 ToDo        |
 | P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 0 / 5       | 📋 ToDo        |
 | P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 0 / 5       | 📋 ToDo        |

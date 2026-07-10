@@ -1,14 +1,17 @@
 /**
  * @fileoverview Pure factory that maps the validated environment to the queue
- * library's module options. No `process.env` access and no side effects, so it
- * is fully unit-testable and is the single copy of the canonical wiring. The
- * connection resolves to the library-owned URL form (Mode B); the bring-your-own
- * client and host/port option shapes are layered on when their env-driven
- * branches are added.
+ * library's module options. No `process.env` access and no side effects, so it is
+ * fully unit-testable and is the single copy of the canonical wiring. The
+ * connection resolves the full spec union: an app-owned client (Mode A, when a
+ * shared client is provided), a host/port options object (Mode B options style),
+ * or a URL (Mode B url style, the default).
  * @layer app/config
  */
-import type { BymaxQueueModuleOptions } from '@bymax-one/nest-queue'
+import type { BymaxQueueModuleOptions, QueueConnectionConfig } from '@bymax-one/nest-queue'
+import type { Redis, RedisOptions } from 'ioredis'
 import type { AppEnv } from './env.js'
+import { buildTelemetry } from './telemetry.config.js'
+import type { TelemetryBuilder } from './telemetry.config.js'
 
 /** Retry budget applied to every job; individual enqueues may still override it. */
 const DEFAULT_JOB_ATTEMPTS = 4
@@ -16,17 +19,86 @@ const DEFAULT_JOB_ATTEMPTS = 4
 const BACKOFF_BASE_DELAY_MS = 1500
 /** Metrics cache TTL (ms); short so dashboard reads stay near real time. */
 const METRICS_CACHE_TTL_MS = 3000
+/** Default Redis port when a URL omits it. */
+const DEFAULT_REDIS_PORT = 6379
 
 /**
- * Build the queue library options from the parsed environment.
+ * Decode a percent-encoded URL credential. WHATWG `URL` keeps `username`/`password`
+ * percent-encoded, so a genuine `%40` must be decoded to `@`; a literal `%` that is
+ * not a valid escape would make `decodeURIComponent` throw, so fall back to the raw
+ * value in that case rather than crashing connection parsing.
+ *
+ * @param value - The raw username or password field from the parsed URL.
+ * @returns The decoded credential, or the original value when decoding fails.
+ */
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+/**
+ * Parse a Redis URL into a discrete `RedisOptions` object (Mode B options style).
+ * Credentials are carried through untouched for the library to use and are never
+ * logged or surfaced.
+ *
+ * @param url - The Redis connection URL.
+ * @returns The equivalent host/port/db options, with auth and TLS when present.
+ */
+export function parseRedisOptions(url: string): RedisOptions {
+  const parsed = new URL(url)
+  const db = parsed.pathname.replace('/', '')
+  return {
+    host: parsed.hostname,
+    port: parsed.port === '' ? DEFAULT_REDIS_PORT : Number(parsed.port),
+    ...(db === '' ? {} : { db: Number(db) }),
+    ...(parsed.username === '' ? {} : { username: safeDecode(parsed.username) }),
+    ...(parsed.password === '' ? {} : { password: safeDecode(parsed.password) }),
+    ...(parsed.protocol === 'rediss:' ? { tls: {} } : {}),
+  }
+}
+
+/**
+ * Select the connection arm per the spec §9.1 union with precedence
+ * client > options > url: an injected client (Mode A) wins, then the options
+ * style, then the default URL (Mode B).
+ *
+ * @param env - The validated environment.
+ * @param sharedClient - The app-owned Mode A client, when in `shared` mode.
+ * @returns The chosen connection configuration.
+ */
+function selectConnection(env: AppEnv, sharedClient?: Redis): QueueConnectionConfig {
+  if (env.QUEUE_CONNECTION_MODE === 'shared' && sharedClient !== undefined) {
+    return { client: sharedClient }
+  }
+  if (env.QUEUE_CONNECTION_STYLE === 'options') {
+    return { options: parseRedisOptions(env.REDIS_URL) }
+  }
+  return { url: env.REDIS_URL }
+}
+
+/**
+ * Build the queue library options from the parsed environment. Async because the
+ * optional telemetry branch dynamically imports `bullmq-otel`; `forRootAsync`
+ * factories may return a promise.
  *
  * @param env - The validated, frozen application environment.
- * @returns Module options with a Mode B URL connection, key prefix, default job
- *   options, flows and metrics enabled, and the shutdown drain budget.
+ * @param sharedClient - The app-owned Mode A client injected in `shared` mode.
+ * @param buildTelemetryFn - The telemetry builder, defaulting to the real one;
+ *   injectable so a test can assert it is never called when the flag is off.
+ * @returns Module options with the resolved connection, key prefix, default job
+ *   options, flows and metrics enabled, the shutdown drain budget, and telemetry
+ *   only when `QUEUE_OTEL` is set.
  */
-export function buildQueueOptions(env: AppEnv): BymaxQueueModuleOptions {
+export async function buildQueueOptions(
+  env: AppEnv,
+  sharedClient?: Redis,
+  buildTelemetryFn: TelemetryBuilder = buildTelemetry,
+): Promise<BymaxQueueModuleOptions> {
   return {
-    connection: { url: env.REDIS_URL },
+    connection: selectConnection(env, sharedClient),
     prefix: env.QUEUE_PREFIX,
     defaultJobOptions: {
       attempts: DEFAULT_JOB_ATTEMPTS,
@@ -38,5 +110,6 @@ export function buildQueueOptions(env: AppEnv): BymaxQueueModuleOptions {
       drainTimeoutMs: env.QUEUE_DRAIN_TIMEOUT_MS,
       drainOnShutdown: env.QUEUE_DRAIN_ON_SHUTDOWN,
     },
+    ...(env.QUEUE_OTEL ? { telemetry: await buildTelemetryFn() } : {}),
   }
 }

@@ -11,8 +11,8 @@
 
 ## 1. Progress dashboard
 
-> **Progress:** 6 / 10 phases complete (60%) · 32 / 53 tasks
-> **Active phase:** P6 metrics-errors-modes
+> **Progress:** 7 / 10 phases complete (70%) · 37 / 53 tasks
+> **Active phase:** P7 web-dashboard
 > **Blockers:** none
 
 | ID  | Phase                       | Status  | Progress  | Size | Last updated |
@@ -23,7 +23,7 @@
 | P3  | enqueue-surface-admin-api   | ✅ Done | 6/6 tasks | L    | 2026-07-09   |
 | P4  | workers-events              | ✅ Done | 6/6 tasks | L    | 2026-07-09   |
 | P5  | flows-schedulers-dynamic    | ✅ Done | 6/6 tasks | L    | 2026-07-09   |
-| P6  | metrics-errors-modes        | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |
+| P6  | metrics-errors-modes        | ✅ Done | 5/5 tasks | M    | 2026-07-10   |
 | P7  | web-dashboard               | 📋 ToDo | 0/6 tasks | L    | 2026-07-06   |
 | P8  | testing                     | 📋 ToDo | 0/5 tasks | L    | 2026-07-06   |
 | P9  | hardening-release-readiness | 📋 ToDo | 0/5 tasks | M    | 2026-07-06   |

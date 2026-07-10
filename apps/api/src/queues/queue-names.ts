@@ -5,6 +5,8 @@
  * an arbitrary queue from untrusted input.
  * @layer app/queues
  */
+import { HttpStatus } from '@nestjs/common'
+import { QUEUE_ERROR_CODES, QueueException } from '@bymax-one/nest-queue'
 
 /** The `email` queue carries receipt and welcome notification jobs. */
 export const EMAIL_QUEUE = 'email'
@@ -40,3 +42,20 @@ export const KNOWN_QUEUES = [
 
 /** Union of the known queue names. */
 export type KnownQueue = (typeof KNOWN_QUEUES)[number]
+
+/**
+ * Narrow an arbitrary string to a known queue name or reject it with the
+ * library's stable not-found envelope. The single guard every surface that
+ * accepts a queue name from untrusted input calls, so an unregistered name can
+ * never lazily create an arbitrary Redis queue.
+ *
+ * @param name - The requested queue name.
+ * @returns The name, typed as a known queue.
+ * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
+ */
+export function assertKnownQueue(name: string): KnownQueue {
+  if ((KNOWN_QUEUES as readonly string[]).includes(name)) {
+    return name as KnownQueue
+  }
+  throw new QueueException(QUEUE_ERROR_CODES.QUEUE_NOT_FOUND, HttpStatus.NOT_FOUND, { queue: name })
+}

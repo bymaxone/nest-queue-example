@@ -11,8 +11,7 @@ import { HttpStatus, Injectable } from '@nestjs/common'
 import type { OnApplicationBootstrap } from '@nestjs/common'
 import { QUEUE_ERROR_CODES, QueueException, QueueService } from '@bymax-one/nest-queue'
 import type { Job, JobStatus, Queue, QueueMetrics } from '@bymax-one/nest-queue'
-import { EMAIL_QUEUE, KNOWN_QUEUES, SEARCH_QUEUE } from '../queues/queue-names.js'
-import type { KnownQueue } from '../queues/queue-names.js'
+import { assertKnownQueue, EMAIL_QUEUE, KNOWN_QUEUES, SEARCH_QUEUE } from '../queues/queue-names.js'
 
 /**
  * Retry budget for the `email` queue, applied via a per-queue override so it
@@ -111,7 +110,7 @@ export class AdminQueuesService implements OnApplicationBootstrap {
    * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
    */
   getManagedQueue(name: string): Queue {
-    return this.queueService.getOrCreateQueue(this.assertKnownQueue(name))
+    return this.queueService.getOrCreateQueue(assertKnownQueue(name))
   }
 
   /**
@@ -134,7 +133,7 @@ export class AdminQueuesService implements OnApplicationBootstrap {
    * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
    */
   async listJobs(name: string, status: JobStatus, start: number, end: number): Promise<JobView[]> {
-    const queue = this.assertKnownQueue(name)
+    const queue = assertKnownQueue(name)
     const jobs = await this.queueService.getJobs(queue, status, start, end)
     return jobs.map(toJobView)
   }
@@ -149,7 +148,7 @@ export class AdminQueuesService implements OnApplicationBootstrap {
    *   or `queue.job_not_found` (404) when the job does not exist.
    */
   async findJob(name: string, jobId: string): Promise<JobView> {
-    const queue = this.assertKnownQueue(name)
+    const queue = assertKnownQueue(name)
     const job = await this.queueService.getJob(queue, jobId)
     if (job === null) {
       throw new QueueException(QUEUE_ERROR_CODES.JOB_NOT_FOUND, HttpStatus.NOT_FOUND, {
@@ -167,7 +166,7 @@ export class AdminQueuesService implements OnApplicationBootstrap {
    * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
    */
   async pause(name: string): Promise<void> {
-    await this.queueService.pauseQueue(this.assertKnownQueue(name))
+    await this.queueService.pauseQueue(assertKnownQueue(name))
   }
 
   /**
@@ -177,7 +176,7 @@ export class AdminQueuesService implements OnApplicationBootstrap {
    * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
    */
   async resume(name: string): Promise<void> {
-    await this.queueService.resumeQueue(this.assertKnownQueue(name))
+    await this.queueService.resumeQueue(assertKnownQueue(name))
   }
 
   /**
@@ -196,22 +195,6 @@ export class AdminQueuesService implements OnApplicationBootstrap {
     limit: number,
     status: CleanStatus,
   ): Promise<string[]> {
-    return this.queueService.cleanQueue(this.assertKnownQueue(name), gracePeriodMs, limit, status)
-  }
-
-  /**
-   * Narrow an arbitrary string to a known queue name or reject it.
-   *
-   * @param name - The requested queue name.
-   * @returns The name, typed as a known queue.
-   * @throws {QueueException} `queue.queue_not_found` (404) for an unknown name.
-   */
-  private assertKnownQueue(name: string): KnownQueue {
-    if ((KNOWN_QUEUES as readonly string[]).includes(name)) {
-      return name as KnownQueue
-    }
-    throw new QueueException(QUEUE_ERROR_CODES.QUEUE_NOT_FOUND, HttpStatus.NOT_FOUND, {
-      queue: name,
-    })
+    return this.queueService.cleanQueue(assertKnownQueue(name), gracePeriodMs, limit, status)
   }
 }
