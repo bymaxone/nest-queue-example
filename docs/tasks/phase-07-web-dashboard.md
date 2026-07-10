@@ -1,6 +1,6 @@
 # Phase 7: web-dashboard
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 6 tasks · **Last updated**: 2026-07-06
+> **Status**: 👀 Review · **Progress**: 6 / 6 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P7)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §13, §14; matrix UI column across §7
 
@@ -22,20 +22,20 @@ The api exposes every library feature; this phase makes them visible. `apps/web`
 
 ## Task index
 
-| ID  | Task                                                   | Status  | Priority | Size | Depends on |
-| --- | ------------------------------------------------------ | ------- | -------- | ---- | ---------- |
-| 7.1 | Branch + Next.js skeleton + design system + app shell  | 📋 ToDo | P0       | M    | Phase 5    |
-| 7.2 | Data layer + overview + queue detail                   | 📋 ToDo | P0       | M    | 7.1        |
-| 7.3 | Job detail + live events feed                          | 📋 ToDo | P0       | M    | 7.2        |
-| 7.4 | Playground + flows + schedulers pages                  | 📋 ToDo | P0       | M    | 7.2        |
-| 7.5 | Workers + errors + health pages                        | 📋 ToDo | P0       | M    | 7.2        |
-| 7.6 | Phase close: audit, dashboards, PR with Copilot review | 📋 ToDo | P0       | S    | 7.3 to 7.5 |
+| ID  | Task                                                   | Status         | Priority | Size | Depends on |
+| --- | ------------------------------------------------------ | -------------- | -------- | ---- | ---------- |
+| 7.1 | Branch + Next.js skeleton + design system + app shell  | ✅ Done        | P0       | M    | Phase 5    |
+| 7.2 | Data layer + overview + queue detail                   | ✅ Done        | P0       | M    | 7.1        |
+| 7.3 | Job detail + live events feed                          | ✅ Done        | P0       | M    | 7.2        |
+| 7.4 | Playground + flows + schedulers pages                  | ✅ Done        | P0       | M    | 7.2        |
+| 7.5 | Workers + errors + health pages                        | ✅ Done        | P0       | M    | 7.2        |
+| 7.6 | Phase close: audit, dashboards, PR with Copilot review | 🔄 In Progress | P0       | S    | 7.3 to 7.5 |
 
 ## Tasks
 
 ### Task 7.1: Branch + Next.js skeleton + design system + app shell
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 5
@@ -46,11 +46,11 @@ Turn the `apps/web` package into a Next.js 16 App Router app carrying the design
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-07-web-dashboard` created with `git switch -c`.
-- [ ] Next.js 16 + React 19 + Tailwind v4 + shadcn (new-york) wired; `pnpm --filter web dev` renders.
-- [ ] The four files byte-identical to the sibling source (diff clean except intentional wordmark tokens documented); `layout.tsx` adapted with wordmark `nest-queue-example`.
-- [ ] Shell: topbar (brand glyph, mono gradient wordmark, Redis status chip placeholder, events-live dot), sidebar nav (Overview, Queues, Flows, Schedulers, Workers, Playground, Events, Errors, Health) with the active-item orange treatment.
-- [ ] `tsc --noEmit` and lint green; no server-subpath import (grep gate).
+- [x] Branch `feat/phase-07-web-dashboard` created with `git switch -c`.
+- [x] Next.js 16 + React 19 + Tailwind v4 + shadcn (new-york) wired; `pnpm --filter web dev` renders.
+- [x] The four files byte-identical to the sibling source (diff clean except intentional wordmark tokens documented); `layout.tsx` adapted with wordmark `nest-queue-example`.
+- [x] Shell: topbar (brand glyph, mono gradient wordmark, Redis status chip placeholder, events-live dot), sidebar nav (Overview, Queues, Flows, Schedulers, Workers, Playground, Events, Errors, Health) with the active-item orange treatment.
+- [x] `tsc --noEmit` and lint green; no server-subpath import (grep gate).
 
 #### Files to create / modify
 
@@ -99,7 +99,7 @@ completion log), commit `feat(web): next skeleton with shared design system shel
 
 ### Task 7.2: Data layer + overview + queue detail
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 7.1
@@ -110,10 +110,10 @@ The typed api client (`lib/api.ts`, `lib/api-types.ts` mirroring api DTOs, `lib/
 
 #### Acceptance criteria
 
-- [ ] `lib/api.ts`: thin typed fetch wrapper honoring `NEXT_PUBLIC_API_URL`; error envelopes surface as typed `ApiError` with `code` from `QUEUE_ERROR_CODES` (shared import).
-- [ ] Overview: cards per queue (six status counts, paused badge), aggregate totals, 3s polling via TanStack Query; Redis chip live (ready/down + latency).
-- [ ] Queue detail `/queues/[name]`: tabs per `JOB_STATUS`, paginated table (mono ids, timestamps), actions pause/resume/clean (confirm dialog; toast with removed ids).
-- [ ] Component tests (React Testing Library) for the status mapping, cards, and actions delegation.
+- [x] `lib/api.ts`: thin typed fetch wrapper honoring `NEXT_PUBLIC_API_URL`; error envelopes surface as typed `ApiError` with `code` from `QUEUE_ERROR_CODES` (shared import).
+- [x] Overview: cards per queue (six status counts, paused badge), aggregate totals, 3s polling via TanStack Query; Redis chip live (ready/down + latency).
+- [x] Queue detail `/queues/[name]`: tabs per `JOB_STATUS`, paginated table (mono ids, timestamps), actions pause/resume/clean (confirm dialog; toast with removed ids).
+- [x] Component tests (React Testing Library) for the status mapping, cards, and actions delegation.
 
 #### Files to create / modify
 
@@ -157,7 +157,7 @@ Completion Protocol: standard 5 steps, id 7.2, commit
 
 ### Task 7.3: Job detail + live events feed
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 7.2
@@ -168,9 +168,9 @@ Completion Protocol: standard 5 steps, id 7.2, commit
 
 #### Acceptance criteria
 
-- [ ] Job detail renders `data`, `opts` (highlighting values that differ from `DEFAULT_JOB_OPTIONS`, documented via a local constant mirror), `attemptsMade` timeline with failure reasons, progress (number bar or staged object), `returnvalue`; auto-refreshes while non-final.
-- [ ] Events page consumes `GET /events/stream` via `EventSource` with reconnect; entries badge `worker` vs `global`; empty/connection states designed.
-- [ ] `AttemptsTimeline` and `EventFeedItem` components tested.
+- [x] Job detail renders `data`, `opts` (highlighting values that differ from `DEFAULT_JOB_OPTIONS`, documented via a local constant mirror), `attemptsMade` timeline with failure reasons, progress (number bar or staged object), `returnvalue`; auto-refreshes while non-final.
+- [x] Events page consumes `GET /events/stream` via `EventSource` with reconnect; entries badge `worker` vs `global`; empty/connection states designed.
+- [x] `AttemptsTimeline` and `EventFeedItem` components tested.
 
 #### Files to create / modify
 
@@ -214,7 +214,7 @@ Completion Protocol: standard 5 steps, id 7.3, commit
 
 ### Task 7.4: Playground + flows + schedulers pages
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 7.2
@@ -225,10 +225,10 @@ Completion Protocol: standard 5 steps, id 7.3, commit
 
 #### Acceptance criteria
 
-- [ ] Playground form maps every option to the api; responses toast `{ jobId, deduplicated }`; the bulk card sends `count` and renders the `bulk_enqueue_failed` envelope when oversized.
-- [ ] Flows page: variant selector (default/stuck/failParent/ignoreDependency), tree visualization polling `/flows/:rootId/tree` with per-node status colors; the stuck variant shows an explanatory callout (the BullMQ default, by design).
-- [ ] Schedulers page: list (id, queue, pattern/every, tz, next run), upsert form with pattern-or-every toggle, delete with confirm; api validation errors render the envelope inline.
-- [ ] `DedupModePicker` and `FlowTree` tested.
+- [x] Playground form maps every option to the api; responses toast `{ jobId, deduplicated }`; the bulk card sends `count` and renders the `bulk_enqueue_failed` envelope when oversized.
+- [x] Flows page: variant selector (default/stuck/failParent/ignoreDependency), tree visualization polling `/flows/:rootId/tree` with per-node status colors; the stuck variant shows an explanatory callout (the BullMQ default, by design).
+- [x] Schedulers page: list (id, queue, pattern/every, tz, next run), upsert form with pattern-or-every toggle, delete with confirm; api validation errors render the envelope inline.
+- [x] `DedupModePicker` and `FlowTree` tested.
 
 #### Files to create / modify
 
@@ -272,7 +272,7 @@ Completion Protocol: standard 5 steps, id 7.4, commit
 
 ### Task 7.5: Workers + errors + health pages
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 7.2
@@ -283,10 +283,10 @@ Completion Protocol: standard 5 steps, id 7.4, commit
 
 #### Acceptance criteria
 
-- [ ] Workers page: three sections (static processors from a small local inventory constant documented as mirroring the api, tenant workers CRUD against `/workers/tenants`, invoice render trigger + `/workers/lag` readout).
-- [ ] Errors page: `GET /errors/catalog` table (code, HTTP, reproducible flag), trigger buttons calling `/errors/trigger/:code`, `EnvelopeViewer` pretty-printing the stable envelope.
-- [ ] Health page: live/ready chips, metrics freshness meter (age vs 3s TTL), diagnostics card (mode, style, queue-role vs worker-role retries).
-- [ ] `EnvelopeViewer` tested.
+- [x] Workers page: three sections (static processors from a small local inventory constant documented as mirroring the api, tenant workers CRUD against `/workers/tenants`, invoice render trigger + `/workers/lag` readout).
+- [x] Errors page: `GET /errors/catalog` table (code, HTTP, reproducible flag), trigger buttons calling `/errors/trigger/:code`, `EnvelopeViewer` pretty-printing the stable envelope.
+- [x] Health page: live/ready chips, metrics freshness meter (age vs 3s TTL), diagnostics card (mode, style, queue-role vs worker-role retries).
+- [x] `EnvelopeViewer` tested.
 
 #### Files to create / modify
 
@@ -330,7 +330,7 @@ Completion Protocol: standard 5 steps, id 7.5, commit
 
 ### Task 7.6: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 7.3 to 7.5
@@ -391,3 +391,10 @@ main: `docs(plan): mark P7 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 7.1 ✅ 2026-07-10 Next.js 16 skeleton, verbatim design-system files, app shell (topbar + 9-item sidebar)
+- 7.2 ✅ 2026-07-10 Typed api client, queue-status palette, Overview + Queues index + queue detail pages
+- 7.3 ✅ 2026-07-10 Job detail page, SSE event-stream hook, live Events feed, AttemptsTimeline + EventFeedItem
+- 7.4 ✅ 2026-07-10 Playground (4 labs), Flows (variant launcher + live tree), Schedulers (list + upsert + inline validation)
+- 7.5 ✅ 2026-07-10 Workers (static inventory + tenant CRUD + sandboxed render/lag), Errors (catalog + EnvelopeViewer), Health page
+- 7.6 🔄 2026-07-10 phase-close audit in progress: click-through verified against a running api, code review and security review both clean, PR being opened

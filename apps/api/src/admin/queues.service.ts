@@ -56,6 +56,8 @@ export interface JobView {
   returnValue: unknown
   /** The failure reason, when failed. */
   failedReason: string | undefined
+  /** Epoch ms when the job finished (completed or failed); undefined while in-flight. */
+  finishedOn: number | undefined
 }
 
 /**
@@ -76,6 +78,7 @@ function toJobView(job: Job<unknown, unknown>): JobView {
     progress: job.progress,
     returnValue: job.returnvalue,
     failedReason: job.failedReason,
+    finishedOn: job.finishedOn,
   }
 }
 
