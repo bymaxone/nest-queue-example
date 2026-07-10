@@ -23,6 +23,23 @@ const METRICS_CACHE_TTL_MS = 3000
 const DEFAULT_REDIS_PORT = 6379
 
 /**
+ * Decode a percent-encoded URL credential. WHATWG `URL` keeps `username`/`password`
+ * percent-encoded, so a genuine `%40` must be decoded to `@`; a literal `%` that is
+ * not a valid escape would make `decodeURIComponent` throw, so fall back to the raw
+ * value in that case rather than crashing connection parsing.
+ *
+ * @param value - The raw username or password field from the parsed URL.
+ * @returns The decoded credential, or the original value when decoding fails.
+ */
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+/**
  * Parse a Redis URL into a discrete `RedisOptions` object (Mode B options style).
  * Credentials are carried through untouched for the library to use and are never
  * logged or surfaced.
@@ -37,8 +54,8 @@ export function parseRedisOptions(url: string): RedisOptions {
     host: parsed.hostname,
     port: parsed.port === '' ? DEFAULT_REDIS_PORT : Number(parsed.port),
     ...(db === '' ? {} : { db: Number(db) }),
-    ...(parsed.username === '' ? {} : { username: decodeURIComponent(parsed.username) }),
-    ...(parsed.password === '' ? {} : { password: decodeURIComponent(parsed.password) }),
+    ...(parsed.username === '' ? {} : { username: safeDecode(parsed.username) }),
+    ...(parsed.password === '' ? {} : { password: safeDecode(parsed.password) }),
     ...(parsed.protocol === 'rediss:' ? { tls: {} } : {}),
   }
 }

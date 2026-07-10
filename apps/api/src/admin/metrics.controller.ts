@@ -17,7 +17,7 @@ import { assertKnownQueue } from '../queues/queue-names.js'
  * Body accepted by the invalidate action: an optional queue name. Omitting it
  * clears the whole cache; providing a known name drops just that entry.
  */
-const invalidateSchema = z.object({ queue: z.string().min(1).optional() })
+const invalidateSchema = z.object({ queue: z.string().min(1).optional() }).default({})
 
 /** Result of an invalidate call: which scope was dropped. */
 export interface InvalidateResult {

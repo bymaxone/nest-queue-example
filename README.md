@@ -57,11 +57,11 @@ per-role retry policy: the Queue/FlowProducer role keeps ioredis' default `maxRe
 forced to `null` (required for BullMQ's blocking commands). The connection URL, host, and
 password are a credential surface and never appear in any response.
 
-| Recipe                                               | Resolved mode  | `connection` in `/admin/diagnostics`                                        |
-| ---------------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
-| _default_ (`QUEUE_CONNECTION_MODE=own`, `STYLE=url`) | `mode-b-owned` | `style: "url"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`     |
-| `QUEUE_CONNECTION_STYLE=options`                     | `mode-b-owned` | `style: "options"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null` |
-| `QUEUE_CONNECTION_MODE=shared`                       | `mode-a-byo`   | `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`                     |
+| Recipe                                                                | Resolved mode  | `connection` in `/admin/diagnostics`                                        |
+| --------------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
+| _default_ (`QUEUE_CONNECTION_MODE=own`, `QUEUE_CONNECTION_STYLE=url`) | `mode-b-owned` | `style: "url"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`     |
+| `QUEUE_CONNECTION_STYLE=options`                                      | `mode-b-owned` | `style: "options"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null` |
+| `QUEUE_CONNECTION_MODE=shared`                                        | `mode-a-byo`   | `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`                     |
 
 In Mode A (`shared`) the app owns an ioredis client and hands it to the library as `{ client }`
 (the shape a `@bymax-one/nest-cache` host would produce); the library uses it as-is for the

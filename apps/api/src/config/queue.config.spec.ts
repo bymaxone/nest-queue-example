@@ -178,4 +178,18 @@ describe('parseRedisOptions (unit)', () => {
       tls: {},
     })
   })
+
+  it('keeps a credential verbatim when it is not valid percent-encoding', () => {
+    /*
+     * Scenario: a password containing a literal '%' that is not a valid escape.
+     * Rule it protects: decoding falls back to the raw value instead of throwing, so
+     * a valid REDIS_URL never crashes connection parsing.
+     */
+    expect(parseRedisOptions('redis://user:pa%zzss@cache:6379')).toEqual({
+      host: 'cache',
+      port: 6379,
+      username: 'user',
+      password: 'pa%zzss',
+    })
+  })
 })
