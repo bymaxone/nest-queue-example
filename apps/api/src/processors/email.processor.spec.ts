@@ -53,6 +53,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
+/** Narrow an unknown value to a worker-event-listener metadata entry. */
+function isWorkerEventEntry(entry: unknown): entry is { eventName: string; methodKey: string } {
+  return isRecord(entry) && typeof entry.eventName === 'string' && typeof entry.methodKey === 'string'
+}
+
 /**
  * Read the worker-event-listener metadata (`eventName` + `methodKey`) attached by
  * the library's `@OnWorkerEvent` decorators. This surfaces each decorator's event
@@ -64,8 +69,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function readWorkerEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
   for (const key of Reflect.getOwnMetadataKeys(ctor)) {
     const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (Array.isArray(value) && value.every((e) => isRecord(e) && 'eventName' in e)) {
-      return value as { eventName: string; methodKey: string }[]
+    if (Array.isArray(value) && value.every(isWorkerEventEntry)) {
+      return value
     }
   }
   return []
