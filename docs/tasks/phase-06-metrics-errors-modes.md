@@ -1,6 +1,6 @@
 # Phase 6: metrics-errors-modes
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P6)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.1, §7.3, §7.6; matrix rows 7, 8, 9, 28 to 30, 33, 66, 67, 68
 
@@ -24,7 +24,7 @@ Every feature area now works on the default configuration. This phase completes 
 
 | ID  | Task                                                                   | Status  | Priority | Size | Depends on |
 | --- | ---------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 6.1 | Branch + `MetricsService` surface + readiness composition              | 📋 ToDo | P0       | S    | Phase 5    |
+| 6.1 | Branch + `MetricsService` surface + readiness composition              | ✅ Done | P0       | S    | Phase 5    |
 | 6.2 | Error explorer: the full reproducible catalog                          | 📋 ToDo | P0       | M    | Phase 5    |
 | 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | 📋 ToDo | P0       | M    | Phase 5    |
 | 6.4 | Optional telemetry (`bullmq-otel`) behind `QUEUE_OTEL`                 | 📋 ToDo | P1       | S    | 6.3        |
@@ -34,7 +34,7 @@ Every feature area now works on the default configuration. This phase completes 
 
 ### Task 6.1: Branch + `MetricsService` surface + readiness composition
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: Phase 5
@@ -45,11 +45,11 @@ Rows 28 to 30, 33: expose the cached metrics surface (`get`, `getAll`, `invalida
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-06-metrics-errors-modes` created with `git switch -c`.
-- [ ] `GET /admin/metrics` returns `MetricsService.getAll()`; `GET /admin/metrics/:queue` returns `get(queue)`; `POST /admin/metrics/invalidate { queue? }` forces refresh.
-- [ ] Two rapid calls inside the 3s TTL return the same `collectedAt` (cache hit); after invalidate, a new one (asserted in tests).
-- [ ] `/health/ready` composes `MetricsService` (aggregate active count + Redis reachability) per the library's documented pattern.
-- [ ] Unit tests for the controller and readiness composition.
+- [x] Branch `feat/phase-06-metrics-errors-modes` created with `git switch -c`.
+- [x] `GET /admin/metrics` returns `MetricsService.getAll()`; `GET /admin/metrics/:queue` returns `get(queue)`; `POST /admin/metrics/invalidate { queue? }` forces refresh.
+- [x] Two rapid calls inside the 3s TTL return the same `collectedAt` (cache hit); after invalidate, a new one (asserted in tests).
+- [x] `/health/ready` composes `MetricsService` (aggregate active count + Redis reachability) per the library's documented pattern.
+- [x] Unit tests for the controller and readiness composition.
 
 #### Files to create / modify
 
@@ -345,3 +345,5 @@ main: `docs(plan): mark P6 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 6.1 ✅ 2026-07-09 Cached metrics controller (getAll / get / invalidate) with allow-list guard; `/health/ready` recomposed on MetricsService (cached reachability probe + active-count aggregate); shared `assertKnownQueue` guard extracted.
