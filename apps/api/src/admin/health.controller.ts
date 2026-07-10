@@ -65,9 +65,10 @@ export class HealthController {
   }
 
   /**
-   * GET /health/ready - readiness. A cached `get` on a known queue reaches Redis
-   * on a cache miss (proving reachability while exercising the TTL cache), then
-   * `getAll` aggregates the active count across every cached queue.
+   * GET /health/ready - readiness. The whole probe (a cached `get` on a known
+   * queue for reachability, then `getAll` to aggregate the active count) runs
+   * under one timeout budget, so a mid-probe Redis stall still fails closed within
+   * the budget rather than hanging.
    *
    * @returns An up signal plus the aggregate active job count when Redis is
    *   reachable.
@@ -77,12 +78,22 @@ export class HealthController {
   @Get('ready')
   async ready(): Promise<ReadinessStatus> {
     try {
-      await withTimeout(this.metrics.get(READINESS_QUEUE), READINESS_TIMEOUT_MS)
-      const all = await this.metrics.getAll()
-      const activeJobs = all.reduce((sum, snapshot) => sum + snapshot.counts.active, 0)
+      const activeJobs = await withTimeout(this.probe(), READINESS_TIMEOUT_MS)
       return { status: 'up', activeJobs }
     } catch {
       throw new ServiceUnavailableException({ status: 'down', reason: 'redis_unreachable' })
     }
+  }
+
+  /**
+   * Reach Redis through the cache and aggregate the active count across every
+   * cached queue. Both round-trips are bounded together by {@link ready}'s budget.
+   *
+   * @returns The aggregate active job count.
+   */
+  private async probe(): Promise<number> {
+    await this.metrics.get(READINESS_QUEUE)
+    const all = await this.metrics.getAll()
+    return all.reduce((sum, snapshot) => sum + snapshot.counts.active, 0)
   }
 }

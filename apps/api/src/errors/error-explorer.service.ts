@@ -4,19 +4,20 @@
  * fabricating an envelope. Each trigger lets the resulting `QueueException`
  * propagate untouched so the client receives the library's stable
  * `{ error: { code, message, details } }` shape with the correct HTTP status.
+ * Probes run against a managed queue and short-circuit before any Redis write, so
+ * the explorer never creates an unmanaged queue or leaves a scheduler behind.
  * @layer app/errors
  */
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import {
   BymaxQueueModule,
   QUEUE_ERROR_CODES,
   QueueException,
   QueueService,
+  WorkerRegistry,
 } from '@bymax-one/nest-queue'
 import type { BulkJob, JobSchedulerRepeatOptions } from '@bymax-one/nest-queue'
 import { z } from 'zod'
-import { APP_ENV } from '../config/env.js'
-import type { AppEnv } from '../config/env.js'
 import { parseJobData } from '../http/validation.js'
 import { AUDIT_QUEUE } from '../queues/queue-names.js'
 import { AdminQueuesService } from '../admin/queues.service.js'
@@ -31,19 +32,24 @@ const OVERSIZED_BATCH_SIZE = 1001
 const UNKNOWN_QUEUE = 'errors-explorer-unknown-queue'
 /** A job id guaranteed absent so `getJob` returns null. */
 const MISSING_JOB_ID = 'errors-explorer-missing-job'
-/** Throwaway queue for the scheduler and bulk probes (never actually reached). */
-const PROBE_QUEUE = 'errors-explorer-probe'
+/**
+ * Managed queue the scheduler and bulk probes target. Using a known queue keeps
+ * the probes inside the allow-list: the bulk cap rejects before any Redis write,
+ * and an invalid cron throws in BullMQ's parser before a scheduler is persisted.
+ */
+const PROBE_QUEUE = AUDIT_QUEUE
+/**
+ * A Redis URL used only to compile invalid module options. It is never connected:
+ * `forRoot` rejects the bad `drainTimeoutMs` synchronously before opening a socket.
+ */
+const INVALID_OPTIONS_URL = 'redis://errors-explorer-invalid-options:6379'
 
 /** Schema whose validation fails for the invalid-job-data probe. */
 const PROBE_JOB_SCHEMA = z.object({ to: z.email() })
 /** A payload that fails {@link PROBE_JOB_SCHEMA} without echoing any real value. */
 const INVALID_JOB_PAYLOAD = { to: 'not-an-email' }
-
-/** Injection token for the isolated duplicate-processor probe seam. */
-export const DUPLICATE_PROBE: unique symbol = Symbol('DUPLICATE_PROBE')
-
-/** The seam that provokes `duplicate_processor` in a throwaway context. */
-export type DuplicateProbe = () => Promise<never>
+/** No-op handler for the duplicate-processor collision; the guard fires first. */
+const COLLISION_HANDLER = (): Promise<void> => Promise.resolve()
 
 /**
  * Build a batch one job larger than the library's bulk cap. Every job is trivial
@@ -90,8 +96,7 @@ export class ErrorExplorerService {
   constructor(
     private readonly adminQueues: AdminQueuesService,
     private readonly queueService: QueueService,
-    @Inject(APP_ENV) private readonly env: AppEnv,
-    @Inject(DUPLICATE_PROBE) private readonly provokeDuplicate: DuplicateProbe,
+    private readonly workers: WorkerRegistry,
   ) {
     this.triggers = {
       [QUEUE_ERROR_CODES.QUEUE_NOT_FOUND]: () => {
@@ -107,7 +112,9 @@ export class ErrorExplorerService {
       [QUEUE_ERROR_CODES.INVALID_OPTIONS]: () => {
         this.triggerInvalidOptions()
       },
-      [QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR]: () => this.provokeDuplicate(),
+      [QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR]: () => {
+        this.triggerDuplicateProcessor()
+      },
     }
   }
 
@@ -168,8 +175,27 @@ export class ErrorExplorerService {
   /** Compile module options the library rejects, throwing synchronously. */
   private triggerInvalidOptions(): void {
     BymaxQueueModule.forRoot({
-      connection: { url: this.env.REDIS_URL },
+      connection: { url: INVALID_OPTIONS_URL },
       shutdown: { drainTimeoutMs: 0 },
     })
+  }
+
+  /**
+   * Register a second worker for an already-registered queue, hitting the library's
+   * duplicate guard. `guardDuplicate` throws before any worker is constructed or
+   * connection opened, so the running app's registry is never mutated.
+   */
+  private triggerDuplicateProcessor(): void {
+    const [registeredQueue] = this.workers.list()
+    if (registeredQueue === undefined) {
+      // Unreachable while any @Processor is registered; a defensive fail-safe so an
+      // impossible empty registry still returns the code rather than a false success.
+      throw new QueueException(
+        QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR,
+        ERROR_HTTP_STATUS[QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR],
+        { reason: 'no registered worker to collide with' },
+      )
+    }
+    this.workers.register({ queueName: registeredQueue, handler: COLLISION_HANDLER })
   }
 }

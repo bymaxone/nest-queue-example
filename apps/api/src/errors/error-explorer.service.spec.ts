@@ -6,16 +6,14 @@
  * library's stable envelope propagate; the catalog is complete; the fallback fires
  * when an operation unexpectedly resolves.
  * Mocks: a real AdminQueuesService over a spied QueueService (getJob/upsert/bulk),
- * plus a spied duplicate-processor probe. parseJobData and forRoot run for real.
+ * plus a spied WorkerRegistry. parseJobData and forRoot run for real.
  */
 import 'reflect-metadata'
 import { jest } from '@jest/globals'
 import { QUEUE_ERROR_CODES, QueueException } from '@bymax-one/nest-queue'
-import type { QueueService } from '@bymax-one/nest-queue'
+import type { Job, QueueService, WorkerRegistry } from '@bymax-one/nest-queue'
 import { AdminQueuesService } from '../admin/queues.service.js'
-import { parseEnv } from '../config/env.js'
 import { ErrorExplorerService } from './error-explorer.service.js'
-import type { DuplicateProbe } from './error-explorer.service.js'
 
 /** Read the stable error code off a thrown QueueException. */
 function codeOf(error: unknown): string {
@@ -40,14 +38,11 @@ function setup() {
     getOrCreateQueue,
   } as unknown as QueueService
   const adminQueues = new AdminQueuesService(queueService)
-  const provokeDuplicate = jest.fn<DuplicateProbe>()
-  const service = new ErrorExplorerService(
-    adminQueues,
-    queueService,
-    parseEnv({}),
-    provokeDuplicate,
-  )
-  return { service, getJob, upsertJobScheduler, enqueueBulk, provokeDuplicate }
+  const list = jest.fn<WorkerRegistry['list']>().mockReturnValue(['email'])
+  const register = jest.fn<WorkerRegistry['register']>()
+  const workers = { list, register } as unknown as WorkerRegistry
+  const service = new ErrorExplorerService(adminQueues, queueService, workers)
+  return { service, getJob, upsertJobScheduler, enqueueBulk, list, register }
 }
 
 describe('ErrorExplorerService (unit)', () => {
@@ -104,7 +99,7 @@ describe('ErrorExplorerService (unit)', () => {
       /*
        * Scenario: each structural repeat-option variant.
        * Rule it protects: the service forwards the exact invalid shape to
-       * upsertJobScheduler, where the library rejects it.
+       * upsertJobScheduler on a managed queue, where the library rejects it.
        */
       const { service, upsertJobScheduler } = setup()
       upsertJobScheduler.mockRejectedValue(
@@ -114,11 +109,7 @@ describe('ErrorExplorerService (unit)', () => {
         .trigger(QUEUE_ERROR_CODES.INVALID_REPEAT_OPTIONS, variant)
         .catch((e: unknown) => e)
       expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.INVALID_REPEAT_OPTIONS)
-      expect(upsertJobScheduler).toHaveBeenCalledWith(
-        'errors-explorer-probe',
-        'errors-explorer-scheduler',
-        shape,
-      )
+      expect(upsertJobScheduler).toHaveBeenCalledWith('audit', 'errors-explorer-scheduler', shape)
     },
   )
 
@@ -138,11 +129,11 @@ describe('ErrorExplorerService (unit)', () => {
     expect((call?.[2] as { endDate: number }).endDate).toBeLessThan(Date.now())
   })
 
-  it('triggers bulk_enqueue_failed with an oversized batch', async () => {
+  it('triggers bulk_enqueue_failed with an oversized batch on a managed queue', async () => {
     /*
      * Scenario: a batch one job over the cap.
-     * Rule it protects: the service submits 1001 jobs so the library's bulk guard
-     * rejects the batch.
+     * Rule it protects: the service submits 1001 jobs to a managed queue so the
+     * library's bulk guard rejects the batch.
      */
     const { service, enqueueBulk } = setup()
     enqueueBulk.mockRejectedValue(
@@ -152,6 +143,7 @@ describe('ErrorExplorerService (unit)', () => {
       .trigger(QUEUE_ERROR_CODES.BULK_ENQUEUE_FAILED)
       .catch((e: unknown) => e)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.BULK_ENQUEUE_FAILED)
+    expect(enqueueBulk.mock.calls[0]?.[0]).toBe('audit')
     expect(enqueueBulk.mock.calls[0]?.[1]).toHaveLength(1001)
   })
 
@@ -166,21 +158,39 @@ describe('ErrorExplorerService (unit)', () => {
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.INVALID_OPTIONS)
   })
 
-  it('delegates duplicate_processor to the isolated probe', async () => {
+  it('triggers duplicate_processor by colliding with a registered worker', async () => {
     /*
-     * Scenario: the duplicate-processor trigger.
-     * Rule it protects: the service defers to the injected probe seam and propagates
-     * its exception.
+     * Scenario: registering a second worker for an already-registered queue.
+     * Rule it protects: the service hits the library's duplicate guard on a real
+     * registered queue, and the guard exception propagates.
      */
-    const { service, provokeDuplicate } = setup()
-    provokeDuplicate.mockRejectedValue(
-      new QueueException(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR, 500, {}),
-    )
+    const { service, register } = setup()
+    register.mockImplementation((config) => {
+      // The library never runs the handler (the guard fires first); exercise the
+      // no-op here to confirm the service supplied a valid handler, then throw.
+      void config.handler({} as Job)
+      throw new QueueException(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR, 500, { queueName: 'email' })
+    })
     const error = await service
       .trigger(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
       .catch((e: unknown) => e)
     expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
-    expect(provokeDuplicate).toHaveBeenCalledTimes(1)
+    expect(register).toHaveBeenCalledWith(expect.objectContaining({ queueName: 'email' }))
+  })
+
+  it('surfaces duplicate_processor defensively when no worker is registered', async () => {
+    /*
+     * Scenario: an impossible empty registry.
+     * Rule it protects: with no worker to collide with, the service still returns the
+     * duplicate code rather than a false success, and never calls register.
+     */
+    const { service, list, register } = setup()
+    list.mockReturnValue([])
+    const error = await service
+      .trigger(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
+      .catch((e: unknown) => e)
+    expect(codeOf(error)).toBe(QUEUE_ERROR_CODES.DUPLICATE_PROCESSOR)
+    expect(register).not.toHaveBeenCalled()
   })
 
   it('surfaces the code when an operation unexpectedly resolves', async () => {

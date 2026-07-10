@@ -94,6 +94,20 @@ describe('MetricsController (unit)', () => {
     expect(invalidate).toHaveBeenCalledWith(undefined)
   })
 
+  it('rejects invalidating an unknown queue with the not-found envelope', () => {
+    /*
+     * Scenario: invalidate a queue outside the managed allow-list.
+     * Rule it protects: the invalidate surface enforces the same allow-list as the
+     * per-queue read, so it never reports success for a queue that was never real.
+     */
+    const invalidate = jest.fn<MetricsService['invalidate']>()
+    const metrics: Partial<MetricsService> = { invalidate }
+    const controller = new MetricsController(metrics as MetricsService)
+
+    expect(() => controller.invalidate({ queue: 'does-not-exist' })).toThrow(QueueException)
+    expect(invalidate).not.toHaveBeenCalled()
+  })
+
   it('rejects a malformed invalidate body', () => {
     /*
      * Scenario: invalid body shape.

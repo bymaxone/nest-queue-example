@@ -13,6 +13,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { QUEUE_ERROR_CODES, QueueException } from '@bymax-one/nest-queue'
 import { ErrorExplorerController } from './error-explorer.controller.js'
 import { ErrorExplorerService } from './error-explorer.service.js'
+import { buildCatalog } from './error-catalog.js'
 import type { CatalogEntry } from './error-catalog.js'
 
 /**
@@ -96,7 +97,8 @@ describe('ErrorExplorerController (unit)', () => {
      * Rule it protects: a known-but-not-reproducible code returns a 400 naming where
      * it is covered, and never reaches the service.
      */
-    const { controller, trigger } = setup()
+    const { controller, catalog, trigger } = setup()
+    catalog.mockReturnValue(buildCatalog())
     try {
       // Non-reproducible codes throw synchronously; `void` marks the never-returned
       // promise as intentionally ignored for the floating-promise rule.
@@ -120,7 +122,8 @@ describe('ErrorExplorerController (unit)', () => {
      * Rule it protects: an unknown code returns a generic 404 that never reflects the
      * raw request string back to the client.
      */
-    const { controller, trigger } = setup()
+    const { controller, catalog, trigger } = setup()
+    catalog.mockReturnValue(buildCatalog())
     try {
       // Unknown codes also throw synchronously; ignore the never-returned promise.
       void controller.trigger('totally.unknown', {})

@@ -72,7 +72,7 @@ describe('HealthController (unit)', () => {
     await expect(controller.ready()).rejects.toBeInstanceOf(ServiceUnavailableException)
   })
 
-  it('returns 503 when the probe exceeds the timeout budget', async () => {
+  it('returns 503 when the cached probe exceeds the timeout budget', async () => {
     /*
      * Scenario: the cached probe hangs past the readiness budget.
      * Rule it protects: the timeout fires and readiness fails closed rather than
@@ -80,6 +80,26 @@ describe('HealthController (unit)', () => {
      */
     const { controller, get } = setup()
     get.mockReturnValue(new Promise(() => undefined))
+    jest.useFakeTimers()
+    try {
+      const pending = controller.ready()
+      const assertion = expect(pending).rejects.toBeInstanceOf(ServiceUnavailableException)
+      await jest.advanceTimersByTimeAsync(1000)
+      await assertion
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('returns 503 when the aggregate call hangs past the timeout budget', async () => {
+    /*
+     * Scenario: the reachability probe resolves but getAll stalls mid-probe.
+     * Rule it protects: the whole probe (get + getAll) shares one timeout budget, so
+     * a stall on the second Redis round-trip still fails closed within the budget.
+     */
+    const { controller, get, getAll } = setup()
+    get.mockResolvedValue(snapshot('audit', 0))
+    getAll.mockReturnValue(new Promise(() => undefined))
     jest.useFakeTimers()
     try {
       const pending = controller.ready()

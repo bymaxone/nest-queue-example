@@ -64,12 +64,16 @@ export class MetricsController {
    * @param body - Unvalidated body; parsed against the invalidate schema.
    * @returns The scope that was invalidated.
    * @throws {BadRequestException} When the body is malformed.
+   * @throws {QueueException} `queue.queue_not_found` (404) for an unknown queue.
    */
   @Post('invalidate')
   @HttpCode(HttpStatus.OK)
   invalidate(@Body() body: unknown): InvalidateResult {
     const { queue } = parseRequest(invalidateSchema, body)
-    this.metrics.invalidate(queue)
-    return { all: queue === undefined, queue: queue ?? null }
+    // Validate a named queue against the allow-list for parity with `one()`, so the
+    // invalidate surface never reports success for a queue that was never real.
+    const known = queue === undefined ? undefined : assertKnownQueue(queue)
+    this.metrics.invalidate(known)
+    return { all: known === undefined, queue: known ?? null }
   }
 }

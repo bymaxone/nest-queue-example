@@ -18,7 +18,7 @@ import {
 import type { HttpException } from '@nestjs/common'
 import { z } from 'zod'
 import { parseRequest } from '../http/validation.js'
-import { buildCatalog, isReproducibleCode } from './error-catalog.js'
+import { isReproducibleCode } from './error-catalog.js'
 import type { CatalogEntry } from './error-catalog.js'
 import { ErrorExplorerService } from './error-explorer.service.js'
 
@@ -73,7 +73,7 @@ export class ErrorExplorerController {
    * @returns The exception to throw for the rejected request.
    */
   private rejectNonReproducible(code: string): HttpException {
-    const entry = buildCatalog().find((candidate) => candidate.code === code)
+    const entry = this.explorer.catalog().find((candidate) => candidate.code === code)
     if (entry === undefined) {
       return new NotFoundException({
         error: { code: 'errors.unknown_code', message: 'Unknown error code', details: null },
