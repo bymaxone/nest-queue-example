@@ -55,7 +55,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /** Narrow an unknown value to a worker-event-listener metadata entry. */
 function isWorkerEventEntry(entry: unknown): entry is { eventName: string; methodKey: string } {
-  return isRecord(entry) && typeof entry.eventName === 'string' && typeof entry.methodKey === 'string'
+  return (
+    isRecord(entry) && typeof entry.eventName === 'string' && typeof entry.methodKey === 'string'
+  )
 }
 
 /**
