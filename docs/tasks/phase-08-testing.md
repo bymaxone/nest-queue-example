@@ -1,6 +1,6 @@
 # Phase 8: testing
 
-> **Status**: 👀 Review · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-10
+> **Status**: ✅ Done · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P8)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15; matrix rows 2, 3, 23, 46, 63, 64, 67 (e2e-only rows) + test column of every row
 
@@ -23,13 +23,13 @@ Every feature exists with per-task unit tests. This phase raises the floor to th
 
 ## Task index
 
-| ID  | Task                                                               | Status    | Priority | Size | Depends on |
-| --- | ------------------------------------------------------------------ | --------- | -------- | ---- | ---------- |
-| 8.1 | Branch + api unit coverage to 100% with hard thresholds            | ✅ Done   | P0       | L    | Phase 7    |
-| 8.2 | Web unit coverage to 100% with hard thresholds                     | ✅ Done   | P0       | M    | Phase 7    |
-| 8.3 | E2E suite: every scenario + registration/connection/shutdown specs | ✅ Done   | P0       | L    | 8.1        |
-| 8.4 | CI: e2e job with Redis service container + coverage gates          | ✅ Done   | P0       | S    | 8.3        |
-| 8.5 | Phase close: audit, dashboards, PR with Copilot review             | 👀 Review | P0       | S    | 8.2, 8.4   |
+| ID  | Task                                                               | Status  | Priority | Size | Depends on |
+| --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ---------- |
+| 8.1 | Branch + api unit coverage to 100% with hard thresholds            | ✅ Done | P0       | L    | Phase 7    |
+| 8.2 | Web unit coverage to 100% with hard thresholds                     | ✅ Done | P0       | M    | Phase 7    |
+| 8.3 | E2E suite: every scenario + registration/connection/shutdown specs | ✅ Done | P0       | L    | 8.1        |
+| 8.4 | CI: e2e job with Redis service container + coverage gates          | ✅ Done | P0       | S    | 8.3        |
+| 8.5 | Phase close: audit, dashboards, PR with Copilot review             | ✅ Done | P0       | S    | 8.2, 8.4   |
 
 ## Tasks
 
@@ -265,7 +265,7 @@ Completion Protocol: standard 5 steps, id 8.4, commit
 
 ### Task 8.5: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 👀 Review
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 8.2, 8.4
@@ -331,4 +331,4 @@ main: `docs(plan): mark P8 complete`.
 - 8.2 ✅ 2026-07-10 web unit suite verified at 100% (825/825 stmts, 202/202 branches) with hard thresholds already active from Phase 7.
 - 8.3 ✅ 2026-07-10 10-file e2e suite (67 specs) against real Redis, covering all nine §12 scenarios plus registration/connection/shutdown; green three consecutive runs via a per-file-process runner (`scripts/run-e2e.mjs`).
 - 8.4 ✅ 2026-07-10 `ci.yml` unit job now runs `test:cov`; new `e2e` job added after `unit` with a `redis:7-alpine` service container.
-- 8.5 👀 2026-07-10 dashboards updated, PR opened with the Copilot review requested; CI/merge owned by the orchestrator.
+- 8.5 ✅ 2026-07-10 PR #11 squash-merged (149f53f) with CI green (unit + e2e); three Copilot review threads (silent-server socket teardown, CRLF-tolerant SSE split, explicit spawnSync error handling) addressed in 9e43314 and resolved.
