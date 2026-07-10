@@ -43,7 +43,13 @@ for (const specFile of specFiles) {
     stdio: 'inherit',
     env: process.env,
   })
-  if (result.status !== 0) {
+  // `spawnSync` can fail before the child ever runs (e.g. `pnpm` not on PATH),
+  // leaving `status === null` and the reason in `error`. Report that explicitly
+  // instead of silently folding it into the ordinary test-failure count.
+  if (result.error !== undefined) {
+    console.error(`\nFailed to launch jest for ${specFile}: ${result.error.message}`)
+    failures += 1
+  } else if (result.status !== 0) {
     failures += 1
   }
 }

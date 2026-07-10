@@ -11,19 +11,21 @@ export type SseEvent = Record<string, unknown>
 
 /**
  * Split a buffered SSE byte stream into complete frames (separated by a blank
- * line) and the remaining partial tail.
+ * line) and the remaining partial tail. Tolerates both LF (`\n\n`) and CRLF
+ * (`\r\n\r\n`) frame terminators, since the SSE spec allows either line ending.
  *
  * @param buffer - Text accumulated so far.
  * @returns The complete frames found and the unconsumed remainder.
  */
 function splitFrames(buffer: string): { frames: string[]; rest: string } {
   const frames: string[] = []
+  const separator = /\r?\n\r?\n/
   let rest = buffer
-  let separatorIndex = rest.indexOf('\n\n')
-  while (separatorIndex !== -1) {
-    frames.push(rest.slice(0, separatorIndex))
-    rest = rest.slice(separatorIndex + 2)
-    separatorIndex = rest.indexOf('\n\n')
+  let match = separator.exec(rest)
+  while (match !== null) {
+    frames.push(rest.slice(0, match.index))
+    rest = rest.slice(match.index + match[0].length)
+    match = separator.exec(rest)
   }
   return { frames, rest }
 }

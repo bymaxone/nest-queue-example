@@ -7,7 +7,7 @@
  */
 import { randomUUID } from 'node:crypto'
 import { createServer } from 'node:net'
-import type { Server } from 'node:net'
+import type { Server, Socket } from 'node:net'
 import { Test } from '@nestjs/testing'
 import { Redis } from 'ioredis'
 import { BymaxQueueModule } from '@bymax-one/nest-queue'
@@ -67,13 +67,16 @@ const RESET_AFTER_MS = 1200
  *   down the server and any sockets it accepted.
  */
 async function startSilentServer(): Promise<{ server: Server; port: number; stop: () => void }> {
+  const openSockets = new Set<Socket>()
   const server = createServer((socket) => {
+    openSockets.add(socket)
     socket.on('error', () => undefined)
     const resetTimer = setTimeout(() => {
       socket.destroy()
     }, RESET_AFTER_MS)
     socket.on('close', () => {
       clearTimeout(resetTimer)
+      openSockets.delete(socket)
     })
   })
   await new Promise<void>((resolve) => {
@@ -83,7 +86,14 @@ async function startSilentServer(): Promise<{ server: Server; port: number; stop
   if (address === null || typeof address === 'string') {
     throw new Error('expected a bound TCP address')
   }
+  // Destroy every accepted socket before closing the server: `server.close()`
+  // alone keeps live sockets open until their own reset timer fires, so an
+  // abandoned half-open connection could otherwise hold the process open and
+  // defeat the contract this `stop` documents.
   const stop = (): void => {
+    for (const socket of openSockets) {
+      socket.destroy()
+    }
     server.close()
   }
   return { server, port: address.port, stop }
