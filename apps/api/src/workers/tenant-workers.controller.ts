@@ -1,8 +1,8 @@
 /**
  * @fileoverview HTTP surface for the dynamic per-tenant workers: register, list,
  * remove, feed, and read the delivery trail. Every input is validated at the trust
- * boundary; the tenant id is a strict identifier (never a colon), so the derived
- * queue name always stays inside the tenant's own `notifications:` namespace and
+ * boundary; the tenant id is a strict identifier (never a dot or colon), so the
+ * derived queue name always stays inside the tenant's own `notifications.` namespace and
  * one tenant's request can never target another tenant's worker.
  * @layer app/workers
  */

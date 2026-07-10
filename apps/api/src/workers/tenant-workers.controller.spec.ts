@@ -23,7 +23,7 @@ describe('TenantWorkersController (unit)', () => {
     /*
      * Scenario: a valid register request.
      * Rule it protects: the validated tenant and tier reach the service and the
-     * derived notifications:<tenantId> queue is returned.
+     * derived notifications.<tenantId> queue is returned.
      */
     const register = jest.fn()
     const controller = build({ register })
@@ -31,7 +31,7 @@ describe('TenantWorkersController (unit)', () => {
     const result = controller.register({ tenantId: 't1', tier: 'premium' })
 
     expect(register).toHaveBeenCalledWith('t1', 'premium')
-    expect(result).toEqual({ tenantId: 't1', tier: 'premium', queue: 'notifications:t1' })
+    expect(result).toEqual({ tenantId: 't1', tier: 'premium', queue: 'notifications.t1' })
   })
 
   it('rejects a malformed tenant id or unknown tier on register', () => {
@@ -55,7 +55,7 @@ describe('TenantWorkersController (unit)', () => {
      * validated tenant id (or undefined) so scoped reads work.
      */
     const workers: TenantWorkerView[] = [
-      { tenantId: 't1', queue: 'notifications:t1', tier: 'free' },
+      { tenantId: 't1', queue: 'notifications.t1', tier: 'free' },
     ]
     const list = jest.fn(() => workers)
     const controller = build({ list })

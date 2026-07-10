@@ -68,7 +68,7 @@ describe('useTenantActions', () => {
 
   it('registers a tenant worker at the given tier', async () => {
     // Scenario: the create-premium-tenant journey posts tenantId + tier.
-    mockPost.mockResolvedValueOnce({ tenantId: 't1', tier: 'premium', queue: 'notifications:t1' })
+    mockPost.mockResolvedValueOnce({ tenantId: 't1', tier: 'premium', queue: 'notifications.t1' })
     const { result } = renderHook(() => useTenantActions(), { wrapper: wrapper() })
     result.current.register.mutate({ tenantId: 't1', tier: 'premium' })
     await waitFor(() => {

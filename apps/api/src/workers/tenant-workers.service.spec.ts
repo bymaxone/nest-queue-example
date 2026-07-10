@@ -58,14 +58,14 @@ describe('TenantWorkersService (unit)', () => {
     /*
      * Scenario: registering a premium tenant.
      * Rule it protects: the tier maps to concurrency 10 and the worker consumes the
-     * derived notifications:<tenantId> queue (row 47).
+     * derived notifications.<tenantId> queue (matrix row 47).
      */
     const harness = build()
 
     harness.service.register('t1', 'premium')
 
     const config = harness.register.mock.calls[0]?.[0] as RegisterConfig
-    expect(config.queueName).toBe('notifications:t1')
+    expect(config.queueName).toBe('notifications.t1')
     expect(config.options.concurrency).toBe(10)
   })
 
@@ -107,13 +107,13 @@ describe('TenantWorkersService (unit)', () => {
     /*
      * Scenario: removing a worker that is registered.
      * Rule it protects: unregister stops consumption by tearing down the worker for
-     * the tenant's queue and truthfully reports it existed (row 48).
+     * the tenant's queue and truthfully reports it existed (matrix row 48).
      */
-    const harness = build(['notifications:t1'])
+    const harness = build(['notifications.t1'])
 
     const existed = await harness.service.unregister('t1')
 
-    expect(harness.unregister).toHaveBeenCalledWith('notifications:t1')
+    expect(harness.unregister).toHaveBeenCalledWith('notifications.t1')
     expect(existed).toBe(true)
   })
 
@@ -132,15 +132,15 @@ describe('TenantWorkersService (unit)', () => {
     /*
      * Scenario: listing while unrelated workers exist in the registry.
      * Rule it protects: the list derives from registry.list(), keeps only the
-     * notifications:* queues, and attaches each registered tier (null when unknown)
-     * (row 48).
+     * notifications.* queues, and attaches each registered tier (null when unknown)
+     * (matrix row 48).
      */
-    const harness = build(['email', 'notifications:t1', 'notifications:t2', 'invoices'])
+    const harness = build(['email', 'notifications.t1', 'notifications.t2', 'invoices'])
     harness.service.register('t1', 'premium')
 
     expect(harness.service.list()).toEqual([
-      { tenantId: 't1', queue: 'notifications:t1', tier: 'premium' },
-      { tenantId: 't2', queue: 'notifications:t2', tier: null },
+      { tenantId: 't1', queue: 'notifications.t1', tier: 'premium' },
+      { tenantId: 't2', queue: 'notifications.t2', tier: null },
     ])
   })
 
@@ -150,25 +150,25 @@ describe('TenantWorkersService (unit)', () => {
      * Rule it protects: passing a tenant id returns only that tenant's worker, so a
      * scoped read is possible in the otherwise-aggregate demo surface.
      */
-    const harness = build(['notifications:t1', 'notifications:t2'])
+    const harness = build(['notifications.t1', 'notifications.t2'])
     harness.service.register('t1', 'free')
 
     expect(harness.service.list('t1')).toEqual([
-      { tenantId: 't1', queue: 'notifications:t1', tier: 'free' },
+      { tenantId: 't1', queue: 'notifications.t1', tier: 'free' },
     ])
   })
 
   it('enqueues a notification onto the tenant queue', async () => {
     /*
      * Scenario: notifying a tenant.
-     * Rule it protects: the message is enqueued onto notifications:<tenantId> so the
+     * Rule it protects: the message is enqueued onto notifications.<tenantId> so the
      * dynamic worker consumes it.
      */
     const harness = build()
 
     const job = await harness.service.notify('t1', 'ping')
 
-    expect(harness.enqueue).toHaveBeenCalledWith('notifications:t1', 'notify', { message: 'ping' })
+    expect(harness.enqueue).toHaveBeenCalledWith('notifications.t1', 'notify', { message: 'ping' })
     expect(job.id).toBe('job-1')
   })
 
