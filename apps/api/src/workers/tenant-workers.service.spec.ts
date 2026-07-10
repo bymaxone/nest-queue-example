@@ -58,7 +58,7 @@ describe('TenantWorkersService (unit)', () => {
     /*
      * Scenario: registering a premium tenant.
      * Rule it protects: the tier maps to concurrency 10 and the worker consumes the
-     * derived notifications.<tenantId> queue (row 47).
+     * derived notifications.<tenantId> queue (matrix row 47).
      */
     const harness = build()
 
@@ -107,7 +107,7 @@ describe('TenantWorkersService (unit)', () => {
     /*
      * Scenario: removing a worker that is registered.
      * Rule it protects: unregister stops consumption by tearing down the worker for
-     * the tenant's queue and truthfully reports it existed (row 48).
+     * the tenant's queue and truthfully reports it existed (matrix row 48).
      */
     const harness = build(['notifications.t1'])
 
@@ -133,7 +133,7 @@ describe('TenantWorkersService (unit)', () => {
      * Scenario: listing while unrelated workers exist in the registry.
      * Rule it protects: the list derives from registry.list(), keeps only the
      * notifications.* queues, and attaches each registered tier (null when unknown)
-     * (row 48).
+     * (matrix row 48).
      */
     const harness = build(['email', 'notifications.t1', 'notifications.t2', 'invoices'])
     harness.service.register('t1', 'premium')
