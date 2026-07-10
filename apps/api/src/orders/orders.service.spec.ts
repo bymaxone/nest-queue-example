@@ -12,8 +12,8 @@ import { jest } from '@jest/globals'
 import { NotFoundException } from '@nestjs/common'
 import type { Job, QueueService } from '@bymax-one/nest-queue'
 import type { AppEnv } from '../config/env.js'
-import { EMAIL_QUEUE } from '../queues/queue-names.js'
-import { RECEIPT_JOB, VIP_PRIORITY } from './order-jobs.constants.js'
+import { EMAIL_QUEUE, WEBHOOKS_QUEUE } from '../queues/queue-names.js'
+import { ORDER_CREATED_JOB, RECEIPT_JOB, VIP_PRIORITY } from './order-jobs.constants.js'
 import { OrdersService } from './orders.service.js'
 import type { OrdersRepository, StoredOrder } from './orders.repository.js'
 
@@ -75,6 +75,22 @@ describe('OrdersService (unit)', () => {
       undefined,
     )
     expect(result).toEqual({ orderId: storedId, jobId: 'job-1' })
+  })
+
+  it('fans out an order-created webhook on placement', async () => {
+    /*
+     * Scenario: placing an order.
+     * Rule it protects: besides the receipt email, an order-created webhook is
+     * enqueued with no per-job overrides so it inherits the module's retry budget.
+     */
+    const { service, enqueue } = setup()
+    enqueue.mockResolvedValue({ id: 'job-1' } as Partial<Job> as Job)
+
+    const result = await service.place({ to: 'a@b.co', total: 42, vip: false })
+
+    expect(enqueue).toHaveBeenCalledWith(WEBHOOKS_QUEUE, ORDER_CREATED_JOB, {
+      orderId: result.orderId,
+    })
   })
 
   it('enqueues a VIP order at the highest priority', async () => {

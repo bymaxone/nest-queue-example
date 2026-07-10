@@ -47,3 +47,45 @@ Node's native `--env-file` flag; there is no `dotenv` dependency anywhere in thi
 Each application documents its own start command as it lands in a later phase.
 
 Tear the stack down with `docker compose down` (add `-v` to also drop the Redis volume).
+
+## Operational journeys
+
+These reproduce two at-least-once behaviors the library handles. Both need a running Redis
+and the built API (`pnpm --filter @nest-queue-example/api build`). Set `REDIS_URL` if your
+Redis is not on `localhost:6379`.
+
+### Stalled-job recovery
+
+A `demos` job sleeps far longer than its deliberately short `lockDuration` (5s). A live
+worker renews the lock and the job completes normally; if the worker is killed mid-job, the
+lock expires and the restarted worker detects the stalled job and re-runs it.
+
+```bash
+# Terminal 1: start the API and watch the event stream
+node apps/api/dist/main.js &
+curl -N http://localhost:3080/events/stream
+
+# Terminal 2: enqueue the slow job, then kill the API mid-job (before ~20s)
+curl -X POST http://localhost:3080/demos/stall
+kill <api-pid>            # plain process kill; no Docker needed
+
+# Restart the API; within ~10s the stream shows the demos job: stalled, active, completed
+node apps/api/dist/main.js
+```
+
+The feed entries for the `demos` queue show the recovery timeline (`active` then `stalled`
+then `completed`) as the restarted worker picks the job back up.
+
+### Graceful shutdown
+
+`scripts/demo-shutdown.mjs` boots the built API, enqueues a slow report job, sends `SIGTERM`
+mid-job, and asserts the process drains the in-flight work and exits cleanly within the drain
+budget.
+
+```bash
+pnpm --filter @nest-queue-example/api build
+node scripts/demo-shutdown.mjs        # prints PASS on a clean drained shutdown
+```
+
+The script exits non-zero on failure, so it can gate a pipeline. Override `DEMO_PORT`,
+`REDIS_URL`, or `QUEUE_PREFIX` via environment variables.

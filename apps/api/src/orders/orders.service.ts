@@ -1,8 +1,9 @@
 /**
  * @fileoverview Order placement service. Stores the order in memory and enqueues
- * strongly-typed email jobs: a `send-receipt` on placement (VIP orders jump the
- * queue via priority) and a delayed reminder on demand. The email processor
- * arrives later, so the jobs wait: a visible, correct producer/consumer split.
+ * strongly-typed jobs: a `send-receipt` email on placement (VIP orders jump the
+ * queue via priority), an `order-created` webhook fan-out, and a delayed reminder
+ * on demand. The webhook inherits the module's default retry budget, so its
+ * exponential backoff is observable in the admin timeline.
  * @layer app/orders
  */
 import { randomUUID } from 'node:crypto'
@@ -10,9 +11,14 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { QueueService } from '@bymax-one/nest-queue'
 import { APP_ENV } from '../config/env.js'
 import type { AppEnv } from '../config/env.js'
-import { EMAIL_QUEUE } from '../queues/queue-names.js'
-import { RECEIPT_JOB, VIP_PRIORITY } from './order-jobs.constants.js'
-import type { ReceiptEmailJobData, ReceiptEmailJobResult } from './order-jobs.types.js'
+import { EMAIL_QUEUE, WEBHOOKS_QUEUE } from '../queues/queue-names.js'
+import { ORDER_CREATED_JOB, RECEIPT_JOB, VIP_PRIORITY } from './order-jobs.constants.js'
+import type {
+  OrderCreatedWebhookJobData,
+  OrderCreatedWebhookJobResult,
+  ReceiptEmailJobData,
+  ReceiptEmailJobResult,
+} from './order-jobs.types.js'
 import { OrdersRepository } from './orders.repository.js'
 
 /** Validated input accepted by {@link OrdersService.place}. */
@@ -43,8 +49,10 @@ export class OrdersService {
   ) {}
 
   /**
-   * Store an order and enqueue its typed receipt email. A VIP order enqueues at
-   * the highest priority so its receipt is processed ahead of standard orders.
+   * Store an order and enqueue its typed receipt email plus an order-created
+   * webhook. A VIP order enqueues the receipt at the highest priority so it is
+   * processed ahead of standard orders; the webhook inherits the module's default
+   * retry budget so its backoff timeline is visible.
    *
    * @param input - The validated order payload.
    * @returns The stored order id and the enqueued receipt job id.
@@ -62,6 +70,11 @@ export class OrdersService {
       RECEIPT_JOB,
       { orderId: order.id, to: order.to, total: order.total },
       input.vip ? { priority: VIP_PRIORITY } : undefined,
+    )
+    await this.queueService.enqueue<OrderCreatedWebhookJobData, OrderCreatedWebhookJobResult>(
+      WEBHOOKS_QUEUE,
+      ORDER_CREATED_JOB,
+      { orderId: order.id },
     )
     return { orderId: order.id, jobId: job.id }
   }

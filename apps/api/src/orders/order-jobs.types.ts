@@ -33,3 +33,17 @@ export interface WelcomeEmailJobResult {
   /** Provider message id of the sent welcome email. */
   messageId: string
 }
+
+/** Payload of an `order-created` job on the `webhooks` queue. */
+export interface OrderCreatedWebhookJobData {
+  /** Identifier of the order whose creation is being fanned out. */
+  orderId: string
+}
+
+/** Result returned by the `order-created` webhook handler once delivery succeeds. */
+export interface OrderCreatedWebhookJobResult {
+  /** Identifier of the delivered order. */
+  orderId: string
+  /** Total attempts it took to deliver, including the successful one. */
+  attempts: number
+}
