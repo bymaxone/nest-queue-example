@@ -11,6 +11,8 @@ out/
 coverage/
 .stryker-tmp/
 reports/
+!apps/*/src/reports/
+!apps/*/src/reports/**
 
 # Environment files
 .env
