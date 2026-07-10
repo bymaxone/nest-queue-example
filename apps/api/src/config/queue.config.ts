@@ -10,6 +10,8 @@
 import type { BymaxQueueModuleOptions, QueueConnectionConfig } from '@bymax-one/nest-queue'
 import type { Redis, RedisOptions } from 'ioredis'
 import type { AppEnv } from './env.js'
+import { buildTelemetry } from './telemetry.config.js'
+import type { TelemetryBuilder } from './telemetry.config.js'
 
 /** Retry budget applied to every job; individual enqueues may still override it. */
 const DEFAULT_JOB_ATTEMPTS = 4
@@ -61,14 +63,23 @@ function selectConnection(env: AppEnv, sharedClient?: Redis): QueueConnectionCon
 }
 
 /**
- * Build the queue library options from the parsed environment.
+ * Build the queue library options from the parsed environment. Async because the
+ * optional telemetry branch dynamically imports `bullmq-otel`; `forRootAsync`
+ * factories may return a promise.
  *
  * @param env - The validated, frozen application environment.
  * @param sharedClient - The app-owned Mode A client injected in `shared` mode.
+ * @param buildTelemetryFn - The telemetry builder, defaulting to the real one;
+ *   injectable so a test can assert it is never called when the flag is off.
  * @returns Module options with the resolved connection, key prefix, default job
- *   options, flows and metrics enabled, and the shutdown drain budget.
+ *   options, flows and metrics enabled, the shutdown drain budget, and telemetry
+ *   only when `QUEUE_OTEL` is set.
  */
-export function buildQueueOptions(env: AppEnv, sharedClient?: Redis): BymaxQueueModuleOptions {
+export async function buildQueueOptions(
+  env: AppEnv,
+  sharedClient?: Redis,
+  buildTelemetryFn: TelemetryBuilder = buildTelemetry,
+): Promise<BymaxQueueModuleOptions> {
   return {
     connection: selectConnection(env, sharedClient),
     prefix: env.QUEUE_PREFIX,
@@ -82,5 +93,6 @@ export function buildQueueOptions(env: AppEnv, sharedClient?: Redis): BymaxQueue
       drainTimeoutMs: env.QUEUE_DRAIN_TIMEOUT_MS,
       drainOnShutdown: env.QUEUE_DRAIN_ON_SHUTDOWN,
     },
+    ...(env.QUEUE_OTEL ? { telemetry: await buildTelemetryFn() } : {}),
   }
 }
