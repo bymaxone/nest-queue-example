@@ -59,8 +59,10 @@ export class TenantWorkersService {
   async unregister(tenantId: string): Promise<boolean> {
     const queueName = tenantQueueName(tenantId)
     const existed = this.registry.list().includes(queueName)
-    this.tiers.delete(tenantId)
+    // Drop the tier only after a successful unregister, so a failure cannot leave
+    // the worker registered while its tier metadata is lost (inconsistent list()).
     await this.registry.unregister(queueName)
+    this.tiers.delete(tenantId)
     return existed
   }
 

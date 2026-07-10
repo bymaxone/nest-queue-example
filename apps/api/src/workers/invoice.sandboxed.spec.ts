@@ -6,7 +6,7 @@
  * lines, and the default export delegates to the pure renderer.
  * Mocks: none (pure function; imported directly, not through a sandbox).
  */
-import type { SandboxedJob } from '@bymax-one/nest-queue'
+import type { SandboxedJob } from 'bullmq'
 import handleInvoiceRender, { renderInvoice } from './invoice.sandboxed.js'
 import type { InvoiceRenderData, InvoiceRenderResult } from './invoice.sandboxed.js'
 

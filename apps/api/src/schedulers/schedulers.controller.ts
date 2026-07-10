@@ -47,8 +47,11 @@ const schedulerIdSchema = z
   .max(MAX_SCHEDULER_ID_LENGTH)
   .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/)
 
+/** Upper bound on an ISO 8601 date/time string (generous for extended formats). */
+const MAX_DATE_STRING_LENGTH = 40
+
 /** A start or stop time: epoch milliseconds or an ISO string. */
-const dateSchema = z.union([z.number().int(), z.string().min(1).max(MAX_TZ_LENGTH)])
+const dateSchema = z.union([z.number().int(), z.string().min(1).max(MAX_DATE_STRING_LENGTH)])
 
 /**
  * Structural (not semantic) validation of the repeat body. Both `pattern` and

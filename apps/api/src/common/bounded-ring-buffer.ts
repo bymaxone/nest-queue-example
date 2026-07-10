@@ -9,6 +9,8 @@
 /** A fixed-capacity in-memory buffer that drops its oldest entry when full. */
 export class BoundedRingBuffer<T> {
   private readonly items: T[] = []
+  /** Index of the oldest slot (the next to be overwritten) once at capacity. */
+  private head = 0
 
   /**
    * @param capacity - Maximum number of entries retained before eviction begins.
@@ -16,16 +18,18 @@ export class BoundedRingBuffer<T> {
   constructor(private readonly capacity: number) {}
 
   /**
-   * Append an entry, evicting the oldest once capacity is exceeded so memory stays
-   * bounded no matter how many entries are pushed.
+   * Append an entry in constant time, overwriting the oldest slot once at capacity
+   * so memory stays bounded no matter how many entries are pushed.
    *
    * @param item - The entry to append.
    */
   push(item: T): void {
-    this.items.push(item)
-    if (this.items.length > this.capacity) {
-      this.items.shift()
+    if (this.items.length < this.capacity) {
+      this.items.push(item)
+      return
     }
+    this.items[this.head] = item
+    this.head = (this.head + 1) % this.capacity
   }
 
   /**
@@ -34,6 +38,9 @@ export class BoundedRingBuffer<T> {
    * @returns A copy of the current entries; mutating it never affects the buffer.
    */
   snapshot(): readonly T[] {
-    return [...this.items]
+    if (this.items.length < this.capacity) {
+      return [...this.items]
+    }
+    return [...this.items.slice(this.head), ...this.items.slice(0, this.head)]
   }
 }
