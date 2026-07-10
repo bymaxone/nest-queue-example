@@ -48,6 +48,32 @@ Each application documents its own start command as it lands in a later phase.
 
 Tear the stack down with `docker compose down` (add `-v` to also drop the Redis volume).
 
+## Connection modes
+
+The library accepts the Redis connection three ways, selected by two environment variables.
+`GET /admin/diagnostics` is the single source of truth for the active mode and proves the
+per-role retry policy: the Queue/FlowProducer role keeps ioredis' default `maxRetriesPerRequest`
+(20, fail-fast so `enqueue` never blocks during an outage) while Worker/QueueEvents roles are
+forced to `null` (required for BullMQ's blocking commands). The connection URL, host, and
+password are a credential surface and never appear in any response.
+
+| Recipe                                               | Resolved mode  | `connection` in `/admin/diagnostics`                                        |
+| ---------------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
+| _default_ (`QUEUE_CONNECTION_MODE=own`, `STYLE=url`) | `mode-b-owned` | `style: "url"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`     |
+| `QUEUE_CONNECTION_STYLE=options`                     | `mode-b-owned` | `style: "options"`, `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null` |
+| `QUEUE_CONNECTION_MODE=shared`                       | `mode-a-byo`   | `queueRoleMaxRetries: 20`, `workerRoleMaxRetries: null`                     |
+
+In Mode A (`shared`) the app owns an ioredis client and hands it to the library as `{ client }`
+(the shape a `@bymax-one/nest-cache` host would produce); the library uses it as-is for the
+Queue role and never closes it, so the app closes it on shutdown. Modes B (`url`/`options`) let
+the library open and close its own connection.
+
+```bash
+pnpm --filter @nest-queue-example/api build
+QUEUE_CONNECTION_MODE=shared node apps/api/dist/main.js &   # or QUEUE_CONNECTION_STYLE=options
+curl -s http://localhost:3080/admin/diagnostics
+```
+
 ## Operational journeys
 
 These reproduce two at-least-once behaviors the library handles. Both need a running Redis

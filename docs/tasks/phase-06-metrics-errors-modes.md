@@ -1,6 +1,6 @@
 # Phase 6: metrics-errors-modes
 
-> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 3 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P6)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.1, §7.3, §7.6; matrix rows 7, 8, 9, 28 to 30, 33, 66, 67, 68
 
@@ -26,7 +26,7 @@ Every feature area now works on the default configuration. This phase completes 
 | --- | ---------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 6.1 | Branch + `MetricsService` surface + readiness composition              | ✅ Done | P0       | S    | Phase 5    |
 | 6.2 | Error explorer: the full reproducible catalog                          | ✅ Done | P0       | M    | Phase 5    |
-| 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | 📋 ToDo | P0       | M    | Phase 5    |
+| 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | ✅ Done | P0       | M    | Phase 5    |
 | 6.4 | Optional telemetry (`bullmq-otel`) behind `QUEUE_OTEL`                 | 📋 ToDo | P1       | S    | 6.3        |
 | 6.5 | Phase close: audit, dashboards, PR with Copilot review                 | 📋 ToDo | P0       | S    | 6.2 to 6.4 |
 
@@ -157,7 +157,7 @@ Completion Protocol: standard 5 steps, id 6.2, commit
 
 ### Task 6.3: Mode A shared client + options-style Mode B + retry-policy diagnostics
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 5
@@ -168,11 +168,11 @@ Rows 7, 8, 9: complete the `buildQueueOptions` union. `QUEUE_CONNECTION_MODE=sha
 
 #### Acceptance criteria
 
-- [ ] `config/shared-redis.provider.ts`: conditional provider (`SHARED_REDIS` Symbol) creating an app-owned ioredis client only when mode is `shared`, closed on app shutdown by the app (Mode A contract: the lib never closes it).
-- [ ] `buildQueueOptions` completes the spec §9.1 union (client vs options vs url); factory unit tests cover all three branches.
-- [ ] `GET /admin/diagnostics` gains `connection: { mode, style, queueRoleMaxRetries, workerRoleMaxRetries }` read from the injected `BYMAX_QUEUE_REDIS_CLIENT` and a registered worker's connection (values, not credentials).
-- [ ] Boot journeys documented for the three configurations (README matrix).
-- [ ] Unit tests: provider conditionality, diagnostics projection.
+- [x] `config/shared-redis.provider.ts`: conditional provider (`SHARED_REDIS` Symbol) creating an app-owned ioredis client only when mode is `shared`, closed on app shutdown by `SharedRedisLifecycle` (Mode A contract: the lib never closes it).
+- [x] `buildQueueOptions` completes the spec §9.1 union (client vs options vs url); factory unit tests cover all three branches plus the shared-without-client fallback.
+- [x] `GET /admin/diagnostics` gains `connection: { mode, style, queueRoleMaxRetries, workerRoleMaxRetries }` read from the injected `BYMAX_QUEUE_REDIS_CLIENT` and a registered worker's connection (values, not credentials).
+- [x] Boot journeys documented for the three configurations (README matrix); all three verified: queueRoleMaxRetries 20, workerRoleMaxRetries null in every mode.
+- [x] Unit tests: provider conditionality, diagnostics projection.
 
 #### Files to create / modify
 
@@ -350,3 +350,4 @@ main: `docs(plan): mark P6 complete`.
 
 - 6.1 ✅ 2026-07-09 Cached metrics controller (getAll / get / invalidate) with allow-list guard; `/health/ready` recomposed on MetricsService (cached reachability probe + active-count aggregate); shared `assertKnownQueue` guard extracted.
 - 6.2 ✅ 2026-07-09 Error explorer: `GET /errors/catalog` (14 codes, 7 reproducible, statuses + origin + coverage) and `POST /errors/trigger/:code` provoking every reproducible code via real operations (consumer guards, `forRoot` validation, oversized bulk, upsertJobScheduler x4 variants, leak-free isolated duplicate-processor probe); library envelope propagates untouched.
+- 6.3 ✅ 2026-07-09 Connection matrix: `SharedRedisModule` app-owned client (Mode A `{ client }`, closed by `SharedRedisLifecycle`); `buildQueueOptions` completes the client/options/url union with `parseRedisOptions`; `/admin/diagnostics` reports `connection { mode, style, queueRoleMaxRetries, workerRoleMaxRetries }` (credential-free). Three boots verified: queue role 20, worker role null in every mode.
