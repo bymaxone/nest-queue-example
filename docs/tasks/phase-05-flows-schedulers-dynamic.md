@@ -1,6 +1,6 @@
 # Phase 5: flows-schedulers-dynamic
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 6 tasks · **Last updated**: 2026-07-06
+> **Status**: 🔄 In Progress · **Progress**: 1 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P5)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4 rows 47 to 49, §7.5; matrix rows 47 to 62
 
@@ -24,7 +24,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 
 | ID  | Task                                                               | Status  | Priority | Size | Depends on    |
 | --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ------------- |
-| 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | 📋 ToDo | P0       | M    | Phase 4       |
+| 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | ✅ Done | P0       | M    | Phase 4       |
 | 5.2 | Failure-propagation variants + `addBulk`                           | 📋 ToDo | P0       | M    | 5.1           |
 | 5.3 | Boot schedulers + management endpoints + validation errors         | 📋 ToDo | P0       | M    | Phase 4       |
 | 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | 📋 ToDo | P0       | S    | Phase 4       |
@@ -35,7 +35,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 
 ### Task 5.1: Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 4
@@ -46,11 +46,11 @@ Rows 50, 51, 56: the fulfillment flow (`ship-order` parent; `reserve-stock` + `c
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-05-flows-schedulers-dynamic` created with `git switch -c`.
-- [ ] `flows/fulfillment.service.ts` builds the `FlowJob` tree; `POST /flows/fulfillment` (variant `default`) runs it; node processors (`fulfillment`, `stock`, `payments`, `invoices-data` queues) record execution order in an in-memory `FlowTrace`.
-- [ ] Parent completes only after every descendant (assert order in the trace).
-- [ ] `GET /flows/:rootId/tree` returns the tree with per-node `{ name, queue, status }` via the producer (row 56).
-- [ ] Unit tests: tree construction shape, trace ordering with mocked processors.
+- [x] Branch `feat/phase-05-flows-schedulers-dynamic` created with `git switch -c`.
+- [x] `flows/fulfillment.service.ts` builds the `FlowJob` tree; `POST /flows/fulfillment` (variant `default`) runs it; node processors (`fulfillment`, `stock`, `payments`, `invoices-data` queues) record execution order in an in-memory `FlowTrace`.
+- [x] Parent completes only after every descendant (assert order in the trace).
+- [x] `GET /flows/:rootId/tree` returns the tree with per-node `{ name, queue, status }` via the producer (row 56).
+- [x] Unit tests: tree construction shape, trace ordering with mocked processors.
 
 #### Files to create / modify
 
@@ -411,3 +411,5 @@ main: `docs(plan): mark P5 complete`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 5.1 ✅ 2026-07-09 fulfillment flow (fan-out/fan-in + nested invoice branch), node processors with FlowTrace, and the live tree endpoint via getProducer
