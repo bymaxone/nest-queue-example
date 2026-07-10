@@ -8,6 +8,12 @@
 /** Concurrency for every flow-node worker: nodes are light, so a small pool suffices. */
 export const FLOW_NODE_CONCURRENCY = 2
 
+/**
+ * Order-id prefix that deterministically makes the `charge-payment` node fail,
+ * driving the failure-propagation variant demonstrations without any randomness.
+ */
+export const ORDER_FAILURE_PREFIX = 'fail-'
+
 /** Queue carrying the flow root (`ship-order`) and the `render-invoice` branch. */
 export const FULFILLMENT_QUEUE = 'fulfillment'
 

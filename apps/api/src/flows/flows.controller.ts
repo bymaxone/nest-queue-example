@@ -13,10 +13,13 @@ import { FULFILLMENT_QUEUE } from './fulfillment.constants.js'
 import { FlowTrace } from './flow-trace.service.js'
 import type { FlowTraceEntry } from './flow-trace.service.js'
 import { FulfillmentService } from './fulfillment.service.js'
-import type { FlowTreeNode } from './fulfillment.types.js'
+import type { FlowTreeNode, FulfillmentVariant } from './fulfillment.types.js'
 
 /** Upper bound on an order id; a demo guardrail against absurd input. */
 const MAX_ORDER_ID_LENGTH = 128
+
+/** Upper bound on a bulk launch; each flow fans out into six jobs, so keep it small. */
+const MAX_BULK_ORDERS = 50
 
 /** Order ids are conservative identifiers: alphanumeric plus dash/underscore. */
 const orderIdSchema = z
@@ -28,18 +31,40 @@ const orderIdSchema = z
 /** A root job id: the same conservative identifier shape as an order id. */
 const rootIdSchema = orderIdSchema
 
-/** Body accepted by the fulfillment launcher. The only variant here is the happy path. */
-const launchSchema = z.object({
-  orderId: orderIdSchema,
-  variant: z.literal('default').default('default'),
+/** The four failure-propagation postures, defaulting to the happy path. */
+const variantSchema = z
+  .enum(['default', 'stuck', 'failParent', 'ignoreDependency'])
+  .default('default')
+
+/** Body accepted by the single-flow launcher. */
+const launchSchema = z.object({ orderId: orderIdSchema, variant: variantSchema })
+
+/** Body accepted by the bulk launcher: one flow per order id, one shared variant. */
+const bulkSchema = z.object({
+  orderIds: z.array(orderIdSchema).min(1).max(MAX_BULK_ORDERS),
+  variant: variantSchema,
 })
 
-/** Outcome of launching a fulfillment flow: the root job id and the order id. */
-export interface FlowLaunched {
+/** The root job id paired with the order it fulfills. */
+export interface FlowRoot {
   /** The root (`ship-order`) job id, used to read the tree back. */
   rootId: string | undefined
   /** The order the flow fulfills. */
   orderId: string
+}
+
+/** Outcome of launching a single fulfillment flow. */
+export interface FlowLaunched extends FlowRoot {
+  /** The failure-propagation posture the flow was launched with. */
+  variant: FulfillmentVariant
+}
+
+/** Outcome of a bulk launch: the roots in input order plus the shared variant. */
+export interface FlowsLaunched {
+  /** The created flow roots, preserving input order. */
+  roots: FlowRoot[]
+  /** The failure-propagation posture applied to every flow. */
+  variant: FulfillmentVariant
 }
 
 /** Launches fulfillment flows and reads their live tree and execution trace. */
@@ -51,17 +76,34 @@ export class FlowsController {
   ) {}
 
   /**
-   * Launch a fulfillment flow for the given order.
+   * Launch a fulfillment flow for the given order and failure-propagation variant.
    *
-   * @param body - The unknown request body carrying the order id.
-   * @returns The root job id and the order id.
+   * @param body - The unknown request body carrying the order id and variant.
+   * @returns The root job id, the order id, and the variant.
    * @throws {BadRequestException} When the body is malformed.
    */
   @Post('fulfillment')
   async launch(@Body() body: unknown): Promise<FlowLaunched> {
-    const { orderId } = parseRequest(launchSchema, body)
-    const root = await this.fulfillment.run(orderId)
-    return { rootId: root.job.id, orderId }
+    const { orderId, variant } = parseRequest(launchSchema, body)
+    const root = await this.fulfillment.run(orderId, variant)
+    return { rootId: root.job.id, orderId, variant }
+  }
+
+  /**
+   * Launch several fulfillment flows in one Redis roundtrip via `addBulk`.
+   *
+   * @param body - The unknown request body carrying the order ids and variant.
+   * @returns The created roots in input order and the shared variant.
+   * @throws {BadRequestException} When the body is malformed.
+   */
+  @Post('fulfillment/bulk')
+  async launchBulk(@Body() body: unknown): Promise<FlowsLaunched> {
+    const { orderIds, variant } = parseRequest(bulkSchema, body)
+    const nodes = await this.fulfillment.runBulk(orderIds, variant)
+    // Map over the input ids (not the nodes) so every root keeps its `string`
+    // order id and pairs positionally with the node addBulk returned for it.
+    const roots = orderIds.map((orderId, index) => ({ rootId: nodes[index]?.job.id, orderId }))
+    return { roots, variant }
   }
 
   /**

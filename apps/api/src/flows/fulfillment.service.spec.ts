@@ -22,6 +22,7 @@ import {
   STOCK_QUEUE,
 } from './fulfillment.constants.js'
 import { FulfillmentService } from './fulfillment.service.js'
+import type { FulfillmentVariant } from './fulfillment.types.js'
 
 /** Build a fake JobNode with a resolvable state, for tree-projection tests. */
 function fakeNode(id: string, name: string, queue: string, children?: JobNode[]): JobNode {
@@ -58,6 +59,50 @@ describe('FulfillmentService (unit)', () => {
     ])
   })
 
+  it('encodes the failure-propagation flag on the payment child per variant', () => {
+    /*
+     * Scenario: building each variant's flow definition.
+     * Rule it protects: the charge-payment child carries no override on the happy
+     * path, a bare single-attempt cap for the stuck pitfall, failParentOnFailure
+     * for propagation, and ignoreDependencyOnFailure for the resilient parent
+     * (rows 52 to 54).
+     */
+    const service = new FulfillmentService({} as unknown as FlowService)
+    const paymentOpts = (variant: FulfillmentVariant): unknown =>
+      (service.buildFulfillmentFlow('order-1', variant).children ?? [])[1]?.opts
+
+    expect(paymentOpts('default')).toBeUndefined()
+    expect(paymentOpts('stuck')).toEqual({ attempts: 1 })
+    expect(paymentOpts('failParent')).toEqual({ attempts: 1, failParentOnFailure: true })
+    expect(paymentOpts('ignoreDependency')).toEqual({
+      attempts: 1,
+      ignoreDependencyOnFailure: true,
+    })
+  })
+
+  it('bulk-launches one flow per order id in input order', async () => {
+    /*
+     * Scenario: launching a batch of flows.
+     * Rule it protects: runBulk maps each order id to its built flow and delegates
+     * the whole batch to FlowService.addBulk in one roundtrip, preserving order
+     * (row 55).
+     */
+    const nodes = [
+      fakeNode('r1', SHIP_ORDER_JOB, FULFILLMENT_QUEUE),
+      fakeNode('r2', SHIP_ORDER_JOB, FULFILLMENT_QUEUE),
+    ]
+    const addBulk = jest.fn<FlowService['addBulk']>().mockResolvedValue(nodes)
+    const service = new FulfillmentService({ addBulk } as unknown as FlowService)
+
+    const result = await service.runBulk(['o1', 'o2'], 'stuck')
+
+    expect(addBulk).toHaveBeenCalledWith([
+      service.buildFulfillmentFlow('o1', 'stuck'),
+      service.buildFulfillmentFlow('o2', 'stuck'),
+    ])
+    expect(result).toBe(nodes)
+  })
+
   it('launches the flow by delegating the built tree to FlowService.add', async () => {
     /*
      * Scenario: running a fulfillment flow.
@@ -68,9 +113,9 @@ describe('FulfillmentService (unit)', () => {
     const add = jest.fn<FlowService['add']>().mockResolvedValue(root)
     const service = new FulfillmentService({ add } as unknown as FlowService)
 
-    const result = await service.run('order-9')
+    const result = await service.run('order-9', 'default')
 
-    expect(add).toHaveBeenCalledWith(service.buildFulfillmentFlow('order-9'))
+    expect(add).toHaveBeenCalledWith(service.buildFulfillmentFlow('order-9', 'default'))
     expect(result).toBe(root)
   })
 

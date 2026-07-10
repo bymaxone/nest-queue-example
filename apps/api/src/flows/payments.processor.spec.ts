@@ -35,4 +35,18 @@ describe('PaymentsProcessor (unit)', () => {
     expect(record).toHaveBeenCalledWith(CHARGE_PAYMENT_JOB)
     expect(result).toEqual({ node: CHARGE_PAYMENT_JOB })
   })
+
+  it('throws a static failure for an order carrying the failure prefix', () => {
+    /*
+     * Scenario: the injected-failure order id (`fail-...`).
+     * Rule it protects: the payment node fails deterministically to drive the
+     * variant demonstrations, but only after recording the attempt, and the error
+     * message echoes no request input.
+     */
+    const record = jest.fn()
+    const processor = new PaymentsProcessor({ record } as unknown as FlowTrace)
+
+    expect(() => processor.charge(jobStub('fail-1'))).toThrow('payment declined (injected failure)')
+    expect(record).toHaveBeenCalledWith(CHARGE_PAYMENT_JOB)
+  })
 })

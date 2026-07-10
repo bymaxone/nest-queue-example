@@ -21,10 +21,13 @@ import {
   SHIP_ORDER_JOB,
   STOCK_QUEUE,
 } from './fulfillment.constants.js'
-import type { FlowTreeNode, FulfillmentNodeData } from './fulfillment.types.js'
+import type { FlowTreeNode, FulfillmentNodeData, FulfillmentVariant } from './fulfillment.types.js'
 
 /** A single child (or grandchild) node of the fulfillment flow tree. */
 type FulfillmentChild = NonNullable<FlowJob['children']>[number]
+
+/** Single attempt for the demo failure variants so an injected failure resolves fast. */
+const DEMO_FAILURE_ATTEMPTS = 1
 
 /**
  * Orchestrates the fulfillment flow: constructs the `FlowJob` tree, launches it
@@ -36,13 +39,15 @@ export class FulfillmentService {
   constructor(private readonly flowService: FlowService) {}
 
   /**
-   * Build the fulfillment `FlowJob` tree for an order. Pure and side-effect free
-   * so the tree shape is fully unit-testable.
+   * Build the fulfillment `FlowJob` tree for an order and failure-propagation
+   * variant. Pure and side-effect free so the tree shape and per-variant flags
+   * are fully unit-testable.
    *
    * @param orderId - The order the flow fulfills.
+   * @param variant - The failure-propagation posture encoded on the payment child.
    * @returns The root `FlowJob` with its children and grandchildren.
    */
-  buildFulfillmentFlow(orderId: string): FlowJob {
+  buildFulfillmentFlow(orderId: string, variant: FulfillmentVariant = 'default'): FlowJob {
     const data: FulfillmentNodeData = { orderId }
     return {
       name: SHIP_ORDER_JOB,
@@ -50,7 +55,7 @@ export class FulfillmentService {
       data,
       children: [
         { name: RESERVE_STOCK_JOB, queueName: STOCK_QUEUE, data },
-        { name: CHARGE_PAYMENT_JOB, queueName: PAYMENTS_QUEUE, data },
+        this.buildPaymentChild(orderId, variant),
         this.buildInvoiceChild(orderId),
       ],
     }
@@ -60,10 +65,23 @@ export class FulfillmentService {
    * Launch a single fulfillment flow.
    *
    * @param orderId - The order the flow fulfills.
+   * @param variant - The failure-propagation posture.
    * @returns The root `JobNode` of the created flow.
    */
-  run(orderId: string): Promise<JobNode> {
-    return this.flowService.add(this.buildFulfillmentFlow(orderId))
+  run(orderId: string, variant: FulfillmentVariant): Promise<JobNode> {
+    return this.flowService.add(this.buildFulfillmentFlow(orderId, variant))
+  }
+
+  /**
+   * Launch several fulfillment flows in a single Redis roundtrip, preserving input
+   * order.
+   *
+   * @param orderIds - The orders to fulfill, one flow each.
+   * @param variant - The failure-propagation posture applied to every flow.
+   * @returns The root `JobNode` for each flow, in input order.
+   */
+  runBulk(orderIds: readonly string[], variant: FulfillmentVariant): Promise<JobNode[]> {
+    return this.flowService.addBulk(orderIds.map((id) => this.buildFulfillmentFlow(id, variant)))
   }
 
   /**
@@ -108,6 +126,25 @@ export class FulfillmentService {
   }
 
   /**
+   * Build the `charge-payment` child, encoding the variant's failure flag. The
+   * happy path carries no override; each demo variant caps attempts at one so an
+   * injected failure resolves deterministically.
+   *
+   * @param orderId - The order the flow fulfills.
+   * @param variant - The failure-propagation posture.
+   * @returns The payment child node.
+   */
+  private buildPaymentChild(orderId: string, variant: FulfillmentVariant): FulfillmentChild {
+    const base: FulfillmentChild = {
+      name: CHARGE_PAYMENT_JOB,
+      queueName: PAYMENTS_QUEUE,
+      data: { orderId },
+    }
+    const opts = paymentChildOpts(variant)
+    return opts ? { ...base, opts } : base
+  }
+
+  /**
    * Build the nested `render-invoice` branch with its two data-fetch grandchildren.
    *
    * @param orderId - The order the flow fulfills.
@@ -124,5 +161,28 @@ export class FulfillmentService {
         { name: FETCH_CUSTOMER_JOB, queueName: INVOICES_DATA_QUEUE, data },
       ],
     }
+  }
+}
+
+/**
+ * Map a variant to the payment child's BullMQ options. Returns `undefined` for the
+ * happy path (module defaults apply) and, for each demo variant, a single-attempt
+ * option set carrying the matching failure-propagation flag: `stuck` sets no flag
+ * (BullMQ's default leaves the parent waiting), `failParent` propagates the
+ * failure up, and `ignoreDependency` lets the parent proceed.
+ *
+ * @param variant - The failure-propagation posture.
+ * @returns The child options, or `undefined` when no override is needed.
+ */
+function paymentChildOpts(variant: FulfillmentVariant): FulfillmentChild['opts'] {
+  switch (variant) {
+    case 'default':
+      return undefined
+    case 'stuck':
+      return { attempts: DEMO_FAILURE_ATTEMPTS }
+    case 'failParent':
+      return { attempts: DEMO_FAILURE_ATTEMPTS, failParentOnFailure: true }
+    case 'ignoreDependency':
+      return { attempts: DEMO_FAILURE_ATTEMPTS, ignoreDependencyOnFailure: true }
   }
 }

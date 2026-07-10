@@ -1,6 +1,6 @@
 # Phase 5: flows-schedulers-dynamic
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 2 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P5)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4 rows 47 to 49, §7.5; matrix rows 47 to 62
 
@@ -25,7 +25,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 | ID  | Task                                                               | Status  | Priority | Size | Depends on    |
 | --- | ------------------------------------------------------------------ | ------- | -------- | ---- | ------------- |
 | 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | ✅ Done | P0       | M    | Phase 4       |
-| 5.2 | Failure-propagation variants + `addBulk`                           | 📋 ToDo | P0       | M    | 5.1           |
+| 5.2 | Failure-propagation variants + `addBulk`                           | ✅ Done | P0       | M    | 5.1           |
 | 5.3 | Boot schedulers + management endpoints + validation errors         | 📋 ToDo | P0       | M    | Phase 4       |
 | 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | 📋 ToDo | P0       | S    | Phase 4       |
 | 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | 📋 ToDo | P0       | M    | 5.4           |
@@ -98,7 +98,7 @@ completion log), commit `feat(api): fulfillment flow with live tree endpoint (5.
 
 ### Task 5.2: Failure-propagation variants + `addBulk`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 5.1
@@ -109,12 +109,12 @@ Rows 52 to 55: the three postures side by side. Variant `stuck`: a child exhaust
 
 #### Acceptance criteria
 
-- [ ] `variant` extends to `stuck | failParent | ignoreDependency`; failure injection: the `charge-payment` child throws always when `orderId` starts with `fail-` (deterministic, attempts capped at 1 for the demo variants).
-- [ ] `stuck`: after child failure, tree endpoint shows the parent in `waiting-children` and the docs/UI copy explains why this is BullMQ's default.
-- [ ] `failParent`: root reaches `failed` with the child's failure reason.
-- [ ] `ignoreDependency`: root completes; the failed child is visible in the tree.
-- [ ] `POST /flows/fulfillment/bulk { orderIds }` uses `addBulk` (row 55).
-- [ ] Unit tests: flow-definition flags per variant asserted; bulk order preserved.
+- [x] `variant` extends to `stuck | failParent | ignoreDependency`; failure injection: the `charge-payment` child throws always when `orderId` starts with `fail-` (deterministic, attempts capped at 1 for the demo variants).
+- [x] `stuck`: after child failure, tree endpoint shows the parent in `waiting-children` and the docs/UI copy explains why this is BullMQ's default.
+- [x] `failParent`: root reaches `failed` with the child's failure reason.
+- [x] `ignoreDependency`: root completes; the failed child is visible in the tree.
+- [x] `POST /flows/fulfillment/bulk { orderIds }` uses `addBulk` (row 55).
+- [x] Unit tests: flow-definition flags per variant asserted; bulk order preserved.
 
 #### Files to create / modify
 
@@ -413,3 +413,4 @@ main: `docs(plan): mark P5 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 5.1 ✅ 2026-07-09 fulfillment flow (fan-out/fan-in + nested invoice branch), node processors with FlowTrace, and the live tree endpoint via getProducer
+- 5.2 ✅ 2026-07-09 three failure-propagation variants (stuck pitfall, failParentOnFailure, ignoreDependencyOnFailure) with deterministic payment failure injection and the addBulk launcher
