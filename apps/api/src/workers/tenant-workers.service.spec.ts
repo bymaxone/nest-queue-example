@@ -24,6 +24,7 @@ interface RegisterConfig {
 interface Harness {
   service: TenantWorkersService
   register: jest.Mock
+  workerOn: jest.Mock
   unregister: jest.Mock
   enqueue: jest.Mock
   record: jest.Mock
@@ -33,7 +34,8 @@ interface Harness {
 
 /** Build the service over spied registry, queue service, and delivery store. */
 function build(registryQueues: string[] = [], recorded: TenantDelivery[] = []): Harness {
-  const register = jest.fn()
+  const workerOn = jest.fn()
+  const register = jest.fn(() => ({ on: workerOn }))
   const unregister = jest.fn<() => Promise<void>>().mockResolvedValue(undefined)
   const list = jest.fn(() => registryQueues)
   const enqueue = jest.fn<() => Promise<Job>>().mockResolvedValue({ id: 'job-1' } as Job)
@@ -45,6 +47,7 @@ function build(registryQueues: string[] = [], recorded: TenantDelivery[] = []): 
   return {
     service: new TenantWorkersService(registry, queueService, deliveries),
     register,
+    workerOn,
     unregister,
     enqueue,
     record,
@@ -80,6 +83,24 @@ describe('TenantWorkersService (unit)', () => {
 
     const config = harness.register.mock.calls[0]?.[0] as RegisterConfig
     expect(config.options.concurrency).toBe(2)
+  })
+
+  it('attaches an error listener to the registered worker so a connection blip never crashes the process', () => {
+    /*
+     * Scenario: registering a tenant worker.
+     * Rule it protects: a programmatically registered worker has no decorator-driven
+     * error binding, so the service attaches one explicitly; invoking it must not
+     * throw (BullMQ's EventEmitter throws on an unhandled "error" event).
+     */
+    const harness = build()
+
+    harness.service.register('t1', 'premium')
+
+    expect(harness.workerOn).toHaveBeenCalledWith('error', expect.any(Function))
+    const errorHandler = harness.workerOn.mock.calls[0]?.[1] as (error: Error) => void
+    expect(() => {
+      errorHandler(new Error('Connection is closed.'))
+    }).not.toThrow()
   })
 
   it('records a delivery when the worker handler runs', async () => {

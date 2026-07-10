@@ -10,7 +10,9 @@
     "start:dev": "nest build && node --env-file-if-exists=.env --watch dist/main.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs",
-    "test:cov": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs --coverage"
+    "test:cov": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' jest --config jest.config.cjs --coverage",
+    "pretest:e2e": "nest build && node scripts/prepare-sandboxed-artifact.mjs",
+    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' node scripts/run-e2e.mjs"
   },
   "dependencies": {
     "@bymax-one/nest-queue": "file:../../../nest-queue",

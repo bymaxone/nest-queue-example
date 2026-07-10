@@ -19,9 +19,9 @@ Tasks live **one file per phase** in this folder (`phase-NN-<slug>.md`). Each fi
 | P5    | [`phase-05-flows-schedulers-dynamic.md`](./phase-05-flows-schedulers-dynamic.md)       | 6 / 6       | ✅ Done        |
 | P6    | [`phase-06-metrics-errors-modes.md`](./phase-06-metrics-errors-modes.md)               | 5 / 5       | ✅ Done        |
 | P7    | [`phase-07-web-dashboard.md`](./phase-07-web-dashboard.md)                             | 6 / 6       | ✅ Done        |
-| P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 0 / 5       | 📋 ToDo        |
+| P8    | [`phase-08-testing.md`](./phase-08-testing.md)                                         | 5 / 5       | 👀 Review      |
 | P9    | [`phase-09-hardening-release-readiness.md`](./phase-09-hardening-release-readiness.md) | 0 / 5       | 📋 ToDo        |
-|       | **Total**                                                                              | **43 / 53** | 🔄 In Progress |
+|       | **Total**                                                                              | **48 / 53** | 🔄 In Progress |
 
 ## Status legend
 
