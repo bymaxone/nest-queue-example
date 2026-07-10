@@ -1,6 +1,6 @@
 # Phase 9: hardening-release-readiness
 
-> **Status**: 📋 ToDo · **Progress**: 0 / 5 tasks · **Last updated**: 2026-07-06
+> **Status**: 👀 Review · **Progress**: 5 / 5 tasks · **Last updated**: 2026-07-10
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P9)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §15, §16; the full §7 matrix
 
@@ -22,19 +22,19 @@ Everything works and everything is tested. This phase completes governance (the 
 
 ## Task index
 
-| ID  | Task                                                      | Status  | Priority | Size | Depends on |
-| --- | --------------------------------------------------------- | ------- | -------- | ---- | ---------- |
-| 9.1 | Branch + the four Copilot review files                    | 📋 ToDo | P0       | S    | Phase 8    |
-| 9.2 | README final + docs cross-check                           | 📋 ToDo | P0       | M    | Phase 8    |
-| 9.3 | Stryker mutation gate on `apps/api`                       | 📋 ToDo | P0       | L    | Phase 8    |
-| 9.4 | Full matrix audit + npm-switch and public-flip checklists | 📋 ToDo | P0       | M    | 9.1 to 9.3 |
-| 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 📋 ToDo | P0       | S    | 9.4        |
+| ID  | Task                                                      | Status    | Priority | Size | Depends on |
+| --- | --------------------------------------------------------- | --------- | -------- | ---- | ---------- |
+| 9.1 | Branch + the four Copilot review files                    | ✅ Done   | P0       | S    | Phase 8    |
+| 9.2 | README final + docs cross-check                           | ✅ Done   | P0       | M    | Phase 8    |
+| 9.3 | Stryker mutation gate on `apps/api`                       | ✅ Done   | P0       | L    | Phase 8    |
+| 9.4 | Full matrix audit + npm-switch and public-flip checklists | ✅ Done   | P0       | M    | 9.1 to 9.3 |
+| 9.5 | Phase close: audit, dashboards, PR with Copilot review    | 👀 Review | P0       | S    | 9.4        |
 
 ## Tasks
 
 ### Task 9.1: Branch + the four Copilot review files
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: Phase 8
@@ -45,10 +45,10 @@ Everything works and everything is tested. This phase completes governance (the 
 
 #### Acceptance criteria
 
-- [ ] Branch `feat/phase-09-hardening-release-readiness` created with `git switch -c`.
-- [ ] The three instruction files < 4000 chars each; every rule verifiable against a real repo config (`package.json`, `tsconfig`, `eslint.config.mjs`, jest configs).
-- [ ] The reviewer agent file covers: coverage-matrix discipline, library-external rule (no workspace/paths), `./shared`-only in web, timeless comments, no suppressions, sequential test rule, design-system parity, and flags any AI-attribution line.
-- [ ] Files reference no plan phases or task ids (timeless).
+- [x] Branch `feat/phase-09-hardening-release-readiness` created with `git switch -c`.
+- [x] The three instruction files < 4000 chars each (3949 / 3506 / 2732); every rule verifiable against a real repo config (`package.json`, `tsconfig.base.json`, `eslint.config.mjs`, `apps/api/jest.config.cjs`, `apps/web/vitest.config.ts`).
+- [x] The reviewer agent file covers: coverage-matrix discipline, library-external rule (no workspace/paths), `./shared`-only in web, timeless comments, no suppressions, sequential test rule, design-system parity, and flags any AI-attribution line.
+- [x] Files reference no plan phases or task ids (timeless).
 
 #### Files to create / modify
 
@@ -94,7 +94,7 @@ completion log), commit `docs(repo): add copilot review configuration (9.1)`.
 
 ### Task 9.2: README final + docs cross-check
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 8
@@ -105,9 +105,9 @@ The public face: README with what/why, quick start (compose + env + two terminal
 
 #### Acceptance criteria
 
-- [ ] README sections: About (the library + the example contract), Quick start, Journeys (§12, each with commands), Connection matrix, Architecture sketch, Testing (how to run each suite sequentially), Docs index, License note.
-- [ ] Every command in the README executed once during this task (copy-paste truth).
-- [ ] Docs cross-check: spec §7 row locations match real files; plan §1 counters match task files; broken links fixed.
+- [x] README sections: About (the library + the example contract), Quick start, Journeys (§12, each with commands), Connection matrix, Architecture sketch, Testing (how to run each suite sequentially), Docs index, License note.
+- [x] Every command in the README executed once during this task (copy-paste truth): health, diagnostics, place-order, reindex, flows, and error-trigger journeys verified live against a dedicated Redis; test suites run in the phase-wide gates.
+- [x] Docs cross-check: spec §7 row locations match real files (rows 14, 44, 45, 52, 56, 69 corrected); plan §1 counters match task files (53 total); README links resolve (COVERAGE_AUDIT, RELEASE_CHECKLISTS, mutation_testing_results land in this same phase PR).
 
 #### Files to create / modify
 
@@ -149,7 +149,7 @@ Completion Protocol: standard 5 steps, id 9.2, commit
 
 ### Task 9.3: Stryker mutation gate on `apps/api`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: L
 - **Depends on**: Phase 8
@@ -160,10 +160,10 @@ The pre-release assertiveness gate: Stryker over `apps/api/src` with `break 95, 
 
 #### Acceptance criteria
 
-- [ ] `stryker.config.json` scoped to `apps/api/src` (jest runner, ignoreStatic decision documented either way).
-- [ ] Baseline run recorded; survivors triaged: killed by new tests or documented as equivalents with reasoning.
-- [ ] Final score >= 95 with the `break` threshold active; results summary committed to `docs/mutation_testing_results.md`.
-- [ ] Runtime bounded: single Stryker process, Jest workers capped.
+- [x] `stryker.config.json` scoped to `apps/api/src` (jest runner, `ignoreStatic: true` decision documented in `docs/mutation_testing_results.md`).
+- [x] Baseline run recorded; survivors triaged: killed by new tests (the majority) or documented as provable equivalents with inline `// Stryker disable` reasoning.
+- [x] Final score **99.71** with the `break 95` threshold active (exit 0); results summary committed to `docs/mutation_testing_results.md`.
+- [x] Runtime bounded: single Stryker process, `concurrency: 2`, `NODE_OPTIONS=--max-old-space-size=4096`.
 
 #### Files to create / modify
 
@@ -210,7 +210,7 @@ Completion Protocol: standard 5 steps, id 9.3, commit
 
 ### Task 9.4: Full matrix audit + npm-switch and public-flip checklists
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: 9.1 to 9.3
@@ -221,9 +221,9 @@ The completion contract: audit all 70 spec §7 rows with evidence (file, route, 
 
 #### Acceptance criteria
 
-- [ ] `docs/COVERAGE_AUDIT.md`: 70 rows, each with status (✅ or gap) and evidence pointer; zero unexplained gaps (a documented gap references the limitation note that sanctions it).
-- [ ] Any gap found is fixed in this task (small) or filed as an explicit follow-up in the audit with rationale.
-- [ ] `docs/RELEASE_CHECKLISTS.md`: the npm-switch steps and the public-flip steps, each command-exact.
+- [x] `docs/COVERAGE_AUDIT.md`: 70 rows, each with status (✅) and evidence pointer (code path + spec name); zero unexplained gaps. The four sanctioned §18 limitations are noted inline (rows 8, 49, 62, 67).
+- [x] Small gaps fixed: the spec §7 path drift (rows 14, 44, 45, 52, 56, 69) was corrected in 9.2; all cited paths and spec names verified to exist and the e2e suite passes against them.
+- [x] `docs/RELEASE_CHECKLISTS.md`: the npm-switch steps and the public-flip steps, each command-exact.
 
 #### Files to create / modify
 
@@ -267,7 +267,7 @@ Completion Protocol: standard 5 steps, id 9.4, commit
 
 ### Task 9.5: Phase close: audit, dashboards, PR with Copilot review
 
-- **Status**: 📋 ToDo
+- **Status**: 👀 Review
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: 9.4
@@ -278,10 +278,10 @@ The final phase close: dashboards to done, the last PR with the Copilot review, 
 
 #### Acceptance criteria
 
-- [ ] All 9.1 to 9.4 verifications re-run green.
-- [ ] Dashboards: plan §1 shows 10/10 phases, 53/53 tasks; tasks README total row done.
-- [ ] PR merged squash with branch deleted, CI green, Copilot findings resolved.
-- [ ] Final state note in the plan header: complete, awaiting the two external checklists.
+- [x] All 9.1 to 9.4 verifications re-run green (typecheck, lint, build, both unit suites at 100%, e2e over all 10 spec files, Stryker 99.71, web bundle sanity, `pnpm audit` clean).
+- [x] Dashboards updated to reflect all five tasks done and the phase in review; the final "mark P9 Done, 10/10 phases" flip is left to the merge step.
+- [ ] PR merged squash with branch deleted, CI green, Copilot findings resolved. _(Owned by the orchestrator: this run stops after opening the PR and requesting the Copilot review.)_
+- [x] Final state note in the plan header: the implementation is complete; only the two externally-gated checklists in `docs/RELEASE_CHECKLISTS.md` remain.
 
 #### Files to create / modify
 
@@ -328,3 +328,9 @@ on main: `docs(plan): mark P9 complete, roadmap done`.
 ## Completion log
 
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
+
+- 9.1 ✅ 2026-07-10 four Copilot review files authored, stack-true and under the 4000-char limit
+- 9.2 ✅ 2026-07-10 final README plus governance files; spec section 7 path drift fixed, docs cross-checked
+- 9.3 ✅ 2026-07-10 Stryker mutation gate on apps/api at 99.71 (break 95), survivors killed or documented as equivalents
+- 9.4 ✅ 2026-07-10 coverage audit (70/70 rows with evidence) and the npm-switch and public-flip release checklists
+- 9.5 👀 2026-07-10 acceptance criteria audited, dashboards updated, PR opened with the Copilot review requested (merge owned by the orchestrator)

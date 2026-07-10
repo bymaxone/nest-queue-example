@@ -7,12 +7,14 @@
  * Mocks: EventFeed.push (spy); fake timers drive the sleep; Date#toISOString
  * pinned for a deterministic completion timestamp.
  */
+import 'reflect-metadata'
 import { jest } from '@jest/globals'
 import type { Job } from '@bymax-one/nest-queue'
 import type { EventFeed } from '../events/event-feed.service.js'
 import type { FeedEntry } from '../events/event-feed.types.js'
 import type { StallJobData, StallJobResult } from '../demos/demo-jobs.types.js'
 import { StallProcessor } from './stall.processor.js'
+import { readWorkerEventListeners } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with a spyable feed.
@@ -64,6 +66,20 @@ describe('StallProcessor (unit)', () => {
     expect(result).toEqual({ demoId: 'd1', completedAt: '2026-07-09T00:00:00.000Z' })
   })
 
+  it('wires each worker-event listener to its BullMQ event name', () => {
+    /*
+     * Scenario: the @OnWorkerEvent decorator arguments.
+     * Rule it protects: each listener subscribes to the exact event name (active,
+     * stalled, completed); a wrong or blank name would silently detach the listener
+     * so the recovery timeline never reaches the feed.
+     */
+    expect(readWorkerEventListeners(StallProcessor)).toEqual([
+      { eventName: 'active', methodKey: 'onActive' },
+      { eventName: 'stalled', methodKey: 'onStalled' },
+      { eventName: 'completed', methodKey: 'onCompleted' },
+    ])
+  })
+
   it('bridges an active event with the attempt count', () => {
     /*
      * Scenario: the job starts (or restarts) processing.
@@ -76,6 +92,7 @@ describe('StallProcessor (unit)', () => {
     processor.onActive(job)
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
     expect(entry.queue).toBe('demos')
     expect(entry.event).toBe('active')
     expect(entry.jobId).toBe('j1')
@@ -93,6 +110,7 @@ describe('StallProcessor (unit)', () => {
     processor.onStalled('j1')
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
     expect(entry.event).toBe('stalled')
     expect(entry.jobId).toBe('j1')
   })
@@ -109,6 +127,7 @@ describe('StallProcessor (unit)', () => {
     processor.onCompleted(job, { demoId: 'd1', completedAt: 'x' })
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('worker')
     expect(entry.event).toBe('completed')
     expect(entry.returnvalue).toEqual({ demoId: 'd1', completedAt: 'x' })
   })

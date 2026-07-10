@@ -10,7 +10,7 @@
  */
 import 'reflect-metadata'
 import { jest } from '@jest/globals'
-import type { Job, QueueService, WorkerOptions } from '@bymax-one/nest-queue'
+import type { Job, QueueService } from '@bymax-one/nest-queue'
 import type { AppEnv } from '../config/env.js'
 import type { EventFeed } from '../events/event-feed.service.js'
 import type { FeedEntry } from '../events/event-feed.types.js'
@@ -20,32 +20,7 @@ import type {
 } from '../orders/order-jobs.types.js'
 import { WebhookProcessor } from './webhook.processor.js'
 import type { WebhookLog } from './webhook-log.service.js'
-
-/** Narrow reflection metadata to the processor metadata carrying worker options. */
-function isProcessorMetadata(
-  value: unknown,
-): value is { queueName: string; workerOptions: WorkerOptions } {
-  return (
-    typeof value === 'object' && value !== null && 'queueName' in value && 'workerOptions' in value
-  )
-}
-
-/**
- * Read the worker options recorded by `@Processor` on a processor class. The
- * processor metadata object is the one carrying a `queueName`.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered worker options.
- */
-function readWorkerOptions(ctor: object): WorkerOptions {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (isProcessorMetadata(value)) {
-      return value.workerOptions
-    }
-  }
-  throw new Error('processor metadata not found')
-}
+import { readQueueEventListeners, readWorkerOptions } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with spyable collaborators and a fixed failure budget.
@@ -96,6 +71,20 @@ function jobAt(
 }
 
 describe('WebhookProcessor (unit)', () => {
+  it('wires each global queue-event listener to its BullMQ event name', () => {
+    /*
+     * Scenario: the @OnQueueEvent decorator arguments.
+     * Rule it protects: each global listener subscribes to the exact event name
+     * (completed, failed, active); a wrong or blank name would silently detach the
+     * cross-instance listener so its serialized entry never reaches the feed.
+     */
+    expect(readQueueEventListeners(WebhookProcessor)).toEqual([
+      { eventName: 'completed', methodKey: 'onGlobalCompleted' },
+      { eventName: 'failed', methodKey: 'onGlobalFailed' },
+      { eventName: 'active', methodKey: 'onGlobalActive' },
+    ])
+  })
+
   it('registers concurrency 5 and a 2-per-second limiter', () => {
     /*
      * Scenario: worker registration.
@@ -190,6 +179,7 @@ describe('WebhookProcessor (unit)', () => {
     processor.onGlobalFailed({ jobId: 'j2', failedReason: 'boom' })
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('global')
     expect(entry.event).toBe('failed')
     expect(entry.jobId).toBe('j2')
     expect(entry.failedReason).toBe('boom')
@@ -205,6 +195,7 @@ describe('WebhookProcessor (unit)', () => {
     processor.onGlobalActive({ jobId: 'j3' })
 
     const entry = pushedEntry(push)
+    expect(entry.source).toBe('global')
     expect(entry.event).toBe('active')
     expect(entry.jobId).toBe('j3')
   })

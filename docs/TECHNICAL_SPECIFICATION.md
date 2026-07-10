@@ -217,7 +217,7 @@ The contract of this repository. Every row must be traceable to working code, a 
 | #   | Library feature                                                 | Example scenario                                                              | Where it lives                 |
 | --- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | 13  | `enqueue<TData, TResult>` typed                                 | Order placement enqueues typed `send-receipt` email job                       | `orders/orders.service.ts`     |
-| 14  | Per-job `priority`                                              | Priority selector in Playground; VIP order emails jump the queue              | `admin/enqueue.controller.ts`  |
+| 14  | Per-job `priority`                                              | Priority selector in Playground; VIP order emails jump the queue              | `orders/orders.service.ts`     |
 | 15  | Per-job `delay`                                                 | Delayed reminder email (visible in `delayed` status)                          | Playground + `orders/`         |
 | 16  | `jobId` idempotent insert                                       | `welcome:{userId}`: second enqueue is a no-op; endpoint returns both attempts | `orders/onboarding.service.ts` |
 | 17  | Deduplication simple `{ id }`                                   | Search reindex per term while in-flight                                       | `search/reindex.service.ts`    |
@@ -245,24 +245,24 @@ The contract of this repository. Every row must be traceable to working code, a 
 
 ### 7.4 Workers, dispatch, events (lib §6)
 
-| #   | Library feature                                                | Example scenario                                                                                | Where it lives                         |
-| --- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------- |
-| 34  | `@Processor(queue, options)` + DI                              | `EmailProcessor` injects a mailer stub via constructor                                          | `processors/email.processor.ts`        |
-| 35  | `@Process('name')` specific dispatch                           | `send-welcome` vs `send-receipt` handlers                                                       | `processors/email.processor.ts`        |
-| 36  | `@Process()` fallback dispatch                                 | Unnamed handler catches every other email job                                                   | `processors/email.processor.ts`        |
-| 37  | Explicit `concurrency`                                         | Webhook worker at 5; visible interleaving in events feed                                        | `processors/webhook.processor.ts`      |
-| 38  | Missing concurrency warning + fallback                         | One deliberately unconfigured processor; warning asserted in unit test                          | `processors/audit.processor.ts`        |
-| 39  | `limiter { max, duration }`                                    | Webhook worker capped at 2/s; feed shows throttling                                             | `processors/webhook.processor.ts`      |
-| 40  | Retries + exponential backoff                                  | Failure-injection flag makes webhook fail N times then succeed; attempts timeline in UI         | `processors/webhook.processor.ts`      |
-| 41  | At-least-once idempotent handler pattern                       | Receipt handler uses an already-processed marker keyed by `job.id`                              | `processors/email.processor.ts`        |
-| 42  | `lockDuration` / `stalledInterval`                             | Long-running report with tuned lock; stalled demo endpoint kills mid-flight and shows recovery  | `processors/report.processor.ts`       |
-| 43  | `job.updateProgress` (number + object)                         | Report job emits 10..100 and `{ stage, pct }`                                                   | `processors/report.processor.ts`       |
-| 44  | `@OnWorkerEvent` (`completed`, `failed`, `progress`, `active`) | Bridged into the SSE feed with full `Job` fields                                                | `events/worker-events.listener.ts`     |
-| 45  | `@OnQueueEvent` (global, serialized) + lazy `QueueEvents`      | Cross-instance feed entries show `jobId` + string `returnvalue`; `getJob` fallback demonstrated | `events/queue-events.listener.ts`      |
-| 46  | `queue.duplicate_processor` guard                              | e2e registers a duplicate `@Processor` in an isolated app and expects the error                 | `test/registration.e2e-spec.ts`        |
-| 47  | `WorkerRegistry.register` (dynamic)                            | Per-tenant notification workers created from config at runtime                                  | `workers/tenant-workers.service.ts`    |
-| 48  | `WorkerRegistry.unregister` / `list`                           | Workers page lists + removes tenant workers                                                     | `workers/tenant-workers.controller.ts` |
-| 49  | `registerSandboxed` (+ `useWorkerThreads`)                     | CPU-bound invoice render in a standalone processor file                                         | `workers/invoice.sandboxed.ts`         |
+| #   | Library feature                                                | Example scenario                                                                                | Where it lives                                                   |
+| --- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 34  | `@Processor(queue, options)` + DI                              | `EmailProcessor` injects a mailer stub via constructor                                          | `processors/email.processor.ts`                                  |
+| 35  | `@Process('name')` specific dispatch                           | `send-welcome` vs `send-receipt` handlers                                                       | `processors/email.processor.ts`                                  |
+| 36  | `@Process()` fallback dispatch                                 | Unnamed handler catches every other email job                                                   | `processors/email.processor.ts`                                  |
+| 37  | Explicit `concurrency`                                         | Webhook worker at 5; visible interleaving in events feed                                        | `processors/webhook.processor.ts`                                |
+| 38  | Missing concurrency warning + fallback                         | One deliberately unconfigured processor; warning asserted in unit test                          | `processors/audit.processor.ts`                                  |
+| 39  | `limiter { max, duration }`                                    | Webhook worker capped at 2/s; feed shows throttling                                             | `processors/webhook.processor.ts`                                |
+| 40  | Retries + exponential backoff                                  | Failure-injection flag makes webhook fail N times then succeed; attempts timeline in UI         | `processors/webhook.processor.ts`                                |
+| 41  | At-least-once idempotent handler pattern                       | Receipt handler uses an already-processed marker keyed by `job.id`                              | `processors/email.processor.ts`                                  |
+| 42  | `lockDuration` / `stalledInterval`                             | Long-running report with tuned lock; stalled demo endpoint kills mid-flight and shows recovery  | `processors/report.processor.ts`                                 |
+| 43  | `job.updateProgress` (number + object)                         | Report job emits 10..100 and `{ stage, pct }`                                                   | `processors/report.processor.ts`                                 |
+| 44  | `@OnWorkerEvent` (`completed`, `failed`, `progress`, `active`) | Bridged into the SSE feed with full `Job` fields                                                | `processors/email.processor.ts`, `processors/stall.processor.ts` |
+| 45  | `@OnQueueEvent` (global, serialized) + lazy `QueueEvents`      | Cross-instance feed entries show `jobId` + string `returnvalue`; `getJob` fallback demonstrated | `processors/webhook.processor.ts`                                |
+| 46  | `queue.duplicate_processor` guard                              | e2e registers a duplicate `@Processor` in an isolated app and expects the error                 | `test/registration.e2e-spec.ts`                                  |
+| 47  | `WorkerRegistry.register` (dynamic)                            | Per-tenant notification workers created from config at runtime                                  | `workers/tenant-workers.service.ts`                              |
+| 48  | `WorkerRegistry.unregister` / `list`                           | Workers page lists + removes tenant workers                                                     | `workers/tenant-workers.controller.ts`                           |
+| 49  | `registerSandboxed` (+ `useWorkerThreads`)                     | CPU-bound invoice render in a standalone processor file                                         | `workers/invoice.sandboxed.ts`                                   |
 
 ### 7.5 Flows and schedulers (lib §7, §8)
 
@@ -270,11 +270,11 @@ The contract of this repository. Every row must be traceable to working code, a 
 | --- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------- |
 | 50  | `FlowService.add` (fan-out/fan-in)                    | Fulfillment flow: reserve-stock + charge-payment children, ship parent                 | `flows/fulfillment.service.ts`          |
 | 51  | Nested children                                       | Invoice branch with two data-fetch grandchildren                                       | `flows/fulfillment.service.ts`          |
-| 52  | `waiting-children` pitfall                            | Endpoint provokes a child failure WITHOUT `failParentOnFailure`; UI shows parent stuck | `flows/fulfillment.controller.ts`       |
+| 52  | `waiting-children` pitfall                            | Endpoint provokes a child failure WITHOUT `failParentOnFailure`; UI shows parent stuck | `flows/flows.controller.ts`             |
 | 53  | `failParentOnFailure: true`                           | Same flow with the flag: parent fails; UI contrast view                                | `flows/fulfillment.service.ts`          |
 | 54  | `ignoreDependencyOnFailure: true`                     | Optional-child variant proceeds despite failure                                        | `flows/fulfillment.service.ts`          |
 | 55  | `FlowService.addBulk`                                 | Batch of order flows in one roundtrip                                                  | `flows/fulfillment.service.ts`          |
-| 56  | `getProducer` escape hatch                            | Advanced endpoint reads the flow tree via producer                                     | `flows/fulfillment.controller.ts`       |
+| 56  | `getProducer` escape hatch                            | Advanced endpoint reads the flow tree via producer                                     | `flows/flows.controller.ts`             |
 | 57  | `upsertJobScheduler` cron 5-field + `tz`              | Nightly cleanup `0 3 * * *` America/Sao_Paulo                                          | `schedulers/boot-schedulers.service.ts` |
 | 58  | Cron 6-field (seconds)                                | Demo heartbeat `*/30 * * * * *`                                                        | `schedulers/boot-schedulers.service.ts` |
 | 59  | `every` + `offset` + `limit`                          | Metrics snapshot every 5m, phase-shifted, capped runs                                  | `schedulers/boot-schedulers.service.ts` |
@@ -292,7 +292,7 @@ The contract of this repository. Every row must be traceable to working code, a 
 | 66  | `QueueException` envelope                            | All error-explorer responses share `{ error: { code, message, details } }`                                      | `errors/` + web error explorer                                       |
 | 67  | Full `QUEUE_ERROR_CODES` catalog (12 codes)          | Error explorer triggers every reproducible code; the two connection-bootstrap codes are covered by e2e variants | `errors/error-explorer.controller.ts`, `test/connection.e2e-spec.ts` |
 | 68  | `telemetry` (bullmq-otel) opt-in                     | `QUEUE_OTEL=true` wires `BullMQOtel`; span presence asserted with an in-memory exporter                         | `config/telemetry.config.ts`                                         |
-| 69  | `./shared` zero-dependency subpath in the browser    | Web imports `JOB_STATUS`, `QUEUE_ERROR_CODES`, `QueueMetrics` types ONLY from `./shared`                        | `apps/web/lib/queue-shared.ts`                                       |
+| 69  | `./shared` zero-dependency subpath in the browser    | Web imports `JOB_STATUS`, `QUEUE_ERROR_CODES`, `QueueMetrics` types ONLY from `./shared`                        | `apps/web/lib/queue-shared-probe.ts`                                 |
 | 70  | Re-exported BullMQ types resolve                     | `Job`, `FlowJob`, `JobSchedulerJson` used in api typings via the library re-export                              | `apps/api/src/**`                                                    |
 
 ## 8. Library Consumption

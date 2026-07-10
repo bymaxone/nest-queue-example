@@ -207,9 +207,9 @@ describe('AdminQueuesService (unit)', () => {
 
     expect(thrown).toBeInstanceOf(QueueException)
     expect((thrown as QueueException).getStatus()).toBe(HttpStatus.NOT_FOUND)
-    expect(
-      ((thrown as QueueException).getResponse() as { error: { code: string } }).error.code,
-    ).toBe('queue.job_not_found')
+    expect((thrown as QueueException).getResponse()).toMatchObject({
+      error: { code: 'queue.job_not_found', details: { queue: EMAIL_QUEUE, jobId: 'missing' } },
+    })
   })
 
   it('delegates pause and resume to the library', async () => {

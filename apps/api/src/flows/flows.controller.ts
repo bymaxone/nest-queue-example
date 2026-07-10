@@ -102,6 +102,9 @@ export class FlowsController {
     const nodes = await this.fulfillment.runBulk(orderIds, variant)
     // Map over the input ids (not the nodes) so every root keeps its `string`
     // order id and pairs positionally with the node addBulk returned for it.
+    // Stryker disable next-line OptionalChaining: addBulk returns exactly one node per
+    // input id, so nodes[index] is always present; the `?.` satisfies the
+    // noUncheckedIndexedAccess type only and is never taken at runtime.
     const roots = orderIds.map((orderId, index) => ({ rootId: nodes[index]?.job.id, orderId }))
     return { roots, variant }
   }

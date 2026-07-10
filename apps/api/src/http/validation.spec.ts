@@ -83,6 +83,22 @@ describe('parseRequest (unit)', () => {
     expect(error).toBeInstanceOf(BadRequestException)
     const body = (error as BadRequestException).getResponse() as ErrorBody
     expect(body.error.code).toBe('validation_failed')
+    expect(body.error.message).toBe('Request validation failed')
     expect(body.error.details.issues[0]?.path).toBe('name')
+  })
+
+  it('joins a nested issue path with dots', () => {
+    /*
+     * Scenario: a validation failure two levels deep in a nested object.
+     * Rule it protects: multi-segment issue paths are joined with '.' (`address.zip`)
+     * so the client can locate the exact field; a blank separator would collapse the
+     * segments into an ambiguous key.
+     */
+    const nested = z.object({ address: z.object({ zip: z.string().min(1) }) })
+
+    const error = caught(() => parseRequest(nested, { address: { zip: '' } }))
+
+    const body = (error as BadRequestException).getResponse() as ErrorBody
+    expect(body.error.details.issues[0]?.path).toBe('address.zip')
   })
 })

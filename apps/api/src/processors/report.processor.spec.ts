@@ -10,34 +10,10 @@
  */
 import 'reflect-metadata'
 import { jest } from '@jest/globals'
-import type { Job, WorkerOptions } from '@bymax-one/nest-queue'
+import type { Job } from '@bymax-one/nest-queue'
 import type { ReportJobData, ReportJobResult } from '../reports/report-jobs.types.js'
 import { ReportProcessor } from './report.processor.js'
-
-/** Narrow reflection metadata to the processor metadata carrying worker options. */
-function isProcessorMetadata(
-  value: unknown,
-): value is { queueName: string; workerOptions: WorkerOptions } {
-  return (
-    typeof value === 'object' && value !== null && 'queueName' in value && 'workerOptions' in value
-  )
-}
-
-/**
- * Read the worker options recorded by `@Processor` on a processor class.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered worker options.
- */
-function readWorkerOptions(ctor: object): WorkerOptions {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (isProcessorMetadata(value)) {
-      return value.workerOptions
-    }
-  }
-  throw new Error('processor metadata not found')
-}
+import { readWorkerOptions } from '../testing/processor-metadata.js'
 
 describe('ReportProcessor (unit)', () => {
   afterEach(() => {
@@ -80,5 +56,8 @@ describe('ReportProcessor (unit)', () => {
     expect(result.reportId).toBe('r1')
     expect(typeof result.durationMs).toBe('number')
     expect(result.durationMs).toBeGreaterThanOrEqual(0)
+    // An elapsed span is far smaller than the wall clock; a mutated `+` would make it
+    // ~2x the epoch, so this pins the subtraction that computes the real duration.
+    expect(result.durationMs).toBeLessThan(Date.now())
   })
 })

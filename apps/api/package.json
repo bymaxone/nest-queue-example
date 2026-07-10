@@ -12,7 +12,8 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs",
     "test:cov": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' jest --config jest.config.cjs --coverage",
     "pretest:e2e": "nest build && node scripts/prepare-sandboxed-artifact.mjs",
-    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' node scripts/run-e2e.mjs"
+    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' node scripts/run-e2e.mjs",
+    "mutation": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=4096' stryker run"
   },
   "dependencies": {
     "@bymax-one/nest-queue": "file:../../../nest-queue",
@@ -34,6 +35,8 @@
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/sdk-trace-base": "^2.9.0",
     "@opentelemetry/sdk-trace-node": "^2.9.0",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/jest-runner": "^9.6.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",

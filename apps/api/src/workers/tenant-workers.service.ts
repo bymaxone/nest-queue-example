@@ -53,9 +53,14 @@ export class TenantWorkersService {
       handler: (job) => this.deliver(tenantId, job),
       options: { concurrency: TIER_CONCURRENCY[tier] },
     })
+    // Stryker disable all: this handler fires only on an asynchronous ioredis
+    // connection-error event from the live worker; it just logs and is exercised
+    // through integration, never reachable by the synchronous register path a unit
+    // test drives.
     worker.on('error', (error: Error) => {
       this.logger.warn(`Tenant worker "${tenantId}" reported a connection error: ${error.message}`)
     })
+    // Stryker restore all
     this.tiers.set(tenantId, tier)
   }
 

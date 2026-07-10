@@ -68,6 +68,9 @@ export class EmailProcessor {
    */
   @Process(RECEIPT_JOB)
   sendReceipt(job: Job<ReceiptEmailJobData, ReceiptEmailJobResult>): ReceiptEmailJobResult {
+    // Stryker disable next-line ConditionalExpression: guarding the lookup only avoids
+    // a Map.get(undefined) call; that call returns undefined for the same reason the
+    // guard does (no marker is ever stored under an undefined key), so both are equal.
     const marker = job.id === undefined ? undefined : this.processedReceipts.get(job.id)
     if (marker !== undefined) {
       return marker
@@ -175,6 +178,10 @@ export class EmailProcessor {
    * @param result - The result to memoize for a redelivery of the same id.
    */
   private rememberReceipt(jobId: string | undefined, result: ReceiptEmailJobResult): void {
+    // Stryker disable next-line ConditionalExpression,BlockStatement: skipping the
+    // store for an undefined id only avoids a marker under an undefined key that
+    // sendReceipt never reads back (it short-circuits on an undefined id), so storing
+    // it anyway is unobservable.
     if (jobId === undefined) {
       return
     }

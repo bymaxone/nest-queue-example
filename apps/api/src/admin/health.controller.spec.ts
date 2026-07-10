@@ -60,6 +60,24 @@ describe('HealthController (unit)', () => {
     expect(get).toHaveBeenCalledWith('audit')
   })
 
+  it('clears the readiness timeout guard on the success path', async () => {
+    /*
+     * Scenario: a fast successful probe under fake timers.
+     * Rule it protects: the finally clears the timeout guard, so no setTimeout handle
+     * is left pending; an emptied finally would leak the timer indefinitely.
+     */
+    const { controller, get, getAll } = setup()
+    get.mockResolvedValue(snapshot('audit', 0))
+    getAll.mockResolvedValue([])
+    jest.useFakeTimers()
+    try {
+      await controller.ready()
+      expect(jest.getTimerCount()).toBe(0)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   it('returns 503 with a non-secret reason when the probe rejects', async () => {
     /*
      * Scenario: Redis is unreachable and the cached probe throws.
@@ -69,7 +87,15 @@ describe('HealthController (unit)', () => {
     const { controller, get } = setup()
     get.mockRejectedValue(new Error('connect ECONNREFUSED redis://user:secret@host:6379'))
 
-    await expect(controller.ready()).rejects.toBeInstanceOf(ServiceUnavailableException)
+    const error = await controller.ready().catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(ServiceUnavailableException)
+    // The 503 body carries a fixed down/redis_unreachable pair and never the raw
+    // error, so a blanked body or reason would either leak the connection string or
+    // strip the actionable status.
+    expect((error as ServiceUnavailableException).getResponse()).toEqual({
+      status: 'down',
+      reason: 'redis_unreachable',
+    })
   })
 
   it('returns 503 when the cached probe exceeds the timeout budget', async () => {

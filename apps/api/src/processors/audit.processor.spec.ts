@@ -11,41 +11,12 @@
 import 'reflect-metadata'
 import { jest } from '@jest/globals'
 import { DEFAULT_WORKER_CONCURRENCY } from '@bymax-one/nest-queue'
-import type { Job, WorkerOptions } from '@bymax-one/nest-queue'
+import type { Job } from '@bymax-one/nest-queue'
 import { AuditProcessor } from './audit.processor.js'
 import type { AuditTrail } from './audit-trail.service.js'
 import type { AuditJobData } from './audit.types.js'
 import { WebhookProcessor } from './webhook.processor.js'
-
-/** The processor metadata the `@Processor` decorator attaches to a class. */
-interface ProcessorMetadata {
-  queueName: string
-  workerOptions: WorkerOptions
-  _warnedNoConcurrency?: boolean
-}
-
-/** Narrow reflection metadata to the processor metadata carrying a queue name. */
-function isProcessorMetadata(value: unknown): value is ProcessorMetadata {
-  return (
-    typeof value === 'object' && value !== null && 'queueName' in value && 'workerOptions' in value
-  )
-}
-
-/**
- * Read the processor metadata recorded by `@Processor` on a processor class.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered processor metadata.
- */
-function readProcessorMetadata(ctor: object): ProcessorMetadata {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (isProcessorMetadata(value)) {
-      return value
-    }
-  }
-  throw new Error('processor metadata not found')
-}
+import { readProcessorMetadata } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with a spyable trail.

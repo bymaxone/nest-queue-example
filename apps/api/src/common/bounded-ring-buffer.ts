@@ -24,6 +24,10 @@ export class BoundedRingBuffer<T> {
    * @param item - The entry to append.
    */
   push(item: T): void {
+    // Stryker disable next-line ConditionalExpression,BlockStatement: seeding via
+    // push (head fixed at 0) and via the overwrite path (head advancing) produce an
+    // identical `items` array and identical snapshots, because head returns to 0
+    // exactly when the buffer fills; the two seeding paths are observationally equal.
     if (this.items.length < this.capacity) {
       this.items.push(item)
       return
@@ -38,6 +42,9 @@ export class BoundedRingBuffer<T> {
    * @returns A copy of the current entries; mutating it never affects the buffer.
    */
   snapshot(): readonly T[] {
+    // Stryker disable next-line ConditionalExpression,BlockStatement: while the buffer
+    // is not full head is always 0, so the wrap path below reduces to a plain copy;
+    // taking it early is equivalent to the fast path.
     if (this.items.length < this.capacity) {
       return [...this.items]
     }
