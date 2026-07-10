@@ -19,6 +19,7 @@ import { ReportsModule } from './reports/reports.module.js'
 import { SchedulersModule } from './schedulers/schedulers.module.js'
 import { SearchModule } from './search/search.module.js'
 import { SmokeModule } from './smoke/smoke.module.js'
+import { WorkersModule } from './workers/workers.module.js'
 
 /** Root module wiring configuration and the globally-registered queue library. */
 @Module({
@@ -37,6 +38,7 @@ import { SmokeModule } from './smoke/smoke.module.js'
     SearchModule,
     FlowsModule,
     SchedulersModule,
+    WorkersModule,
     AdminModule,
   ],
 })

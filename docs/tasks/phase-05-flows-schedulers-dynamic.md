@@ -1,6 +1,6 @@
 # Phase 5: flows-schedulers-dynamic
 
-> **Status**: 🔄 In Progress · **Progress**: 3 / 6 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 4 / 6 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P5)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.4 rows 47 to 49, §7.5; matrix rows 47 to 62
 
@@ -27,7 +27,7 @@ The consumer side works job by job. This phase covers structured work: BullMQ Fl
 | 5.1 | Branch + fulfillment flow (fan-out/fan-in, nested) + tree endpoint | ✅ Done | P0       | M    | Phase 4       |
 | 5.2 | Failure-propagation variants + `addBulk`                           | ✅ Done | P0       | M    | 5.1           |
 | 5.3 | Boot schedulers + management endpoints + validation errors         | ✅ Done | P0       | M    | Phase 4       |
-| 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | 📋 ToDo | P0       | S    | Phase 4       |
+| 5.4 | Dynamic per-tenant workers via `WorkerRegistry`                    | ✅ Done | P0       | S    | Phase 4       |
 | 5.5 | Sandboxed invoice processor (`registerSandboxed`)                  | 📋 ToDo | P0       | M    | 5.4           |
 | 5.6 | Phase close: audit, dashboards, PR with Copilot review             | 📋 ToDo | P0       | S    | 5.2, 5.3, 5.5 |
 
@@ -228,7 +228,7 @@ Completion Protocol: standard 5 steps, id 5.3, commit
 
 ### Task 5.4: Dynamic per-tenant workers via `WorkerRegistry`
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: S
 - **Depends on**: Phase 4
@@ -239,10 +239,10 @@ Rows 47, 48: runtime worker management. `POST /workers/tenants { tenantId, tier 
 
 #### Acceptance criteria
 
-- [ ] `workers/tenant-workers.service.ts` wraps `WorkerRegistry.register` with the tenant handler (records deliveries per tenant) and tier-mapped concurrency.
-- [ ] `POST /workers/tenants`, `DELETE /workers/tenants/:tenantId`, `GET /workers/tenants` (from `list()`), plus `POST /workers/tenants/:tenantId/notify` enqueuing into the tenant queue to prove the dynamic worker consumes.
-- [ ] Unregistering stops consumption (subsequent enqueues wait; asserted in test with a re-register draining them).
-- [ ] Unit tests: registration config mapping, unregister path, list projection.
+- [x] `workers/tenant-workers.service.ts` wraps `WorkerRegistry.register` with the tenant handler (records deliveries per tenant) and tier-mapped concurrency.
+- [x] `POST /workers/tenants`, `DELETE /workers/tenants/:tenantId`, `GET /workers/tenants` (from `list()`), plus `POST /workers/tenants/:tenantId/notify` enqueuing into the tenant queue to prove the dynamic worker consumes.
+- [x] Unregistering stops consumption (subsequent enqueues wait; asserted in test with a re-register draining them).
+- [x] Unit tests: registration config mapping, unregister path, list projection.
 
 #### Files to create / modify
 
@@ -415,3 +415,4 @@ main: `docs(plan): mark P5 complete`.
 - 5.1 ✅ 2026-07-09 fulfillment flow (fan-out/fan-in + nested invoice branch), node processors with FlowTrace, and the live tree endpoint via getProducer
 - 5.2 ✅ 2026-07-09 three failure-propagation variants (stuck pitfall, failParentOnFailure, ignoreDependencyOnFailure) with deterministic payment failure injection and the addBulk launcher
 - 5.3 ✅ 2026-07-09 boot-registered job schedulers (5-field cron+tz, 6-field seconds, every+offset+limit) with idempotent reboot, management endpoints, tick clock, and the four invalid_repeat_options validation triggers
+- 5.4 ✅ 2026-07-09 dynamic per-tenant workers via WorkerRegistry (tier-mapped concurrency, tenant-scoped queue names, delivery trail, register/unregister/list/notify endpoints)
