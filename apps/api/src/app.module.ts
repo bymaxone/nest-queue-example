@@ -11,6 +11,7 @@ import { APP_ENV } from './config/env.js'
 import { buildQueueOptions } from './config/queue.config.js'
 import { AdminModule } from './admin/admin.module.js'
 import { DemosModule } from './demos/demos.module.js'
+import { ErrorsModule } from './errors/errors.module.js'
 import { EventsModule } from './events/events.module.js'
 import { FlowsModule } from './flows/flows.module.js'
 import { OrdersModule } from './orders/orders.module.js'
@@ -40,6 +41,7 @@ import { WorkersModule } from './workers/workers.module.js'
     SchedulersModule,
     WorkersModule,
     AdminModule,
+    ErrorsModule,
   ],
 })
 export class AppModule {}

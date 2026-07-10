@@ -1,6 +1,6 @@
 # Phase 6: metrics-errors-modes
 
-> **Status**: 🔄 In Progress · **Progress**: 1 / 5 tasks · **Last updated**: 2026-07-09
+> **Status**: 🔄 In Progress · **Progress**: 2 / 5 tasks · **Last updated**: 2026-07-09
 > **Source roadmap**: [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) §5 (P6)
 > **Source spec**: [`../TECHNICAL_SPECIFICATION.md`](../TECHNICAL_SPECIFICATION.md) §7.1, §7.3, §7.6; matrix rows 7, 8, 9, 28 to 30, 33, 66, 67, 68
 
@@ -25,7 +25,7 @@ Every feature area now works on the default configuration. This phase completes 
 | ID  | Task                                                                   | Status  | Priority | Size | Depends on |
 | --- | ---------------------------------------------------------------------- | ------- | -------- | ---- | ---------- |
 | 6.1 | Branch + `MetricsService` surface + readiness composition              | ✅ Done | P0       | S    | Phase 5    |
-| 6.2 | Error explorer: the full reproducible catalog                          | 📋 ToDo | P0       | M    | Phase 5    |
+| 6.2 | Error explorer: the full reproducible catalog                          | ✅ Done | P0       | M    | Phase 5    |
 | 6.3 | Mode A shared client + options-style Mode B + retry-policy diagnostics | 📋 ToDo | P0       | M    | Phase 5    |
 | 6.4 | Optional telemetry (`bullmq-otel`) behind `QUEUE_OTEL`                 | 📋 ToDo | P1       | S    | 6.3        |
 | 6.5 | Phase close: audit, dashboards, PR with Copilot review                 | 📋 ToDo | P0       | S    | 6.2 to 6.4 |
@@ -91,7 +91,7 @@ completion log), commit `feat(api): cached metrics surface and readiness composi
 
 ### Task 6.2: Error explorer: the full reproducible catalog
 
-- **Status**: 📋 ToDo
+- **Status**: ✅ Done
 - **Priority**: P0
 - **Size**: M
 - **Depends on**: Phase 5
@@ -102,10 +102,12 @@ Rows 66, 67: `POST /errors/trigger/:code` provokes every catalog code reproducib
 
 #### Acceptance criteria
 
-- [ ] `GET /errors/catalog` returns the full `QUEUE_ERROR_CODES` map with HTTP statuses and a `reproducibleHere: boolean` flag per code.
-- [ ] `POST /errors/trigger/:code` supports every `reproducibleHere` code by invoking the real failing operation; responses carry the stable envelope with correct HTTP status.
-- [ ] `duplicate_processor` and `invalid_options` triggers compile a throwaway Nest module in-process (isolated `Test.createTestingModule`-style bootstrap inside the service) so the main app stays healthy.
-- [ ] Unit tests: every trigger path asserts `error.code`, HTTP status, and envelope shape.
+- [x] `GET /errors/catalog` returns the full `QUEUE_ERROR_CODES` map with HTTP statuses and a `reproducibleHere: boolean` flag per code.
+- [x] `POST /errors/trigger/:code` supports every `reproducibleHere` code by invoking the real failing operation; responses carry the stable envelope with correct HTTP status.
+- [x] `duplicate_processor` compiles a throwaway module in-process (an isolated `NestFactory.createApplicationContext`, torn down after) and `invalid_options` compiles throwaway module options (`forRoot`, which validates synchronously) so the main app stays healthy.
+- [x] Unit tests: every trigger path asserts `error.code`, HTTP status, and envelope shape.
+
+> Reconciliation: the shipped `QUEUE_ERROR_CODES` has **14** members (the spec §12.3 sketch listed 12; the library added `flow_disabled` / `metrics_disabled`), so the catalog lists 14 with 7 reproducible. `queue_not_found`, `job_not_found`, and `invalid_job_data` are **consumer-raised** (the library never throws them: `getJob` returns null and schema validation is the consumer's), triggered through the app's real guards. `duplicate_processor` uses `createApplicationContext` + a double `WorkerRegistry.register` (leak-free: the context is always closed) rather than two `@Processor` classes, which would leak the first probe worker's Redis connection when init rejects. `invalid_options` is provoked via `forRoot`'s synchronous `validateOptions`.
 
 #### Files to create / modify
 
@@ -347,3 +349,4 @@ main: `docs(plan): mark P6 complete`.
 <!-- append-only: - <id> ✅ <YYYY-MM-DD> <one-line summary> -->
 
 - 6.1 ✅ 2026-07-09 Cached metrics controller (getAll / get / invalidate) with allow-list guard; `/health/ready` recomposed on MetricsService (cached reachability probe + active-count aggregate); shared `assertKnownQueue` guard extracted.
+- 6.2 ✅ 2026-07-09 Error explorer: `GET /errors/catalog` (14 codes, 7 reproducible, statuses + origin + coverage) and `POST /errors/trigger/:code` provoking every reproducible code via real operations (consumer guards, `forRoot` validation, oversized bulk, upsertJobScheduler x4 variants, leak-free isolated duplicate-processor probe); library envelope propagates untouched.
