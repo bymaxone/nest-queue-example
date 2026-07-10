@@ -10,7 +10,7 @@
  */
 import 'reflect-metadata'
 import { jest } from '@jest/globals'
-import type { Job, QueueService, WorkerOptions } from '@bymax-one/nest-queue'
+import type { Job, QueueService } from '@bymax-one/nest-queue'
 import type { AppEnv } from '../config/env.js'
 import type { EventFeed } from '../events/event-feed.service.js'
 import type { FeedEntry } from '../events/event-feed.types.js'
@@ -20,59 +20,7 @@ import type {
 } from '../orders/order-jobs.types.js'
 import { WebhookProcessor } from './webhook.processor.js'
 import type { WebhookLog } from './webhook-log.service.js'
-
-/** Narrow reflection metadata to the processor metadata carrying worker options. */
-function isProcessorMetadata(
-  value: unknown,
-): value is { queueName: string; workerOptions: WorkerOptions } {
-  return (
-    typeof value === 'object' && value !== null && 'queueName' in value && 'workerOptions' in value
-  )
-}
-
-/**
- * Read the worker options recorded by `@Processor` on a processor class. The
- * processor metadata object is the one carrying a `queueName`.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered worker options.
- */
-function readWorkerOptions(ctor: object): WorkerOptions {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (isProcessorMetadata(value)) {
-      return value.workerOptions
-    }
-  }
-  throw new Error('processor metadata not found')
-}
-
-/**
- * Read the queue-event-listener metadata (`eventName` + `methodKey`) attached by
- * the library's `@OnQueueEvent` decorators. This surfaces the decorator's event
- * name, which a direct method call cannot observe.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered `{ eventName, methodKey }` entries.
- */
-function readQueueEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (
-      Array.isArray(value) &&
-      value.every(
-        (entry) =>
-          typeof entry === 'object' &&
-          entry !== null &&
-          'eventName' in entry &&
-          'methodKey' in entry,
-      )
-    ) {
-      return value as { eventName: string; methodKey: string }[]
-    }
-  }
-  return []
-}
+import { readQueueEventListeners, readWorkerOptions } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with spyable collaborators and a fixed failure budget.

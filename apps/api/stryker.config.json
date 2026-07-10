@@ -18,7 +18,8 @@
     "!src/**/*.types.ts",
     "!src/**/*.d.ts",
     "!src/**/index.ts",
-    "!src/main.ts"
+    "!src/main.ts",
+    "!src/**/testing/**"
   ],
   "thresholds": { "high": 99, "low": 95, "break": 95 },
   "concurrency": 2,

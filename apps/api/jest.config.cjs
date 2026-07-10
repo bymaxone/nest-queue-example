@@ -40,7 +40,8 @@ module.exports = {
   },
   // Coverage scope: executable source under `src`, minus non-executable glue —
   // framework modules (DI wiring), the bootstrap entrypoint, type-only files,
-  // and barrels. The exclusions keep the 100% gate meaningful rather than gamed.
+  // barrels, and test-only helpers. The exclusions keep the 100% gate meaningful
+  // rather than gamed.
   collectCoverageFrom: [
     '**/*.ts',
     '!**/*.spec.ts',
@@ -49,6 +50,7 @@ module.exports = {
     '!**/*.types.ts',
     '!**/*.d.ts',
     '!**/index.ts',
+    '!**/testing/**',
   ],
   coverageThreshold: {
     global: { branches: 100, functions: 100, lines: 100, statements: 100 },

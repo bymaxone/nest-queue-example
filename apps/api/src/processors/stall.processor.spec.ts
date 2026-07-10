@@ -14,33 +14,7 @@ import type { EventFeed } from '../events/event-feed.service.js'
 import type { FeedEntry } from '../events/event-feed.types.js'
 import type { StallJobData, StallJobResult } from '../demos/demo-jobs.types.js'
 import { StallProcessor } from './stall.processor.js'
-
-/**
- * Read the worker-event-listener metadata (`eventName` + `methodKey`) attached to
- * a processor class by the library's `@OnWorkerEvent` decorators. This surfaces the
- * decorator's event-name argument, which a direct method call cannot observe.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered `{ eventName, methodKey }` entries.
- */
-function readWorkerEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (
-      Array.isArray(value) &&
-      value.every(
-        (entry) =>
-          typeof entry === 'object' &&
-          entry !== null &&
-          'eventName' in entry &&
-          'methodKey' in entry,
-      )
-    ) {
-      return value as { eventName: string; methodKey: string }[]
-    }
-  }
-  return []
-}
+import { readWorkerEventListeners } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with a spyable feed.

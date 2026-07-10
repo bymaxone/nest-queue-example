@@ -20,63 +20,7 @@ import type {
   ReceiptEmailJobResult,
   WelcomeEmailJobData,
 } from '../orders/order-jobs.types.js'
-
-/** A discovered process-handler metadata entry. */
-interface ProcessHandlerEntry {
-  jobName?: string
-  methodKey: string
-}
-
-/**
- * Read the `@Process` handler metadata attached to a processor class. Process
- * entries carry a `methodKey` and no `eventName`, which distinguishes them from
- * event-listener metadata attached to the same class.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered process-handler entries.
- */
-function readProcessHandlers(ctor: object): ProcessHandlerEntry[] {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (
-      Array.isArray(value) &&
-      value.every((entry) => isRecord(entry) && 'methodKey' in entry && !('eventName' in entry))
-    ) {
-      return value as ProcessHandlerEntry[]
-    }
-  }
-  return []
-}
-
-/** Narrow an unknown value to a plain record. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-/** Narrow an unknown value to a worker-event-listener metadata entry. */
-function isWorkerEventEntry(entry: unknown): entry is { eventName: string; methodKey: string } {
-  return (
-    isRecord(entry) && typeof entry.eventName === 'string' && typeof entry.methodKey === 'string'
-  )
-}
-
-/**
- * Read the worker-event-listener metadata (`eventName` + `methodKey`) attached by
- * the library's `@OnWorkerEvent` decorators. This surfaces each decorator's event
- * name, which a direct method call cannot observe.
- *
- * @param ctor - The processor class constructor.
- * @returns The registered `{ eventName, methodKey }` entries.
- */
-function readWorkerEventListeners(ctor: object): { eventName: string; methodKey: string }[] {
-  for (const key of Reflect.getOwnMetadataKeys(ctor)) {
-    const value: unknown = Reflect.getOwnMetadata(key, ctor)
-    if (Array.isArray(value) && value.every(isWorkerEventEntry)) {
-      return value
-    }
-  }
-  return []
-}
+import { readProcessHandlers, readWorkerEventListeners } from '../testing/processor-metadata.js'
 
 /**
  * Build the processor with spyable collaborators.
