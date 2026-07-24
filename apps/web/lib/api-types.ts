@@ -225,14 +225,50 @@ export interface ReindexResult {
   deduplicated: boolean
 }
 
+/** Mirrors `apps/api/src/reports/reports.controller.ts` `ReportRequested`. */
+export interface ReportRequested {
+  reportId: string
+  jobId: string | undefined
+}
+
+/** Mirrors `apps/api/src/demos/demos.controller.ts` `StallRequested`. */
+export interface StallRequested {
+  demoId: string
+  jobId: string | undefined
+}
+
+/** Mirrors `apps/api/src/admin/dedup.controller.ts` view response. */
+export interface DedupKeyView {
+  jobId: string | null
+}
+
+/** Mirrors `apps/api/src/admin/dedup.controller.ts` clear response. */
+export interface DedupKeyCleared {
+  removed: boolean
+}
+
 /** Mirrors `apps/api/src/orders/onboarding.service.ts` `OnboardingResult`. */
 export interface OnboardingResult {
   created: boolean
   jobId: string
 }
 
-/** The six queues the admin/metrics surface manages (mirrors `queue-names.ts`). */
-export const KNOWN_QUEUES = ['email', 'search', 'audit', 'webhooks', 'reports', 'demos'] as const
+/** Every boot-registered queue the admin/metrics surface manages (mirrors `queue-names.ts`). */
+export const KNOWN_QUEUES = [
+  'email',
+  'search',
+  'audit',
+  'webhooks',
+  'reports',
+  'demos',
+  'maintenance',
+  'monitoring',
+  'fulfillment',
+  'stock',
+  'payments',
+  'invoices-data',
+  'invoices',
+] as const
 
 /** A queue name managed by the admin surface. */
 export type KnownQueue = (typeof KNOWN_QUEUES)[number]

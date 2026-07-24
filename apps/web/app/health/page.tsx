@@ -7,10 +7,12 @@
 
 'use client'
 
+import { toast } from 'sonner'
 import { AppShell } from '@/components/layout/AppShell'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDiagnostics, useLiveness, useReadiness } from '@/hooks/use-health-page'
-import { useMetrics } from '@/hooks/use-metrics'
+import { useInvalidateMetrics, useMetrics } from '@/hooks/use-metrics'
 import { METRICS_POLL_INTERVAL_MS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import type { DiagnosticsSnapshot, ReadinessStatus } from '@/lib/api-types'
@@ -50,10 +52,22 @@ function FreshnessMeter() {
 
 /** Freshness meter plus the aggregate active-job count from the readiness probe. */
 function FreshnessCard({ ready }: { ready: ReadinessStatus | undefined }) {
+  const invalidate = useInvalidateMetrics()
+
+  function invalidateAll(): void {
+    invalidate.mutate(undefined, {
+      onSuccess: () => toast.success('Metrics cache invalidated - next read collects fresh counts'),
+      onError: (error) => toast.error(error.message),
+    })
+  }
+
   return (
     <Card className="mb-4">
-      <CardHeader accent>
+      <CardHeader accent className="flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">Metrics cache freshness</CardTitle>
+        <Button variant="outline" size="sm" onClick={invalidateAll} disabled={invalidate.isPending}>
+          Invalidate cache
+        </Button>
       </CardHeader>
       <CardContent>
         <FreshnessMeter />

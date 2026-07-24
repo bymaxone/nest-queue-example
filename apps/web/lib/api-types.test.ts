@@ -24,10 +24,24 @@ describe('DEDUP_MODES', () => {
 })
 
 describe('KNOWN_QUEUES', () => {
-  it('mirrors the six queues the admin surface manages', () => {
+  it('mirrors every boot-registered queue the admin surface manages', () => {
     // Scenario: the playground and queue pickers must offer exactly the
-    // queues the API allow-lists.
-    expect(KNOWN_QUEUES).toEqual(['email', 'search', 'audit', 'webhooks', 'reports', 'demos'])
+    // queues the API allow-lists (dynamic tenant queues stay excluded).
+    expect(KNOWN_QUEUES).toEqual([
+      'email',
+      'search',
+      'audit',
+      'webhooks',
+      'reports',
+      'demos',
+      'maintenance',
+      'monitoring',
+      'fulfillment',
+      'stock',
+      'payments',
+      'invoices-data',
+      'invoices',
+    ])
   })
 })
 

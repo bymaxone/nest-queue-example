@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useMetrics, METRICS_QUERY_KEY } from './use-metrics'
+import { useMetrics, useInvalidateMetrics, METRICS_QUERY_KEY } from './use-metrics'
 
-vi.mock('@/lib/api-client', () => ({ apiGet: vi.fn() }))
-import { apiGet } from '@/lib/api-client'
+vi.mock('@/lib/api-client', () => ({ apiGet: vi.fn(), apiPost: vi.fn() }))
+import { apiGet, apiPost } from '@/lib/api-client'
 
 function wrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -61,5 +61,39 @@ describe('useMetrics', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
+  })
+})
+
+describe('useInvalidateMetrics', () => {
+  const mockPost = vi.mocked(apiPost)
+
+  beforeEach(() => {
+    mockPost.mockReset()
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('clears the whole cache with an empty body when no queue is given', async () => {
+    // Scenario: the Health page's Invalidate button drops every cache entry.
+    mockPost.mockResolvedValueOnce({ all: true, queue: null })
+    const { result } = renderHook(() => useInvalidateMetrics(), { wrapper: wrapper() })
+    result.current.mutate(undefined)
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/admin/metrics/invalidate', {})
+  })
+
+  it('scopes the invalidation to one queue when a name is passed', async () => {
+    // Scenario: a queue-scoped drop must forward the name in the body.
+    mockPost.mockResolvedValueOnce({ all: false, queue: 'email' })
+    const { result } = renderHook(() => useInvalidateMetrics(), { wrapper: wrapper() })
+    result.current.mutate('email')
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/admin/metrics/invalidate', { queue: 'email' })
   })
 })

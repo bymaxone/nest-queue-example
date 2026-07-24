@@ -8,6 +8,7 @@
 
 'use client'
 
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -66,19 +67,22 @@ function toastOutcome(onSuccess: string): {
 /** Destructive clean action behind a confirm dialog with a status picker. */
 function CleanDialog({ name, clean }: { name: string; clean: QueueActions['clean'] }) {
   const [cleanStatus, setCleanStatus] = useState<CleanStatus>('completed')
+  const [open, setOpen] = useState(false)
 
   function runClean(): void {
     clean.mutate(cleanStatus, {
-      onSuccess: (result) =>
+      onSuccess: (result) => {
+        setOpen(false)
         toast.success(`Removed ${String(result.removed.length)} job(s)`, {
           description: result.removed.join(', ') || 'none matched',
-        }),
+        })
+      },
       onError: (error) => toast.error(error.message),
     })
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="destructive" size="sm">
           Clean
@@ -121,7 +125,7 @@ function CleanDialog({ name, clean }: { name: string; clean: QueueActions['clean
 /** Pause/resume buttons plus the destructive clean action. */
 function QueueActionsBar({ name, pause, resume, clean }: { name: string } & QueueActions) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <Button
         variant="outline"
         size="sm"
@@ -146,12 +150,14 @@ function QueueActionsBar({ name, pause, resume, clean }: { name: string } & Queu
 }
 
 /**
- * Renders the jobs table body for a page, or an empty-state row.
+ * Renders the jobs table body for a page, or an empty-state row. Each job id
+ * links into the job detail page (`/jobs/[queue]/[id]`).
  *
+ * @param queue - The queue the jobs belong to.
  * @param jobs - The current page of jobs.
  * @returns The table rows.
  */
-function JobRows({ jobs }: { jobs: JobView[] }) {
+function JobRows({ queue, jobs }: { queue: string; jobs: JobView[] }) {
   if (jobs.length === 0) {
     return (
       <TableRow>
@@ -165,7 +171,18 @@ function JobRows({ jobs }: { jobs: JobView[] }) {
     <>
       {jobs.map((job) => (
         <TableRow key={job.id}>
-          <TableCell className="font-mono">{job.id}</TableCell>
+          <TableCell className="font-mono">
+            {job.id === undefined ? (
+              '-'
+            ) : (
+              <Link
+                href={`/jobs/${queue}/${job.id}`}
+                className="text-brand-400 underline-offset-4 hover:underline"
+              >
+                {job.id}
+              </Link>
+            )}
+          </TableCell>
           <TableCell>{job.name}</TableCell>
           <TableCell className="font-mono">{new Date(job.timestamp).toLocaleString()}</TableCell>
           <TableCell className="font-mono">{job.attemptsMade}</TableCell>
@@ -233,7 +250,7 @@ function JobsPanel({ name }: { name: string }) {
 
   const start = page * PAGE_SIZE
   const end = start + PAGE_SIZE - 1
-  const { data: jobs, isPending } = useQueueJobs(name, status, start, end)
+  const { data: jobs, isPending, error } = useQueueJobs(name, status, start, end)
 
   return (
     <>
@@ -247,7 +264,9 @@ function JobsPanel({ name }: { name: string }) {
 
       <Card className="mt-4">
         <CardContent className="p-0">
-          {isPending ? (
+          {error !== null ? (
+            <p className="p-6 text-sm text-red-400">Failed to load jobs: {error.message}</p>
+          ) : isPending ? (
             <Skeleton className="m-6 h-40 w-auto" />
           ) : (
             <Table>
@@ -260,7 +279,7 @@ function JobsPanel({ name }: { name: string }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <JobRows jobs={jobs ?? []} />
+                <JobRows queue={name} jobs={jobs} />
               </TableBody>
             </Table>
           )}

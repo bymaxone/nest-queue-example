@@ -7,6 +7,14 @@
  */
 import { HttpStatus } from '@nestjs/common'
 import { QUEUE_ERROR_CODES, QueueException } from '@bymax-one/nest-queue'
+import {
+  FULFILLMENT_QUEUE,
+  INVOICES_DATA_QUEUE,
+  PAYMENTS_QUEUE,
+  STOCK_QUEUE,
+} from '../flows/fulfillment.constants.js'
+import { MAINTENANCE_QUEUE, MONITORING_QUEUE } from '../schedulers/scheduler.constants.js'
+import { INVOICES_QUEUE } from '../workers/invoice.constants.js'
 
 /** The `email` queue carries receipt and welcome notification jobs. */
 export const EMAIL_QUEUE = 'email'
@@ -27,9 +35,11 @@ export const REPORTS_QUEUE = 'reports'
 export const DEMOS_QUEUE = 'demos'
 
 /**
- * Every queue name the example registers. The admin plane validates a requested
- * queue name against this set before touching Redis, surfacing
+ * Every queue name the example registers at boot. The admin plane validates a
+ * requested queue name against this set before touching Redis, surfacing
  * `queue.queue_not_found` for anything else instead of lazily creating it.
+ * Dynamic per-tenant queues (`notifications.<tenant>`) are intentionally
+ * excluded: they exist only while their worker is registered.
  */
 export const KNOWN_QUEUES = [
   EMAIL_QUEUE,
@@ -38,6 +48,13 @@ export const KNOWN_QUEUES = [
   WEBHOOKS_QUEUE,
   REPORTS_QUEUE,
   DEMOS_QUEUE,
+  MAINTENANCE_QUEUE,
+  MONITORING_QUEUE,
+  FULFILLMENT_QUEUE,
+  STOCK_QUEUE,
+  PAYMENTS_QUEUE,
+  INVOICES_DATA_QUEUE,
+  INVOICES_QUEUE,
 ] as const
 
 /** Union of the known queue names. */

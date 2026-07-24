@@ -9,13 +9,17 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { apiPost } from '@/lib/api-client'
+import { apiDelete, apiGet, apiPost } from '@/lib/api-client'
 import type {
   CampaignResult,
+  DedupKeyCleared,
+  DedupKeyView,
   DedupMode,
   OnboardingResult,
   PlacedOrder,
   ReindexResult,
+  ReportRequested,
+  StallRequested,
 } from '@/lib/api-types'
 
 /** Body accepted by `POST /orders`. */
@@ -25,10 +29,25 @@ export interface PlaceOrderInput {
   vip: boolean
 }
 
+/**
+ * Builds the dedup-inspector path for a reindex term. The key mirrors the
+ * api's `dedupId` (`reindex:<term>`); the colon is legal in a dedup key, so
+ * the whole key is URI-encoded into a single path segment.
+ *
+ * @param term - The search term whose dedup key is inspected.
+ * @returns The admin dedup path for the term's key.
+ */
+export function dedupKeyPath(term: string): string {
+  return `/admin/dedup/search/${encodeURIComponent(`reindex:${term}`)}`
+}
+
 /** Mutations backing the playground's demo-domain laboratories. */
 export function usePlayground() {
   const placeOrder = useMutation({
     mutationFn: (input: PlaceOrderInput) => apiPost<PlacedOrder>('/orders', input),
+  })
+  const remindOrder = useMutation({
+    mutationFn: (orderId: string) => apiPost<PlacedOrder>(`/orders/${orderId}/remind`),
   })
   const onboard = useMutation({
     mutationFn: (userId: string) => apiPost<OnboardingResult>(`/onboarding/${userId}`),
@@ -40,6 +59,28 @@ export function usePlayground() {
     mutationFn: (input: { term: string; mode: DedupMode }) =>
       apiPost<ReindexResult>('/search/reindex', input),
   })
+  const viewDedupKey = useMutation({
+    mutationFn: (term: string) => apiGet<DedupKeyView>(dedupKeyPath(term)),
+  })
+  const clearDedupKey = useMutation({
+    mutationFn: (term: string) => apiDelete<DedupKeyCleared>(dedupKeyPath(term)),
+  })
+  const generateReport = useMutation({
+    mutationFn: () => apiPost<ReportRequested>('/reports'),
+  })
+  const stallDemo = useMutation({
+    mutationFn: () => apiPost<StallRequested>('/demos/stall'),
+  })
 
-  return { placeOrder, onboard, sendCampaign, reindex }
+  return {
+    placeOrder,
+    remindOrder,
+    onboard,
+    sendCampaign,
+    reindex,
+    viewDedupKey,
+    clearDedupKey,
+    generateReport,
+    stallDemo,
+  }
 }
