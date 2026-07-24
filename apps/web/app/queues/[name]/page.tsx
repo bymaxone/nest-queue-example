@@ -169,14 +169,14 @@ function JobRows({ queue, jobs }: { queue: string; jobs: JobView[] }) {
   }
   return (
     <>
-      {jobs.map((job) => (
-        <TableRow key={job.id}>
+      {jobs.map((job, index) => (
+        <TableRow key={job.id ?? `missing-id-${String(index)}`}>
           <TableCell className="font-mono">
             {job.id === undefined ? (
               '-'
             ) : (
               <Link
-                href={`/jobs/${queue}/${job.id}`}
+                href={`/jobs/${queue}/${encodeURIComponent(job.id)}`}
                 className="text-brand-400 underline-offset-4 hover:underline"
               >
                 {job.id}

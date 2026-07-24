@@ -376,7 +376,7 @@ function ReportLab() {
           <p className="text-sm text-muted-foreground">
             Watch its progress on{' '}
             <Link
-              href={`/jobs/reports/${lastJobId}`}
+              href={`/jobs/reports/${encodeURIComponent(lastJobId)}`}
               className="text-brand-400 underline-offset-4 hover:underline"
             >
               the job page
@@ -422,7 +422,7 @@ function StallLab() {
           <p className="text-sm text-muted-foreground">
             Follow the recovery on{' '}
             <Link
-              href={`/jobs/demos/${lastJobId}`}
+              href={`/jobs/demos/${encodeURIComponent(lastJobId)}`}
               className="text-brand-400 underline-offset-4 hover:underline"
             >
               the job page

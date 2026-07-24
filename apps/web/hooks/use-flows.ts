@@ -58,7 +58,7 @@ export function useLaunchFlowBulk() {
 
 /**
  * Reads the in-memory execution trace so the child-before-parent ordering is
- * observable from the browser. Fetched on demand via `refetch`.
+ * observable from the browser. Fetched on mount and re-read via `refetch`.
  *
  * @returns The TanStack Query result carrying the trace entries.
  */
