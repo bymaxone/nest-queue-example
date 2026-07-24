@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { usePlayground } from './use-playground'
+import { dedupKeyPath, usePlayground } from './use-playground'
 
-vi.mock('@/lib/api-client', () => ({ apiPost: vi.fn() }))
-import { apiPost } from '@/lib/api-client'
+vi.mock('@/lib/api-client', () => ({ apiPost: vi.fn(), apiGet: vi.fn(), apiDelete: vi.fn() }))
+import { apiDelete, apiGet, apiPost } from '@/lib/api-client'
 
 function wrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -56,6 +56,60 @@ describe('usePlayground', () => {
       expect(result.current.sendCampaign.isSuccess).toBe(true)
     })
     expect(mockPost).toHaveBeenCalledWith('/campaigns/receipts', { count: 5 })
+  })
+
+  it('schedules a reminder against POST /orders/:id/remind', async () => {
+    // Scenario: the delayed-reminder action targets the placed order's id.
+    mockPost.mockResolvedValueOnce({ orderId: 'o1', jobId: 'remind-1' })
+    const { result } = renderHook(() => usePlayground(), { wrapper: wrapper() })
+    result.current.remindOrder.mutate('o1')
+    await waitFor(() => {
+      expect(result.current.remindOrder.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/orders/o1/remind')
+  })
+
+  it('requests a progress report against POST /reports', async () => {
+    // Scenario: the report lab enqueues the progress-reporting generate job.
+    mockPost.mockResolvedValueOnce({ reportId: 'rep-1', jobId: 'j9' })
+    const { result } = renderHook(() => usePlayground(), { wrapper: wrapper() })
+    result.current.generateReport.mutate()
+    await waitFor(() => {
+      expect(result.current.generateReport.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/reports')
+  })
+
+  it('enqueues the stall demo against POST /demos/stall', async () => {
+    // Scenario: the stalled-recovery lab enqueues the deliberately stalling job.
+    mockPost.mockResolvedValueOnce({ demoId: 'd1', jobId: 'j10' })
+    const { result } = renderHook(() => usePlayground(), { wrapper: wrapper() })
+    result.current.stallDemo.mutate()
+    await waitFor(() => {
+      expect(result.current.stallDemo.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/demos/stall')
+  })
+
+  it('inspects and clears a dedup key via the admin dedup surface', async () => {
+    // Scenario: both inspector actions target the URI-encoded reindex:<term>
+    // key on the search queue, mirroring the api's dedupId shape.
+    vi.mocked(apiGet).mockResolvedValueOnce({ jobId: 'j1' })
+    vi.mocked(apiDelete).mockResolvedValueOnce({ removed: true })
+    const { result } = renderHook(() => usePlayground(), { wrapper: wrapper() })
+    result.current.viewDedupKey.mutate('shoes')
+    result.current.clearDedupKey.mutate('shoes')
+    await waitFor(() => {
+      expect(result.current.viewDedupKey.isSuccess).toBe(true)
+      expect(result.current.clearDedupKey.isSuccess).toBe(true)
+    })
+    expect(apiGet).toHaveBeenCalledWith('/admin/dedup/search/reindex%3Ashoes')
+    expect(apiDelete).toHaveBeenCalledWith('/admin/dedup/search/reindex%3Ashoes')
+  })
+
+  it('URI-encodes the dedup key so the colon survives as one path segment', () => {
+    // Scenario: dedup keys legally contain colons; the path must encode them.
+    expect(dedupKeyPath('running shoes')).toBe('/admin/dedup/search/reindex%3Arunning%20shoes')
   })
 
   it('reindexes a term against POST /search/reindex with the chosen mode', async () => {

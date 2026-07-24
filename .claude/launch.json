@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@nest-queue-example/api", "run", "start:dev"],
+      "port": 3080
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@nest-queue-example/web", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

@@ -8,7 +8,13 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiGet, apiPost } from '@/lib/api-client'
-import type { FlowLaunched, FlowTreeNode, FulfillmentVariant } from '@/lib/api-types'
+import type {
+  FlowLaunched,
+  FlowsLaunched,
+  FlowTraceEntry,
+  FlowTreeNode,
+  FulfillmentVariant,
+} from '@/lib/api-types'
 
 /** Poll interval (ms) for the flow tree while any node is still in-flight. */
 const FLOW_TREE_POLL_INTERVAL_MS = 1_000
@@ -35,6 +41,31 @@ export function useLaunchFlow() {
   return useMutation({
     mutationFn: (input: { orderId: string; variant: FulfillmentVariant }) =>
       apiPost<FlowLaunched>('/flows/fulfillment', input),
+  })
+}
+
+/**
+ * Launches several fulfillment flows in one `addBulk` roundtrip.
+ *
+ * @returns The bulk-launch mutation.
+ */
+export function useLaunchFlowBulk() {
+  return useMutation({
+    mutationFn: (input: { orderIds: string[]; variant: FulfillmentVariant }) =>
+      apiPost<FlowsLaunched>('/flows/fulfillment/bulk', input),
+  })
+}
+
+/**
+ * Reads the in-memory execution trace so the child-before-parent ordering is
+ * observable from the browser. Fetched on mount and re-read via `refetch`.
+ *
+ * @returns The TanStack Query result carrying the trace entries.
+ */
+export function useFlowTrace() {
+  return useQuery({
+    queryKey: ['flows', 'trace'],
+    queryFn: () => apiGet<{ entries: FlowTraceEntry[] }>('/flows/trace'),
   })
 }
 

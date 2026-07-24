@@ -6,9 +6,10 @@
  */
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { QueueMetrics } from '@bymax-one/nest-queue/shared'
-import { apiGet } from '@/lib/api-client'
+import { apiGet, apiPost } from '@/lib/api-client'
+import type { InvalidateResult } from '@/lib/api-types'
 import { METRICS_POLL_INTERVAL_MS } from '@/lib/constants'
 
 /** Query key for the aggregate metrics read. */
@@ -24,5 +25,21 @@ export function useMetrics() {
     queryKey: METRICS_QUERY_KEY,
     queryFn: () => apiGet<QueueMetrics[]>('/admin/metrics'),
     refetchInterval: METRICS_POLL_INTERVAL_MS,
+  })
+}
+
+/**
+ * Forces the API's metrics cache to drop (whole cache, or one queue when a
+ * name is passed), then refetches the aggregate read so the UI shows the
+ * freshly collected counts.
+ *
+ * @returns The invalidate mutation.
+ */
+export function useInvalidateMetrics() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (queue?: string) =>
+      apiPost<InvalidateResult>('/admin/metrics/invalidate', queue === undefined ? {} : { queue }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: METRICS_QUERY_KEY }),
   })
 }

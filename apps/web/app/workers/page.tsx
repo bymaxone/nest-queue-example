@@ -27,6 +27,7 @@ import {
   useLagProbe,
   useRenderInvoice,
   useTenantActions,
+  useTenantDeliveries,
   useTenantWorkers,
 } from '@/hooks/use-workers'
 import type { TenantTier, TenantWorkerView } from '@/lib/api-types'
@@ -234,8 +235,30 @@ function TenantWorkersCard() {
           />
         </div>
         <TenantsTable message={message} />
+        <DeliveriesTrail />
       </CardContent>
     </Card>
+  )
+}
+
+/** The recorded notification deliveries, oldest first - proof a notify ran. */
+function DeliveriesTrail() {
+  const { data } = useTenantDeliveries()
+  if (data === undefined || data.deliveries.length === 0) return null
+  return (
+    <div>
+      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Deliveries
+      </p>
+      <ol className="space-y-1 font-mono text-xs text-white/70">
+        {data.deliveries.map((delivery, index) => (
+          <li key={`${delivery.tenantId}-${String(delivery.at)}-${String(index)}`}>
+            {new Date(delivery.at).toLocaleTimeString()} - {delivery.tenantId}:{' '}
+            {delivery.notification}
+          </li>
+        ))}
+      </ol>
+    </div>
   )
 }
 

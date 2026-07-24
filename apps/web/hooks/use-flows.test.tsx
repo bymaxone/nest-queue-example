@@ -7,7 +7,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useLaunchFlow, useFlowTree, isTreeFinal, treePath } from './use-flows'
+import {
+  useLaunchFlow,
+  useLaunchFlowBulk,
+  useFlowTrace,
+  useFlowTree,
+  isTreeFinal,
+  treePath,
+} from './use-flows'
 import type { FlowTreeNode } from '@/lib/api-types'
 
 vi.mock('@/lib/api-client', () => ({ apiGet: vi.fn(), apiPost: vi.fn() }))
@@ -99,6 +106,46 @@ describe('useLaunchFlow', () => {
       orderId: 'o1',
       variant: 'default',
     })
+  })
+})
+
+describe('useLaunchFlowBulk', () => {
+  const mockPost = vi.mocked(apiPost)
+  beforeEach(() => mockPost.mockReset())
+  afterEach(() => vi.clearAllMocks())
+
+  it('posts the order ids and variant to /flows/fulfillment/bulk', async () => {
+    // Scenario: the bulk launcher must send every order id in one addBulk call.
+    mockPost.mockResolvedValueOnce({
+      roots: [{ rootId: 'r1', orderId: 'o1' }],
+      variant: 'default',
+    })
+    const { result } = renderHook(() => useLaunchFlowBulk(), { wrapper: wrapper() })
+    result.current.mutate({ orderIds: ['o1', 'o2'], variant: 'default' })
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+    expect(mockPost).toHaveBeenCalledWith('/flows/fulfillment/bulk', {
+      orderIds: ['o1', 'o2'],
+      variant: 'default',
+    })
+  })
+})
+
+describe('useFlowTrace', () => {
+  const mockGet = vi.mocked(apiGet)
+  beforeEach(() => mockGet.mockReset())
+  afterEach(() => vi.clearAllMocks())
+
+  it('reads the execution trace from /flows/trace', async () => {
+    // Scenario: the trace card reads the recorded node executions on demand.
+    mockGet.mockResolvedValueOnce({ entries: [{ node: 'charge-payment', at: 1 }] })
+    const { result } = renderHook(() => useFlowTrace(), { wrapper: wrapper() })
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+    expect(mockGet).toHaveBeenCalledWith('/flows/trace')
+    expect(result.current.data).toEqual({ entries: [{ node: 'charge-payment', at: 1 }] })
   })
 })
 

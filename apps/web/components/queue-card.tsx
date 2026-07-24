@@ -50,11 +50,16 @@ export function QueueCard({ metrics }: QueueCardProps) {
           {isPaused ? <Badge variant="secondary">paused</Badge> : null}
         </CardHeader>
         <CardContent>
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-1.5">
             {ALL_JOB_STATUSES.map((status) => (
-              <div key={status} className="flex items-center justify-between gap-2">
+              <div
+                key={status}
+                className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-white/[0.04] px-2 py-1"
+              >
                 <JobStatusBadge status={status} />
-                <dd className="font-mono text-sm text-foreground">{metrics.counts[status]}</dd>
+                <dd className="font-mono text-sm font-semibold text-foreground">
+                  {metrics.counts[status]}
+                </dd>
               </div>
             ))}
           </dl>

@@ -38,3 +38,8 @@ reports/
 # import.meta.url, which ts-jest points at src/ instead of dist/); staged by
 # `pnpm --filter api test:e2e` right before the suite runs, never committed.
 apps/api/src/workers/invoice.sandboxed.js
+
+# Claude Code local state: settings.local.json is covered by *.local; the
+# worktrees dir holds machine-specific symlinks and must never be committed.
+# launch.json IS committed - it defines the shared preview servers.
+.claude/worktrees/
