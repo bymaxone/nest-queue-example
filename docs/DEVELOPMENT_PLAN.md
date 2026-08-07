@@ -12,7 +12,7 @@
 ## 1. Progress dashboard
 
 > **Progress:** 10 / 10 phases complete (100%) · 53 / 53 tasks
-> **Active phase:** none — all phases merged
+> **Active phase:** none; all phases merged
 > **Blockers:** none
 > **Final state:** all implementation is complete; only the two externally-gated actions in [`RELEASE_CHECKLISTS.md`](./RELEASE_CHECKLISTS.md) (the npm dependency flip and the public-visibility flip) remain.
 
@@ -71,7 +71,7 @@ Reading: the backend feature phases (P3 to P6) are strictly sequential, each bui
 ### P0: repo-foundation (M)
 
 - **Goal:** a green, governed, empty workspace: tooling, Redis infra, and CI gating the very first PR.
-- **Scope (in):** pnpm workspace root (`private: true`, engines Node >= 24), base `tsconfig`, ESLint flat config + Prettier, husky + commitlint + lint-staged + `.gitmessage`, `docker-compose.yml` (redis:7-alpine + healthcheck), `.npmrc` (engine-strict), README skeleton, `.github/`: `ci.yml` (install, lint, typecheck, build, unit placeholder), `codeql.yml` + `scorecard.yml` **conditional on the repo being public** (`if: ${{ !github.event.repository.private }}`), dependabot.
+- **Scope (in):** pnpm workspace root (`private: true`, engines Node >= 24), base `tsconfig`, ESLint flat config + Prettier, husky + commitlint + lint-staged + `.gitmessage`, `docker-compose.yml` (redis:7-alpine + healthcheck), `.npmrc` (engine-strict), README skeleton, `.github/`: `ci.yml` (install, lint, typecheck, build, unit placeholder), `codeql.yml` + `scorecard.yml` **conditional on the repo being public**; CodeQL by calling the org's reusable analysis, Scorecard by `if: ${{ !github.event.repository.private }}` ; dependabot.
 - **Scope (out):** any application code; the Copilot review files (P9 tailors them to the final stack).
 - **Definition of Done:**
   - `pnpm install && pnpm lint && pnpm typecheck` green on a clean clone.
