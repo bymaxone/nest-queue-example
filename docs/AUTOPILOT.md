@@ -74,8 +74,16 @@ CI job names become contractual once branch protection references them
 container — is added when the first e2e lands and runs sequentially after unit).
 
 **Expected-skip CI checks**: `codeql.yml` and `scorecard.yml` are committed from
-P0 but guarded with `if: ${{ !github.event.repository.private }}`; while the repo
-is **private** they report as **skipped** and count as pass — never as failures.
+P0 and stay inert while the repo is **private**, but they gate differently and so
+report differently:
+
+- `codeql.yml` calls the org's reusable analysis. Its `codeql / Repository visibility`
+  job **runs and passes** on every trigger; only `codeql / Analyze (<language>)` skips
+  while the repo is private. Expect one green check and one skipped, not two skipped.
+- `scorecard.yml` gates on `if: ${{ !github.event.repository.private }}` and reports as
+  skipped.
+
+A skipped job counts as pass — never as a failure.
 
 ## Invariant greps
 
