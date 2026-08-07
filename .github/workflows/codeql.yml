@@ -1,4 +1,4 @@
-# CodeQL — thin caller of the org-wide reusable analysis (bymaxone/.github).
+# CodeQL; thin caller of the org-wide reusable analysis (bymaxone/.github).
 #
 # The whole definition, including the public-repository gate that decides
 # whether scanning may run at all, lives in bymaxone/.github so the licensing
@@ -11,6 +11,12 @@ on:
   pull_request:
   schedule:
     - cron: '0 3 * * 0'
+
+# Workflow-level floor, matching every other workflow here. The calling job
+# below declares its own set, which replaces this one rather than being capped
+# by it.
+permissions:
+  contents: read
 
 jobs:
   # Job id is the convention across the org: it prefixes the reported check,
