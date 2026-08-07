@@ -23,10 +23,10 @@
 
 ## External preconditions
 
-| Applies to                          | Check (exit 0 = OK)                                                                                 | On failure                                                                                                                                                    |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| launch                              | `docker info`                                                                                       | STOP; operator starts Docker (Redis via `docker compose` is needed for `start:dev` smoke, demo scripts, and e2e)                                             |
-| phases 1+                           | `test -d ../nest-queue/dist` (sibling `@bymax-one/nest-queue` checked out and built at repo-parent) | mark phase ⛔ blocked on the missing/unbuilt sibling; operator runs `pnpm --dir ../nest-queue build`, STOP                                                    |
+| Applies to                         | Check (exit 0 = OK)                                                                                 | On failure                                                                                                                                                   |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| launch                             | `docker info`                                                                                       | STOP; operator starts Docker (Redis via `docker compose` is needed for `start:dev` smoke, demo scripts, and e2e)                                             |
+| phases 1+                          | `test -d ../nest-queue/dist` (sibling `@bymax-one/nest-queue` checked out and built at repo-parent) | mark phase ⛔ blocked on the missing/unbuilt sibling; operator runs `pnpm --dir ../nest-queue build`, STOP                                                   |
 | phase 9; dependency-flip step ONLY | `npm view @bymax-one/nest-queue version`                                                            | do NOT block the phase; the file→`^0.1.0` flip is a documented deferred checklist item; run the rest of P9 and record the flip as deferred-until-publication |
 
 **Note:** as of this config the sibling builds (`../nest-queue/dist` present) but
@@ -35,18 +35,18 @@ ships as a follow-up PR when the library publishes.
 
 ## Model policy
 
-| Phase | Model   | Rationale                                                                                                                                |
-| ----- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 0     | sonnet  | mechanical scaffold on a fully specified checklist (tooling, ESLint/Prettier, husky, compose, CI YAML)                                   |
+| Phase | Model   | Rationale                                                                                                                               |
+| ----- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 0     | sonnet  | mechanical scaffold on a fully specified checklist (tooling, ESLint/Prettier, husky, compose, CI YAML)                                  |
 | 1     | inherit | first contact with the consumed library; subpath resolution + peer wiring; invented APIs / wrong export shapes are the failure mode     |
 | 2     | inherit | first real library runtime wiring (`forRootAsync`, `buildQueueOptions` factory, Mode B url default); config-factory correctness matters |
 | 3     | inherit | broad producer API surface (typed enqueue, 4 dedup modes, bulk limits, admin inspection/control); high invented-API risk                |
 | 4     | inherit | consumer API surface (worker knobs, both event decorators, progress, retries, stalls, SSE); subtle contract semantics                   |
-| 5     | inherit | most complex library surface (flows, failure-propagation variants, schedulers, dynamic `WorkerRegistry`, sandboxed processor)            |
+| 5     | inherit | most complex library surface (flows, failure-propagation variants, schedulers, dynamic `WorkerRegistry`, sandboxed processor)           |
 | 6     | inherit | error catalog fidelity, connection modes (A/B/shared), telemetry; precision-sensitive and touches env/connection handling               |
 | 7     | sonnet  | UI pages on an established API and the verbatim shared design system; mechanical dashboard work                                         |
 | 8     | sonnet  | test authoring against already-built code to 100% coverage + e2e; demanding but mechanical, no new API discovery                        |
-| 9     | inherit | final hardening/audit: governance files, mutation gate, full §7 matrix audit, security/public-grade review                               |
+| 9     | inherit | final hardening/audit: governance files, mutation gate, full §7 matrix audit, security/public-grade review                              |
 
 Fix sub-agents escalate to `inherit` (strong tier) whenever a phase stalls on
 review/CI findings, regardless of the phase's base model.
@@ -57,17 +57,17 @@ against real Redis + 100% coverage runs) and **P9** (Stryker mutation testing,
 
 ## Gates
 
-| Gate (local command)                                                                            | Active from                       |
-| ----------------------------------------------------------------------------------------------- | --------------------------------- |
-| `pnpm typecheck` (zero errors, both apps)                                                       | phase 0                           |
-| `pnpm lint` (zero warnings; no `eslint-disable`, no `@ts-ignore`)                               | phase 0                           |
-| `pnpm build`                                                                                    | phase 0                           |
-| `pnpm --filter api test` (unit; `maxWorkers: '50%'`, thresholds on implemented files)           | phase 2                           |
-| `pnpm --filter web test` (unit)                                                                 | phase 7                           |
+| Gate (local command)                                                                           | Active from                       |
+| ---------------------------------------------------------------------------------------------- | --------------------------------- |
+| `pnpm typecheck` (zero errors, both apps)                                                      | phase 0                           |
+| `pnpm lint` (zero warnings; no `eslint-disable`, no `@ts-ignore`)                              | phase 0                           |
+| `pnpm build`                                                                                   | phase 0                           |
+| `pnpm --filter api test` (unit; `maxWorkers: '50%'`, thresholds on implemented files)          | phase 2                           |
+| `pnpm --filter web test` (unit)                                                                | phase 7                           |
 | Bundle sanity; `./shared`-only proof: no `bullmq`/`ioredis`/`@nestjs` in the web client bundle | phase 7                           |
 | `pnpm test:cov` (100% line/branch/function/statement, both apps; hard `coverageThreshold`)     | phase 8                           |
-| `pnpm test:e2e` (every documented flow vs real Redis; sequential after unit; needs Docker)      | phase 8                           |
-| Stryker mutation (`break 95, high 99, low 95`) on `apps/api`                                    | phase 9 (pre-release, not per-PR) |
+| `pnpm test:e2e` (every documented flow vs real Redis; sequential after unit; needs Docker)     | phase 8                           |
+| Stryker mutation (`break 95, high 99, low 95`) on `apps/api`                                   | phase 9 (pre-release, not per-PR) |
 
 CI job names become contractual once branch protection references them
 (`ci.yml`: install, lint, typecheck, build, unit; the e2e job; `redis:7` service
