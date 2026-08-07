@@ -478,7 +478,7 @@ Mirrors the sibling examples:
 ## 16. CI and Repository Governance
 
 - **`ci.yml` exists from the first PR** (phase 00): install, lint, typecheck, build, unit; the e2e job (Redis `redis:7` service container) is added when the first e2e lands and runs sequentially after unit. Job names are contractual once branch protection references them.
-- **Public-only features ship conditionally.** `codeql.yml` and `scorecard.yml` are committed from phase 00 and are inert while the repo is private, activating on the visibility flip with zero workflow edits. CodeQL calls the org's reusable analysis, which resolves visibility through the API so the gate holds on `schedule` as well; Scorecard guards with `if: ${{ !github.event.repository.private }}`.
+- **Public-only features ship conditionally.** `codeql.yml` and `scorecard.yml` are committed from phase 00 and are inert while the repo is private, activating on the visibility flip with zero workflow edits. CodeQL calls the org's reusable analysis, which resolves visibility through the API, so the answer is the same on every trigger; Scorecard guards with `if: ${{ !github.event.repository.private }}`.
 - **Governance files:** husky + commitlint + lint-staged, `.gitmessage`, dependabot, and the four Copilot review files customized to this stack (each instruction file < 4000 chars except the `.agent.md`).
 - **Every phase is one PR** on a `feat/phase-NN-<slug>` branch, opened with `gh pr create`, reviewed by the GitHub Copilot code reviewer (all findings addressed), merged squash with CI green, branch deleted.
 - **No AI attribution anywhere**: commits, PR titles, PR bodies, and comments never carry `Co-Authored-By`, "Generated with", or similar lines.

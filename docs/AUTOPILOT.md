@@ -74,7 +74,7 @@ CI job names become contractual once branch protection references them
 container; is added when the first e2e lands and runs sequentially after unit).
 
 **Expected-skip CI checks**: `codeql.yml` and `scorecard.yml` are committed from
-P0 and stay inert while the repo is **private**, but they gate differently and so
+P0 and produce no findings while the repo is **private**. They gate differently, and so
 report differently:
 
 - `codeql.yml` calls the org's reusable analysis. Its `codeql / Repository visibility`
