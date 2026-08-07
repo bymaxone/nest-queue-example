@@ -65,7 +65,7 @@ Verification:
 ## 2. Public flip (private to public)
 
 The repository is written public-grade from day one. CodeQL and OpenSSF Scorecard ship from the first PR
-and stay inert while the repository is private — CodeQL through the visibility job of the org's reusable
+and stay inert while the repository is private; CodeQL through the visibility job of the org's reusable
 analysis, Scorecard through `if: ${{ !github.event.repository.private }}`. Both activate automatically on
 the flip, with zero workflow edits.
 
